@@ -1,6 +1,6 @@
 import readline from 'readline'
 import { Readable } from 'stream'
-import { Component } from '.'
+import { Calendar, CalendarEvent, Component } from '.'
 
 export class DeserializationError extends Error {
     name = 'DeserializationError'
@@ -138,4 +138,28 @@ export async function deserializeString(text: string): Promise<Component> {
     const stream = Readable.from(text)
     const lines = readline.createInterface({ input: stream, crlfDelay: Infinity })
     return deserialize(lines)
+}
+
+/**
+ * Parse a calendar in ICalendar format
+ * @param text the serialized calendar
+ * @returns the parsed calendar
+ */
+export async function parseCalendar(text: string): Promise<Calendar> {
+    const component = await deserializeString(text)
+    if (component.name !== "VCALENDAR")
+        throw new DeserializationError("Not a calendar")
+    return new Calendar(component)
+}
+
+/**
+ * Parse an event in ICalendar format
+ * @param text the serialized event
+ * @returns the parsed event
+ */
+export async function parseEvent(text: string): Promise<CalendarEvent> {
+    const component = await deserializeString(text)
+    if (component.name !== "VEVENT")
+        throw new DeserializationError("Not an event")
+    return new CalendarEvent(component)
 }
