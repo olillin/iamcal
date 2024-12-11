@@ -1,17 +1,17 @@
 {
   "name": "iamcal",
   "version": "1.0.0",
-  "description": "Read and write .ical calendars",
-  "main": "dist/main.js",
-  "exports": [
-    "./dist/main.js",
-    "./dist/calendar.js",
-    "./dist/parse.js"
+  "description": "Read and write ICalendar files",
+  "files": [
+    "/lib"
   ],
-  "types": "./dist/*.d.ts",
+  "exports": {
+    ".": "./lib/index.js",
+    "./parse": "./lib/parse.js",
+    "./io": "./lib/io.js"
+  },
   "scripts": {
     "build": "tsc",
-    "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -29,7 +29,6 @@
   },
   "homepage": "https://github.com/olillin/iamcal#readme",
   "dependencies": {
-    "iamcal": "file:",
     "typescript": "^5.7.2"
   },
   "devDependencies": {
