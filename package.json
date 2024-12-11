@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "description": "Read and write .ical calendars",
   "main": "dist/main.js",
+  "exports": [
+    "./dist/main.js",
+    "./dist/calendar.js",
+    "./dist/parse.js"
+  ],
+  "types": "./dist/*.d.ts",
   "scripts": {
     "build": "tsc",
     "start": "node .",
@@ -24,7 +30,6 @@
   "homepage": "https://github.com/olillin/iamcal#readme",
   "dependencies": {
     "iamcal": "file:",
-    "ical2json": "^4.1.0",
     "typescript": "^5.7.2"
   },
   "devDependencies": {
