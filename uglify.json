@@ -1,0 +1,10 @@
+{
+  "compress": true,
+  "mangle": true,
+  "sourceMap": {
+    "content": "inline"
+  },
+  "format": {
+    "comments": true
+  }
+}

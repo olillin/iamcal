@@ -1,9 +1,10 @@
 {
   "name": "iamcal",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Read and write ICalendar files",
   "files": [
-    "/lib"
+    "/lib",
+    "/src"
   ],
   "exports": {
     ".": "./lib/index.js",
@@ -11,7 +12,8 @@
     "./io": "./lib/io.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf lib && tsc && npm run minify",
+    "minify": "uglifyjs-folder lib -eo lib -x .js --config-file './uglify.json'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -33,6 +35,8 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
-    "tsc": "^2.0.4"
+    "rimraf": "^6.0.1",
+    "tsc": "^2.0.4",
+    "uglifyjs-folder": "^3.3.0"
   }
 }
