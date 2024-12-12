@@ -2,6 +2,7 @@ import fs from 'fs'
 import readline from 'readline'
 import { Calendar } from '.'
 import { deserialize } from './parse'
+import { resolve } from 'path'
 
 /**
  * Read a calendar from a .ical file
@@ -27,6 +28,10 @@ export async function load(path: fs.PathLike): Promise<Calendar> {
  * @param calendar The calendar
  * @param path Path to the file to write
  */
-export function dump(calendar: Calendar, path: string) {
-    fs.writeFileSync(path, calendar.serialize())
+export function dump(calendar: Calendar, path: string): Promise<void> {
+    return new Promise(resolve => {
+        fs.writeFile(path, calendar.serialize(), () => {
+            resolve()
+        })
+    })
 }
