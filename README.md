@@ -1,4 +1,4 @@
-# iamcal
+# iamcal [![build status](https://img.shields.io/github/actions/workflow/status/olillin/iamcal/npm-test.yml?style=flat-square)](https://github.com/olillin/iamcal/actions/workflows/npm-test.yml) [![npm badge](<https://img.shields.io/npm/v/iamcal?style=flat-square&color=red>)](https://www.npmjs.com/package/iamcal)
 
 A library for reading, modifying and writing [ICalendar](https://en.wikipedia.org/wiki/ICalendar) files.
 
