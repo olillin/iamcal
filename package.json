@@ -30,12 +30,10 @@
     "url": "https://github.com/olillin/iamcal/issues"
   },
   "homepage": "https://github.com/olillin/iamcal#readme",
-  "dependencies": {
-    "typescript": "^5.7.2"
-  },
   "devDependencies": {
     "@types/node": "^22.10.1",
     "rimraf": "^6.0.1",
+    "typescript": "^5.7.2",
     "uglifyjs-folder": "^3.3.0"
   }
 }
