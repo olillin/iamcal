@@ -12,8 +12,7 @@
     "./io": "./lib/io.js"
   },
   "scripts": {
-    "build": "rimraf lib && tsc && npm run minify",
-    "minify": "uglifyjs-folder lib -eo lib -x .js --config-file './uglify.json'",
+    "build": "rimraf lib && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -33,7 +32,6 @@
   "devDependencies": {
     "@types/node": "^22.10.1",
     "rimraf": "^6.0.1",
-    "typescript": "^5.7.2",
-    "uglifyjs-folder": "^3.3.0"
+    "typescript": "^5.7.2"
   }
 }
