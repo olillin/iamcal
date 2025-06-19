@@ -10,9 +10,11 @@ A library for reading, modifying and writing [ICalendar](https://en.wikipedia.or
 npm install iamcal
 ```
 
-## Getting started/Example
+## Getting started
 
-This code;
+### Parsing and editing a calendar
+
+This code:
 
 ```typescript
 import { Calendar } from 'iamcal'
@@ -59,3 +61,5 @@ DTEND:20241211T230000Z
 END:VEVENT
 END:VCALENDAR
 ```
+
+### Creating a new calendar
