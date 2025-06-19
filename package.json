@@ -7,10 +7,21 @@
     "/src"
   ],
   "exports": {
-    ".": "./lib/index.js",
-    "./parse": "./lib/parse.js",
-    "./io": "./lib/io.js"
+    ".": {
+      "default": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    },
+    "./parse": {
+      "default": "./lib/parse.js",
+      "types": "./lib/parse.d.ts"
+    },
+    "./io": {
+      "default": "./lib/io.js",
+      "types": "./lib/io.d.ts"
+    }
   },
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
     "build": "rimraf lib && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
