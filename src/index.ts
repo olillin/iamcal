@@ -1,3 +1,4 @@
+import { parseDate, toDateString, toDateTimeString } from './parse'
 import { Property } from './types'
 
 // Max line length as defined by RFC 5545 3.1.
@@ -278,7 +279,7 @@ export class TimeZone extends Component {
     lastMod(): Date | undefined {
         const text = this.getProperty('LAST-MOD')
         if (!text) return
-        return new Date(text.value)
+        return parseDate(text)
     }
 
     setLastMod(value: Date) {
@@ -347,7 +348,7 @@ class TimeZoneOffset extends Component {
             const offsetFrom = c as Offset
             const offsetTo = d as Offset
             component = new Component(name)
-            component.setProperty('DTSTART', start.toISOString())
+            component.setProperty('DTSTART', toDateTimeString(start))
             component.setProperty('TZOFFSETFROM', offsetFrom)
             component.setProperty('TZOFFSETTO', offsetTo)
         }
@@ -355,11 +356,16 @@ class TimeZoneOffset extends Component {
     }
 
     start(): Date {
-        return new Date(this.getProperty('DTSTART')!.value)
+        return parseDate(this.getProperty('DTSTART')!)
     }
 
-    setStart(value: Date) {
-        this.setProperty('DTSTART', value.toISOString())
+    setStart(value: Date, fullDay: boolean = false) {
+        if (fullDay) {
+            this.setProperty('DTSTART', toDateString(value))
+            this.setPropertyParams('DTSTART', ['VALUE=DATE'])
+        } else {
+            this.setProperty('DTSTART', toDateTimeString(value))
+        }
     }
 
     offsetFrom(): Offset {
@@ -423,11 +429,16 @@ export class CalendarEvent extends Component {
     }
 
     stamp(): Date {
-        return new Date(this.getProperty('DTSTAMP')!.value)
+        return parseDate(this.getProperty('DTSTAMP')!)
     }
 
-    setStamp(value: Date) {
-        this.setProperty('DTSTAMP', value.toISOString())
+    setStamp(value: Date, fullDay: boolean = false) {
+        if (fullDay) {
+            this.setProperty('DTSTAMP', toDateString(value))
+            this.setPropertyParams('DTSTAMP', ['VALUE=DATE'])
+        } else {
+            this.setProperty('DTSTAMP', toDateTimeString(value))
+        }
     }
 
     uid(): string {
@@ -475,11 +486,16 @@ export class CalendarEvent extends Component {
     }
 
     start(): Date {
-        return new Date(this.getProperty('DTSTART')!.value)
+        return parseDate(this.getProperty('DTSTART')!)
     }
 
-    setStart(value: Date) {
-        this.setProperty('DTSTART', value.toISOString())
+    setStart(value: Date, fullDay: boolean = false) {
+        if (fullDay) {
+            this.setProperty('DTSTART', toDateString(value))
+            this.setPropertyParams('DTSTART', ['VALUE=DATE'])
+        } else {
+            this.setProperty('DTSTART', toDateTimeString(value))
+        }
     }
 
     removeStart() {
@@ -487,11 +503,16 @@ export class CalendarEvent extends Component {
     }
 
     end(): Date {
-        return new Date(this.getProperty('DTEND')!.value)
+        return parseDate(this.getProperty('DTEND')!)
     }
 
-    setEnd(value: Date) {
-        this.setProperty('DTEND', value.toISOString())
+    setEnd(value: Date, fullDay: boolean = false) {
+        if (fullDay) {
+            this.setProperty('DTEND', toDateString(value))
+            this.setPropertyParams('DTEND', ['VALUE=DATE'])
+        } else {
+            this.setProperty('DTEND', toDateTimeString(value))
+        }
     }
 
     removeEnd() {
@@ -499,13 +520,13 @@ export class CalendarEvent extends Component {
     }
 
     created(): Date | undefined {
-        const text = this.getProperty('CREATED')?.value
-        if (!text) return
-        return new Date(text)
+        const property = this.getProperty('CREATED')
+        if (!property) return
+        return parseDate(property)
     }
 
     setCreated(value: Date) {
-        this.setProperty('CREATED', value.toISOString())
+        this.setProperty('CREATED', toDateTimeString(value))
     }
 
     removeCreated() {
