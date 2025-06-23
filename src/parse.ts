@@ -1,6 +1,7 @@
 import readline from 'readline'
 import { Readable } from 'stream'
-import { Calendar, CalendarEvent, Component } from '.'
+import { Calendar, Component } from '.'
+import { CalendarEvent } from './events'
 
 export class DeserializationError extends Error {
     name = 'DeserializationError'
