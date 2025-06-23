@@ -146,4 +146,12 @@ export class CalendarEventCollection extends Array<CalendarEvent> {
     findByUid(uid: string): CalendarEvent | undefined {
         return this.find(event => event.uid() === uid)
     }
+
+    filterStartingAfter(date: Date, inclusive: boolean = true): CalendarEventCollection {
+        return new CalendarEventCollection(
+            this.filter(event =>
+                event.start() > date
+                || (inclusive && event.start().getTime() === date.getTime()))
+        )
+    }
 }
