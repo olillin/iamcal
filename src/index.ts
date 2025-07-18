@@ -63,11 +63,11 @@ export class Component {
         return null
     }
 
-    setProperty(name: string, value: string) {
+    setProperty(name: string, value: string): this {
         for (const property of this.properties) {
             if (property.name === name) {
                 property.value = value
-                return
+                return this
             }
         }
         this.properties.push({
@@ -75,11 +75,12 @@ export class Component {
             params: [],
             value: value,
         })
+        return this
     }
 
     removePropertiesWithName(name: string) {
         const index = this.properties.findIndex(p => p.name === name)
-        if (index === -1) return
+        if (index === -1) return this
         // Remove property at index
         this.properties.splice(index, 1)
     }
@@ -93,18 +94,24 @@ export class Component {
         return null
     }
 
-    setPropertyParams(name: string, params: string[]) {
+    setPropertyParams(name: string, params: string[]): this {
         for (const property of this.properties) {
             if (property.name === name) {
                 property.params = params
             }
         }
+        return this
     }
 
-    addComponent(component: Component) {
+    addComponent(component: Component): this {
         this.components.push(component)
+        return this
     }
 
+    /**
+     * Remove a component from this component
+     * @returns `true` if the component was removed. `false` if the component was not present
+     */
     removeComponent(component: Component): boolean {
         const index = this.components.indexOf(component)
         if (index === -1) return false
@@ -189,24 +196,24 @@ export class Calendar extends Component {
         return this.getProperty('PRODID')!.value
     }
 
-    setProdId(value: string) {
-        this.setProperty('PRODID', value)
+    setProdId(value: string): this {
+        return this.setProperty('PRODID', value)
     }
 
     version(): string {
         return this.getProperty('VERSION')!.value
     }
 
-    setVersion(value: string) {
-        this.setProperty('VERSION', value)
+    setVersion(value: string): this {
+        return this.setProperty('VERSION', value)
     }
 
     calScale(): string | undefined {
         return this.getProperty('CALSCALE')?.value
     }
 
-    setCalScale(value: string) {
-        this.setProperty('CALSCALE', value)
+    setCalScale(value: string): this {
+        return this.setProperty('CALSCALE', value)
     }
 
     removeCalScale() {
@@ -241,8 +248,8 @@ export class Calendar extends Component {
         return this.getProperty('X-WR-CALDESC')?.value
     }
 
-    setCalendarDescription(value: string) {
-        this.setProperty('X-WR-CALDESC', value)
+    setCalendarDescription(value: string): this {
+        return this.setProperty('X-WR-CALDESC', value)
     }
 
     removeCalendarDescription() {
@@ -272,8 +279,8 @@ export class TimeZone extends Component {
         return this.getProperty('TZID')!.value
     }
 
-    setId(value: string) {
-        this.setProperty('TZID', value)
+    setId(value: string): this {
+        return this.setProperty('TZID', value)
     }
 
     lastMod(): Date | undefined {
@@ -282,8 +289,8 @@ export class TimeZone extends Component {
         return parseDate(text)
     }
 
-    setLastMod(value: Date) {
-        this.setProperty('LAST-MOD', value.toISOString())
+    setLastMod(value: Date): this {
+        return this.setProperty('LAST-MOD', value.toISOString())
     }
 
     removeLastMod() {
@@ -294,8 +301,8 @@ export class TimeZone extends Component {
         return this.getProperty('TZURL')?.value
     }
 
-    setUrl(value: string) {
-        this.setProperty('TZURL', value)
+    setUrl(value: string): this {
+        return this.setProperty('TZURL', value)
     }
 
     removeUrl() {
@@ -359,37 +366,38 @@ class TimeZoneOffset extends Component {
         return parseDate(this.getProperty('DTSTART')!)
     }
 
-    setStart(value: Date, fullDay: boolean = false) {
+    setStart(value: Date, fullDay: boolean = false): this {
         if (fullDay) {
             this.setProperty('DTSTART', toDateString(value))
             this.setPropertyParams('DTSTART', ['VALUE=DATE'])
         } else {
             this.setProperty('DTSTART', toDateTimeString(value))
         }
+        return this
     }
 
     offsetFrom(): Offset {
         return this.getProperty('TZOFFSETFROM')!.value as Offset
     }
 
-    setOffsetFrom(value: Offset) {
-        this.setProperty('TZOFFSETFROM', value)
+    setOffsetFrom(value: Offset): this {
+        return this.setProperty('TZOFFSETFROM', value)
     }
 
     offsetTo(): Offset {
         return this.getProperty('TZOFFSETTO')!.value as Offset
     }
 
-    setOffsetTo(value: Offset) {
-        this.setProperty('TZOFFSETTO', value)
+    setOffsetTo(value: Offset): this {
+        return this.setProperty('TZOFFSETTO', value)
     }
 
     comment(): string | undefined {
         return this.getProperty('COMMENT')?.value
     }
 
-    setComment(value: string) {
-        this.setProperty('COMMENT', value)
+    setComment(value: string): this {
+        return this.setProperty('COMMENT', value)
     }
 
     removeComment() {
@@ -400,8 +408,8 @@ class TimeZoneOffset extends Component {
         return this.getProperty('TZNAME')?.value
     }
 
-    setTimeZoneName(value: string) {
-        this.setProperty('TZNAME', value)
+    setTimeZoneName(value: string): this {
+        return this.setProperty('TZNAME', value)
     }
 
     removeTimeZoneName() {
@@ -432,29 +440,30 @@ export class CalendarEvent extends Component {
         return parseDate(this.getProperty('DTSTAMP')!)
     }
 
-    setStamp(value: Date, fullDay: boolean = false) {
+    setStamp(value: Date, fullDay: boolean = false): this {
         if (fullDay) {
             this.setProperty('DTSTAMP', toDateString(value))
             this.setPropertyParams('DTSTAMP', ['VALUE=DATE'])
         } else {
             this.setProperty('DTSTAMP', toDateTimeString(value))
         }
+        return this
     }
 
     uid(): string {
         return this.getProperty('UID')!.value
     }
 
-    setUid(value: string) {
-        this.setProperty('UID', value)
+    setUid(value: string): this {
+        return this.setProperty('UID', value)
     }
 
     summary(): string {
         return this.getProperty('SUMMARY')!.value
     }
 
-    setSummary(value: string) {
-        this.setProperty('SUMMARY', value)
+    setSummary(value: string): this {
+        return this.setProperty('SUMMARY', value)
     }
 
     removeSummary() {
@@ -465,8 +474,8 @@ export class CalendarEvent extends Component {
         return this.getProperty('DESCRIPTION')!.value
     }
 
-    setDescription(value: string) {
-        this.setProperty('DESCRIPTION', value)
+    setDescription(value: string): this {
+        return this.setProperty('DESCRIPTION', value)
     }
 
     removeDescription() {
@@ -477,8 +486,8 @@ export class CalendarEvent extends Component {
         return this.getProperty('LOCATION')?.value
     }
 
-    setLocation(value: string) {
-        this.setProperty('LOCATION', value)
+    setLocation(value: string): this {
+        return this.setProperty('LOCATION', value)
     }
 
     removeLocation() {
@@ -493,13 +502,14 @@ export class CalendarEvent extends Component {
         return parseDate(this.getProperty('DTSTART')!)
     }
 
-    setStart(value: Date, fullDay: boolean = false) {
+    setStart(value: Date, fullDay: boolean = false): this {
         if (fullDay) {
             this.setProperty('DTSTART', toDateString(value))
             this.setPropertyParams('DTSTART', ['VALUE=DATE'])
         } else {
             this.setProperty('DTSTART', toDateTimeString(value))
         }
+        return this
     }
 
     removeStart() {
@@ -521,13 +531,14 @@ export class CalendarEvent extends Component {
         }
     }
 
-    setEnd(value: Date, fullDay: boolean = false) {
+    setEnd(value: Date, fullDay: boolean = false): this {
         if (fullDay) {
             this.setProperty('DTEND', toDateString(value))
             this.setPropertyParams('DTEND', ['VALUE=DATE'])
         } else {
             this.setProperty('DTEND', toDateTimeString(value))
         }
+        return this
     }
 
     removeEnd() {
@@ -540,8 +551,8 @@ export class CalendarEvent extends Component {
         return parseDate(property)
     }
 
-    setCreated(value: Date) {
-        this.setProperty('CREATED', toDateTimeString(value))
+    setCreated(value: Date): this {
+        return this.setProperty('CREATED', toDateTimeString(value))
     }
 
     removeCreated() {
@@ -557,7 +568,12 @@ export class CalendarEvent extends Component {
         return [parseFloat(longitude), parseFloat(latitude)]
     }
 
-    setGeo(latitude: number, longitude: number) {
+    setGeo(latitude: number, longitude: number): this {
         const text = `${latitude},${longitude}`
+        return this
+    }
+
+    removeGeo() {
+        this.removePropertiesWithName('GEO')
     }
 }
