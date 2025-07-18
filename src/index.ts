@@ -421,7 +421,7 @@ export class CalendarEvent extends Component {
             const dtstamp = b as Date
             component = new Component('VEVENT')
             component.setProperty('UID', uid)
-            component.setProperty('DTSTAMP', dtstamp.toISOString())
+            component.setProperty('DTSTAMP', toDateTimeString(dtstamp))
         } else {
             component = a as Component
         }
@@ -485,6 +485,10 @@ export class CalendarEvent extends Component {
         this.removePropertiesWithName('LOCATION')
     }
 
+    /**
+     * Get the start of the event.
+     * If set as a full day the time will be at the start of the day.
+     */
     start(): Date {
         return parseDate(this.getProperty('DTSTART')!)
     }
@@ -502,8 +506,19 @@ export class CalendarEvent extends Component {
         this.removePropertiesWithName('DTSTART')
     }
 
+    /**
+     * Get the end of the event.
+     * If set as a full day the time will be at the end of the day.
+     */
     end(): Date {
-        return parseDate(this.getProperty('DTEND')!)
+        const endDate = parseDate(this.getProperty('DTEND')!)
+        if (this.getPropertyParams('DTEND')?.includes('VALUE=DATE')) {
+            const ONE_DAY = 24 * 60 * 60 * 1000
+            const endTime = new Date(endDate.getTime() + ONE_DAY)
+            return endTime
+        } else {
+            return endDate
+        }
     }
 
     setEnd(value: Date, fullDay: boolean = false) {
