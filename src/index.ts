@@ -502,6 +502,7 @@ export class CalendarEvent extends Component {
         return parseDate(this.getProperty('DTSTART')!)
     }
 
+    /** Set the start of the event. */
     setStart(value: Date, fullDay: boolean = false): this {
         if (fullDay) {
             this.setProperty('DTSTART', toDateString(value))
@@ -517,20 +518,16 @@ export class CalendarEvent extends Component {
     }
 
     /**
-     * Get the end of the event.
-     * If set as a full day the time will be at the end of the day.
+     * Get the non-inclusive end of the event.
+     * If set as a full day the time will be at the start of the day.
      */
     end(): Date {
-        const endDate = parseDate(this.getProperty('DTEND')!)
-        if (this.getPropertyParams('DTEND')?.includes('VALUE=DATE')) {
-            const ONE_DAY = 24 * 60 * 60 * 1000
-            const endTime = new Date(endDate.getTime() + ONE_DAY)
-            return endTime
-        } else {
-            return endDate
-        }
+        return parseDate(this.getProperty('DTEND')!)
     }
 
+    /**
+     * Set the non-inclusive end of the event.
+     */
     setEnd(value: Date, fullDay: boolean = false): this {
         if (fullDay) {
             this.setProperty('DTEND', toDateString(value))
