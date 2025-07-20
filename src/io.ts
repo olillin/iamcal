@@ -1,8 +1,7 @@
 import fs from 'fs'
 import readline from 'readline'
-import { Calendar } from '.'
+import { Calendar } from './components/Calendar'
 import { deserialize } from './parse'
-import { resolve } from 'path'
 
 /**
  * Read a calendar from a .ical file
