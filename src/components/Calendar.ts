@@ -90,8 +90,8 @@ export class Calendar extends Component {
         return this.getProperty('METHOD')?.value
     }
 
-    setMethod(value: string) {
-        this.setProperty('METHOD', value)
+    setMethod(value: string): this {
+        return this.setProperty('METHOD', value)
     }
 
     removeMethod() {
@@ -102,8 +102,8 @@ export class Calendar extends Component {
         return this.getProperty('X-WR-CALNAME')?.value
     }
 
-    setCalendarName(value: string) {
-        this.setProperty('X-WR-CALNAME', value)
+    setCalendarName(value: string): this {
+        return this.setProperty('X-WR-CALNAME', value)
     }
 
     removeCalendarName() {
