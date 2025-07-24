@@ -164,26 +164,3 @@ export async function parseEvent(text: string): Promise<CalendarEvent> {
         throw new DeserializationError("Not an event")
     return new CalendarEvent(component)
 }
-
-export function parseDate(dateProperty: Property): Date {
-    const value = dateProperty.value.trim()
-    if (dateProperty.params.includes('VALUE=DATE')) {
-        // Parse date only
-        return new Date(`${value.substring(0, 4)}-${value.substring(4, 6)}-${value.substring(6, 8)}`)
-    } else {
-        // Parse date and time
-        return new Date(`${value.substring(0, 4)}-${value.substring(4, 6)}-${value.substring(6, 8)} ${value.substring(9, 11)}:${value.substring(11, 13)}:${value.substring(13, 15)}`)
-    }
-}
-
-export function toTimeString(date: Date): string {
-    return `${date.getHours().toString().padStart(2, '0')}${date.getMinutes().toString().padStart(2, '0')}${date.getSeconds().toString().padStart(2, '0')}`
-}
-
-export function toDateString(date: Date): string {
-    return `${date.getFullYear().toString().padStart(4, '0')}${date.getMonth().toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`
-}
-
-export function toDateTimeString(date: Date): string {
-    return `${toDateString(date)}T${toTimeString(date)}`
-}

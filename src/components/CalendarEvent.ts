@@ -1,5 +1,5 @@
 import { Component } from "../component"
-import { parseDate, toDateString, toDateTimeString } from "../parse"
+import { convertDate, ICalendarDate, parseDateProperty, toDateTimeString } from "../date"
 
 /**
  * Represents a VEVENT component, representing an event in a calendar.
@@ -7,34 +7,37 @@ import { parseDate, toDateString, toDateTimeString } from "../parse"
 export class CalendarEvent extends Component {
     name = 'VEVENT';
 
-    constructor(uid: string, dtstamp: Date)
+    constructor(uid: string, dtstamp: ICalendarDate | Date, dtstart: ICalendarDate | Date)
     constructor(component: Component)
-    constructor(a: string | Component, b?: Date) {
+    constructor(a: string | Component, b?: ICalendarDate | Date, c?: ICalendarDate | Date) {
         var component: Component
         if (b) {
             const uid = a as string
-            const dtstamp = b as Date
+            const dtstamp = convertDate(b!)
+            const dtstart = convertDate(c!)
             component = new Component('VEVENT')
             component.setProperty('UID', uid)
-            component.setProperty('DTSTAMP', toDateTimeString(dtstamp))
+            component.setProperty('DTSTAMP', dtstamp)
+            component.setProperty('DTSTART', dtstart)
         } else {
             component = a as Component
         }
         super(component.name, component.properties, component.components)
     }
 
-    stamp(): Date {
-        return parseDate(this.getProperty('DTSTAMP')!)
+    serialize(): string {
+        if (!this.end() && !this.duration()) {
+            throw new Error('Failed to serialize calendar event, end or duration must be set')
+        }
+        return super.serialize()
     }
 
-    setStamp(value: Date, fullDay: boolean = false): this {
-        if (fullDay) {
-            this.setProperty('DTSTAMP', toDateString(value))
-            this.setPropertyParams('DTSTAMP', ['VALUE=DATE'])
-        } else {
-            this.setProperty('DTSTAMP', toDateTimeString(value))
-        }
-        return this
+    stamp(): ICalendarDate {
+        return parseDateProperty(this.getProperty('DTSTAMP')!)
+    }
+
+    setStamp(value: ICalendarDate | Date): this {
+        return this.setProperty('DTSTAMP', convertDate(value))
     }
 
     uid(): string {
@@ -83,23 +86,14 @@ export class CalendarEvent extends Component {
 
     /**
      * Get the start of the event.
-     * If set as a full day the time will be at the start of the day.
      */
-    start(): Date | undefined {
-        const property = this.getProperty('DTSTART')
-        if (!property) return
-        return parseDate(property)
+    start(): ICalendarDate {
+        return parseDateProperty(this.getProperty('DTSTART')!)
     }
 
     /** Set the start of the event. */
-    setStart(value: Date, fullDay: boolean = false): this {
-        if (fullDay) {
-            this.setProperty('DTSTART', toDateString(value))
-            this.setPropertyParams('DTSTART', ['VALUE=DATE'])
-        } else {
-            this.setProperty('DTSTART', toDateTimeString(value))
-        }
-        return this
+    setStart(value: ICalendarDate | Date): this {
+        return this.setProperty('DTSTART', convertDate(value))
     }
 
     removeStart() {
@@ -108,35 +102,58 @@ export class CalendarEvent extends Component {
 
     /**
      * Get the non-inclusive end of the event.
-     * If set as a full day the time will be at the start of the day.
      */
-    end(): Date | undefined {
+    end(): ICalendarDate | undefined {
         const property = this.getProperty('DTEND')
         if (!property) return
-        return parseDate(property)
+        return parseDateProperty(property)
     }
 
     /**
-     * Set the non-inclusive end of the event.
+     * Set the exclusive end of the event.
+     * 
+     * Will remove 'duration' if present.
      */
-    setEnd(value: Date, fullDay: boolean = false): this {
-        if (fullDay) {
-            this.setProperty('DTEND', toDateString(value))
-            this.setPropertyParams('DTEND', ['VALUE=DATE'])
-        } else {
-            this.setProperty('DTEND', toDateTimeString(value))
+    setEnd(value: ICalendarDate | Date): this {
+        const date = convertDate(value)
+        const start = this.start()
+        if (date.isFullDay() !== start.isFullDay()) {
+            throw new Error(`End must be same date type as start. Start is ${start.isFullDay() ? 'date' : 'datetime'} but new end value is ${date.isFullDay() ? 'date' : 'datetime'}`)
         }
-        return this
+
+        this.removeDuration()
+        return this.setProperty('DTEND', date)
     }
 
     removeEnd() {
         this.removePropertiesWithName('DTEND')
     }
 
-    created(): Date | undefined {
+    /**
+     * Set the duration of the event.
+     * 
+     * Will remove 'end' if present.
+     */
+    setDuration(value: string): this {
+        this.removeDuration()
+        return this.setProperty('DURATION', value)
+    }
+
+    /**
+     * Get the duration of the event as the raw string value.
+     */
+    duration(): string | undefined {
+        return this.getProperty('DURATION')?.value
+    }
+
+    removeDuration() {
+        this.removePropertiesWithName('DURATION')
+    }
+
+    created(): ICalendarDate | undefined {
         const property = this.getProperty('CREATED')
         if (!property) return
-        return parseDate(property)
+        return parseDateProperty(property)
     }
 
     setCreated(value: Date): this {

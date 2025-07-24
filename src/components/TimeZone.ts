@@ -1,5 +1,5 @@
 import { Component } from '../component'
-import { parseDate, toDateString, toDateTimeString } from '../parse'
+import { convertDate, ICalendarDate, parseDateProperty, toDateString, toDateTimeString } from '../date'
 
 /**
  * Represents a VTIMEZONE component, containing time zone definitions.
@@ -27,10 +27,10 @@ export class TimeZone extends Component {
         return this.setProperty('TZID', value)
     }
 
-    lastMod(): Date | undefined {
+    lastMod(): ICalendarDate | undefined {
         const text = this.getProperty('LAST-MOD')
         if (!text) return
-        return parseDate(text)
+        return parseDateProperty(text)
     }
 
     setLastMod(value: Date): this {
@@ -87,37 +87,31 @@ class TimeZoneOffset extends Component {
      * @param offsetFrom The offset that is in use prior to this time zone observance.
      * @param offsetTo The offset that is in use during this time zone observance.
      */
-    constructor(type: OffsetType, start: Date, offsetFrom: Offset, offsetTo: Offset)
+    constructor(type: OffsetType, start: ICalendarDate | Date, offsetFrom: Offset, offsetTo: Offset)
     constructor(component: Component)
-    constructor(a: OffsetType | Component, b?: Date, c?: Offset, d?: Offset) {
+    constructor(a: OffsetType | Component, b?: ICalendarDate | Date, c?: Offset, d?: Offset) {
         var component: Component
         if (a instanceof Component) {
             component = a as Component
         } else {
             const name = a as OffsetType
-            const start = b as Date
+            const start = convertDate(b!)
             const offsetFrom = c as Offset
             const offsetTo = d as Offset
             component = new Component(name)
-            component.setProperty('DTSTART', toDateTimeString(start))
+            component.setProperty('DTSTART', start)
             component.setProperty('TZOFFSETFROM', offsetFrom)
             component.setProperty('TZOFFSETTO', offsetTo)
         }
         super(component.name, component.properties, component.components)
     }
 
-    start(): Date {
-        return parseDate(this.getProperty('DTSTART')!)
+    start(): ICalendarDate {
+        return parseDateProperty(this.getProperty('DTSTART')!)
     }
 
-    setStart(value: Date, fullDay: boolean = false): this {
-        if (fullDay) {
-            this.setProperty('DTSTART', toDateString(value))
-            this.setPropertyParams('DTSTART', ['VALUE=DATE'])
-        } else {
-            this.setProperty('DTSTART', toDateTimeString(value))
-        }
-        return this
+    setStart(value: ICalendarDate | Date): this {
+        return this.setProperty('DTSTART', convertDate(value))
     }
 
     offsetFrom(): Offset {

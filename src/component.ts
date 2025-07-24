@@ -1,3 +1,5 @@
+import { ICalendarDate } from "./date"
+
 // Max line length as defined by RFC 5545 3.1.
 const MAX_LINE_LENGTH = 75
 
@@ -66,18 +68,24 @@ export class Component {
         return null
     }
 
-    setProperty(name: string, value: string): this {
+    setProperty(name: string, value: string | ICalendarDate): this {
         for (const property of this.properties) {
             if (property.name === name) {
-                property.value = value
+                if (typeof value === 'string') {
+                    property.value = value
+                } else {
+                    const prop = value.toProperty(name)
+                    property.params = prop.params
+                    property.value = prop.value
+                }
                 return this
             }
         }
-        this.properties.push({
+        this.properties.push(typeof value === 'string' ? {
             name: name,
             params: [],
             value: value,
-        })
+        } : value.toProperty(name))
         return this
     }
 
@@ -94,7 +102,7 @@ export class Component {
 
     removePropertiesWithName(name: string) {
         const index = this.properties.findIndex(p => p.name === name)
-        if (index === -1) return this
+        if (index === -1) return
         // Remove property at index
         this.properties.splice(index, 1)
     }
