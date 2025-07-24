@@ -81,6 +81,17 @@ export class Component {
         return this
     }
 
+    hasProperty(name: string, value?: string): boolean {
+        for (const property of this.properties) {
+            if (property.name === name
+                && (value === undefined || property.value === value)
+            ) {
+                return true
+            }
+        }
+        return false
+    }
+
     removePropertiesWithName(name: string) {
         const index = this.properties.findIndex(p => p.name === name)
         if (index === -1) return this
@@ -111,6 +122,11 @@ export class Component {
         return this
     }
 
+    addComponents(components: Component[]): this {
+        this.components.push(...components)
+        return this
+    }
+
     /**
      * Remove a component from this component
      * @returns `true` if the component was removed. `false` if the component was not present
@@ -125,7 +141,7 @@ export class Component {
         return true
     }
 
-    getComponents(name: string): Component[] {
+    getComponentsWithName(name: string): Component[] {
         const components: Component[] = []
 
         for (let component of this.components) {

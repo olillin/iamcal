@@ -66,12 +66,12 @@ export class TimeZone extends Component {
 
     /** Get standard/winter time offsets. */
     standardOffsets(): TimeZoneOffset[] {
-        return this.getComponents('STANDARD').map(c => new TimeZoneOffset(c))
+        return this.getComponentsWithName('STANDARD').map(c => new TimeZoneOffset(c))
     }
 
     /** Get daylight savings time offsets. */
     daylightOffsets(): TimeZoneOffset[] {
-        return this.getComponents('DAYLIGHT').map(c => new TimeZoneOffset(c))
+        return this.getComponentsWithName('DAYLIGHT').map(c => new TimeZoneOffset(c))
     }
 }
 

@@ -45,8 +45,8 @@ export class CalendarEvent extends Component {
         return this.setProperty('UID', value)
     }
 
-    summary(): string {
-        return this.getProperty('SUMMARY')!.value
+    summary(): string | undefined {
+        return this.getProperty('SUMMARY')?.value
     }
 
     setSummary(value: string): this {
@@ -57,8 +57,8 @@ export class CalendarEvent extends Component {
         this.removePropertiesWithName('SUMMARY')
     }
 
-    description(): string {
-        return this.getProperty('DESCRIPTION')!.value
+    description(): string | undefined {
+        return this.getProperty('DESCRIPTION')?.value
     }
 
     setDescription(value: string): this {
@@ -85,8 +85,10 @@ export class CalendarEvent extends Component {
      * Get the start of the event.
      * If set as a full day the time will be at the start of the day.
      */
-    start(): Date {
-        return parseDate(this.getProperty('DTSTART')!)
+    start(): Date | undefined {
+        const property = this.getProperty('DTSTART')
+        if (!property) return
+        return parseDate(property)
     }
 
     /** Set the start of the event. */
@@ -108,8 +110,10 @@ export class CalendarEvent extends Component {
      * Get the non-inclusive end of the event.
      * If set as a full day the time will be at the start of the day.
      */
-    end(): Date {
-        return parseDate(this.getProperty('DTEND')!)
+    end(): Date | undefined {
+        const property = this.getProperty('DTEND')
+        if (!property) return
+        return parseDate(property)
     }
 
     /**
@@ -161,6 +165,3 @@ export class CalendarEvent extends Component {
         this.removePropertiesWithName('GEO')
     }
 }
-
-const event = new CalendarEvent('abc', new Date())
-event.getPropertyParams('DTEND')?.includes('VALUE=DATE')

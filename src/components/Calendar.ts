@@ -39,7 +39,7 @@ export class Calendar extends Component {
     }
 
     events(): CalendarEvent[] {
-        return this.getComponents('VEVENT').map(c => new CalendarEvent(c))
+        return this.getComponentsWithName('VEVENT').map(c => new CalendarEvent(c))
     }
 
     removeEvent(event: CalendarEvent): boolean
