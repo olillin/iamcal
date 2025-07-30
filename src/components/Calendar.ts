@@ -25,7 +25,7 @@ export class Calendar extends Component {
      */
     constructor(component: Component)
     constructor(a?: string | Component, b?: string) {
-        var component: Component
+        let component: Component
         if (a instanceof Component) {
             component = a as Component
         } else {

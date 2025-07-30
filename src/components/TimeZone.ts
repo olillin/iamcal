@@ -1,5 +1,5 @@
 import { Component } from '../component'
-import { convertDate, ICalendarDate, parseDateProperty, toDateString, toDateTimeString } from '../date'
+import { convertDate, ICalendarDate, parseDateProperty } from '../date'
 
 /**
  * Represents a VTIMEZONE component, containing time zone definitions.
@@ -8,7 +8,7 @@ export class TimeZone extends Component {
     constructor(id: string)
     constructor(component: Component)
     constructor(a: string | Component) {
-        var component: Component
+        let component: Component
         if (a instanceof Component) {
             component = a as Component
         } else {
@@ -90,7 +90,7 @@ class TimeZoneOffset extends Component {
     constructor(type: OffsetType, start: ICalendarDate | Date, offsetFrom: Offset, offsetTo: Offset)
     constructor(component: Component)
     constructor(a: OffsetType | Component, b?: ICalendarDate | Date, c?: Offset, d?: Offset) {
-        var component: Component
+        let component: Component
         if (a instanceof Component) {
             component = a as Component
         } else {

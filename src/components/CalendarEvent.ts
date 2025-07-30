@@ -10,7 +10,7 @@ export class CalendarEvent extends Component {
     constructor(uid: string, dtstamp: ICalendarDate | Date, dtstart: ICalendarDate | Date)
     constructor(component: Component)
     constructor(a: string | Component, b?: ICalendarDate | Date, c?: ICalendarDate | Date) {
-        var component: Component
+        let component: Component
         if (b) {
             const uid = a as string
             const dtstamp = convertDate(b!)
@@ -167,15 +167,15 @@ export class CalendarEvent extends Component {
     geo(): [number, number] | undefined {
         const text = this.getProperty('GEO')?.value
         if (!text) return
-        const pattern = /^[+-]?\d+(\.\d+)?,[+-]?\d+(\.\d+)?$/
-        if (!pattern.test(text)) throw new Error(`Failed to parse GEO property: ${text}`)
+        const validGeoPattern = /^[+-]?\d+(\.\d+)?;[+-]?\d+(\.\d+)?$/
+        if (!validGeoPattern.test(text)) throw new Error(`Failed to parse GEO property: ${text}`)
         const [longitude, latitude] = text.split(',')
         return [parseFloat(longitude), parseFloat(latitude)]
     }
 
     setGeo(latitude: number, longitude: number): this {
-        const text = `${latitude},${longitude}`
-        return this
+        const text = `${latitude};${longitude}`
+        return this.setProperty('GEO', text)
     }
 
     removeGeo() {

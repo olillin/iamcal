@@ -1,3 +1,5 @@
+/* eslint-disable no-control-regex */
+
 // ABNF patterns from RFC5545
 export const CONTROL = /[\x00-\x08\x0A-\x1F\x7F]/g
 export const NON_US_ASCII = /[^\x00-\x7F]/g

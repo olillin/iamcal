@@ -19,12 +19,12 @@ export class Component {
         if (properties) {
             this.properties = properties
         } else {
-            this.properties = new Array()
+            this.properties = []
         }
         if (components) {
             this.components = components
         } else {
-            this.components = new Array()
+            this.components = []
         }
     }
 
@@ -32,7 +32,7 @@ export class Component {
         // Create lines
         const lines = [`BEGIN:${this.name}`]
 
-        for (let property of this.properties) {
+        for (const property of this.properties) {
             let line =
                 property['name'] + //
                 property.params.map(p => ';' + p).join('') +
@@ -47,7 +47,7 @@ export class Component {
             lines.push(line)
         }
 
-        for (let component of this.components) {
+        for (const component of this.components) {
             lines.push(component.serialize())
         }
 
@@ -152,7 +152,7 @@ export class Component {
     getComponentsWithName(name: string): Component[] {
         const components: Component[] = []
 
-        for (let component of this.components) {
+        for (const component of this.components) {
             if (component.name === name) {
                 components.push(component)
             }
