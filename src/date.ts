@@ -148,34 +148,38 @@ export function parseDateProperty(dateProperty: Property, defaultType: 'DATE-TIM
 }
 
 export function toTimeString(date: Date): string {
+    if (isNaN(date.getTime())) throw new Error('Date is invalid')
     return `${padHours(date.getHours())}${padMinutes(date.getMinutes())}${padSeconds(date.getSeconds())}`
 }
 
 export function toDateString(date: Date): string {
-    return `${padYear(date.getFullYear())}${padMonth(date.getMonth())}${padDay(date.getDate())}`
+    if (isNaN(date.getTime())) throw new Error('Date is invalid')
+    return `${padYear(date.getFullYear())}${padMonth(date.getMonth() + 1)}${padDay(date.getDate())}`
 }
 
 /**
  * Format a date as an RFC5545 compliant date-time string.
  * 
  * @param date the date to convert to a date-time string
- * @param timezoneOffset the timezone offset in minutes, uses the local timezone offset by default
  * @returns a date-time string formatted according to RFC5545
  */
 export function toDateTimeString(date: Date): string {
+    if (isNaN(date.getTime())) throw new Error('Date is invalid')
     return `${toDateString(date)}T${toTimeString(date)}`
 }
 
 /**
- * Format a date as an RFC5545 compliant UTC date-time string.
+ * Format a date as an RFC5545 compliant date-time string. Uses the timezone
+ * offset of the date to adjust the time to UTC.
  * 
  * @param date the date to convert to a date-time string
  * @param timezoneOffset the timezone offset in minutes, uses the local timezone offset by default
  * @returns a UTC date-time string formatted according to RFC5545
  */
-export function toDateTimeStringUTC(date: Date, timezoneOffset?: number): string {
-    const offset = timezoneOffset ?? new Date().getTimezoneOffset()
-    const offsetDate = new Date(date.getTime() - offset * ONE_MINUTE_MS)
+export function toDateTimeStringUTC(date: Date): string {
+    if (isNaN(date.getTime())) throw new Error('Date is invalid')
+    const offset = date.getTimezoneOffset()
+    const offsetDate = new Date(date.getTime() + offset * ONE_MINUTE_MS)
     return `${toDateString(offsetDate)}T${toTimeString(offsetDate)}Z`
 }
 
