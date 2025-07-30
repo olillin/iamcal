@@ -2,6 +2,7 @@ import { Component, Property } from './component'
 import readline from 'readline'
 import { Readable } from 'stream'
 import { Calendar, CalendarEvent } from './components'
+import * as patterns from './patterns'
 
 export class DeserializationError extends Error {
     name = 'DeserializationError'
@@ -163,4 +164,48 @@ export async function parseEvent(text: string): Promise<CalendarEvent> {
     if (component.name !== "VEVENT")
         throw new DeserializationError("Not an event")
     return new CalendarEvent(component)
+}
+
+export const knownValueTypes = [
+    "BINARY",
+    "BOOLEAN",
+    "CAL-ADDRESS",
+    "DATE",
+    "DATE-TIME",
+    "DURATION",
+    "FLOAT",
+    "INTEGER",
+    "PERIOD",
+    "RECUR",
+    "TEXT",
+    "TIME",
+    "URI",
+    "UTC-OFFSET"
+] as const
+
+export type AllowedValueTypes = typeof knownValueTypes | (string & {})
+
+/**
+ * Get the parameter value of the property VALUE parameter.
+ * @param property the property to get the value type of.
+ * @returns the value type if present, else `defaultValue` or `undefined`.
+ */
+export function getPropertyValueType(property: Property): AllowedValueTypes | undefined
+export function getPropertyValueType(property: Property, defaultValue: AllowedValueTypes): AllowedValueTypes
+export function getPropertyValueType(property: Property, defaultValue?: AllowedValueTypes): AllowedValueTypes | undefined {
+    const found = property.params
+        .find(param => /^VALUE=.+$/i.test(param))
+    if (!found) return defaultValue
+
+    if (!patterns.matchesWholeString(patterns.paramValue, found)) {
+        throw new Error('Invalid parameter value')
+    }
+
+    // Return as uppercase if known value
+    const value = found?.split('=')[1]
+    if ((knownValueTypes as readonly string[]).includes(value.toUpperCase())) {
+        return value.toUpperCase()
+    }
+
+    return value
 }
