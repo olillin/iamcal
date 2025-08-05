@@ -52,11 +52,15 @@ describe('constructor', () => {
 })
 
 describe('toProperty', () => {
-    it('returns a property with the same name', () => {
+    it('returns a property with same name when name is DTSTART', () => {
         const date = new CalendarDate('20250804')
-        let property = date.toProperty('DTSTART')
+        const property = date.toProperty('DTSTART')
         expect(property.name).toBe('DTSTART')
-        property = date.toProperty('CREATED')
+    })
+
+    it('returns a property with same name when name is CREATED', () => {
+        const date = new CalendarDate('20250804')
+        const property = date.toProperty('CREATED')
         expect(property.name).toBe('CREATED')
     })
 
@@ -79,12 +83,15 @@ describe('getValue', () => {
         expect(date.getValue()).toBe('20250804')
     })
 
-    it('uses local time', () => {
-        let date = new Date('2025-08-05T00:00:00')
-        let calendarDate = new CalendarDate(date)
+    it('returns same day when time is midnight', () => {
+        const date = new Date('2025-08-05T00:00:00')
+        const calendarDate = new CalendarDate(date)
         expect(calendarDate.getValue()).toBe('20250805')
-        date = new Date('2025-08-04T23:59:59')
-        calendarDate = new CalendarDate(date)
+    })
+
+    it('returns same day when time is one second before midnight', () => {
+        const date = new Date('2025-08-04T23:59:59')
+        const calendarDate = new CalendarDate(date)
         expect(calendarDate.getValue()).toBe('20250804')
     })
 })

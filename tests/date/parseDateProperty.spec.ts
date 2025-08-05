@@ -1,11 +1,15 @@
-import { Property } from "../../src"
-import { CalendarDate, CalendarDateTime, parseDateProperty } from "../../src/date"
+import { Property } from '../../src'
+import {
+    CalendarDate,
+    CalendarDateTime,
+    parseDateProperty,
+} from '../../src/date'
 
 it('returns a CalendarDateTime with value type DATE-TIME', () => {
     const property: Property = {
         name: 'DTSTART',
         params: ['VALUE=DATE-TIME'],
-        value: '20250729T120000Z'
+        value: '20250729T120000Z',
     }
     const result = parseDateProperty(property)
     expect(result).toBeInstanceOf(CalendarDateTime)
@@ -15,27 +19,29 @@ it('returns a CalendarDate with value type DATE', () => {
     const property: Property = {
         name: 'DTSTART',
         params: ['VALUE=DATE'],
-        value: '20250729'
+        value: '20250729',
     }
     const result = parseDateProperty(property)
     expect(result).toBeInstanceOf(CalendarDate)
 })
 
-it('returns a CalendarDateTime with no value type', () => {
-    let property: Property = {
+it('returns a CalendarDateTime when no parameters are given', () => {
+    const property: Property = {
         name: 'DTSTART',
         params: [],
-        value: '20250729T120000Z'
+        value: '20250729T120000Z',
     }
-    let result = parseDateProperty(property)
+    const result = parseDateProperty(property)
     expect(result).toBeInstanceOf(CalendarDateTime)
+})
 
-    property = {
+it('returns a CalendarDateTime with no value type is given', () => {
+    const property = {
         name: 'DTSTART',
         params: ['OTHER=PARAM'],
-        value: '20250729T120000Z'
+        value: '20250729T120000Z',
     }
-    result = parseDateProperty(property)
+    const result = parseDateProperty(property)
     expect(result).toBeInstanceOf(CalendarDateTime)
 })
 
@@ -43,7 +49,7 @@ it('throws when parsing date-time as date', () => {
     const property: Property = {
         name: 'DTSTART',
         params: ['VALUE=DATE'],
-        value: '20250729T120000Z'
+        value: '20250729T120000Z',
     }
     expect(() => parseDateProperty(property)).toThrow()
 })
@@ -52,7 +58,7 @@ it('throws when parsing date as date-time', () => {
     const property: Property = {
         name: 'DTSTART',
         params: ['VALUE=DATE-TIME'],
-        value: '20250729'
+        value: '20250729',
     }
     expect(() => parseDateProperty(property)).toThrow()
 })
@@ -67,8 +73,7 @@ it('ignores the property name', () => {
         { name: 'CREATED', params, value },
     ]
 
-    const parsed = properties
-        .map(property => parseDateProperty(property))
+    const parsed = properties.map(property => parseDateProperty(property))
 
     parsed.forEach(a => {
         parsed.forEach(b => {
@@ -81,7 +86,7 @@ it('throws if value type is illegal', () => {
     const property: Property = {
         name: 'DTSTART',
         params: ['VALUE=BINARY'],
-        value: '20250729T120000Z'
+        value: '20250729T120000Z',
     }
     expect(() => parseDateProperty(property)).toThrow()
 })

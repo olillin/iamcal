@@ -1,6 +1,6 @@
 import { toTimeString } from '../../src/date'
 
-it('formats time as HHMMSS', () => {
+it('formats time as HHmmSS', () => {
     const date = new Date(2025, 6, 29, 12, 34, 56, 789)
     const result = toTimeString(date)
     expect(result).toBe('123456')
