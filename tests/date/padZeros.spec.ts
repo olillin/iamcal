@@ -1,6 +1,18 @@
-import { padZeros } from "../../src/date"
+import { padZeros } from '../../src/date'
 
-it('should return a string of the same length as length argument', () => {
+it('returns the correct number', () => {
+    let length = 5
+    let num = 123
+    let result = padZeros(num, length)
+    expect(result).toBe('00123')
+
+    length = 2
+    num = 52
+    result = padZeros(num, length)
+    expect(result).toBe('52')
+})
+
+it('returns a string of the same length as length argument', () => {
     let length = 6
     let num = 3
     let result = padZeros(num, length)
@@ -17,7 +29,7 @@ it('should return a string of the same length as length argument', () => {
     expect(result).toHaveLength(length)
 })
 
-it('should throw if number has more digits than length argument', () => {
+it('throws if number has more digits than length argument', () => {
     let length = 3
     let num = 1000
     expect(() => padZeros(num, length)).toThrow()
@@ -31,25 +43,25 @@ it('should throw if number has more digits than length argument', () => {
     expect(() => padZeros(num, length)).toThrow()
 })
 
-it('should throw if number is decimal', () => {
+it('throws if number is decimal', () => {
     const length = 4
     const num = 1.5
     expect(() => padZeros(num, length)).toThrow()
 })
 
-it('should throw if number is negative', () => {
+it('throws if number is negative', () => {
     const length = 3
     const num = -5
     expect(() => padZeros(num, length)).toThrow()
 })
 
-it('should throw if length is decimal', () => {
+it('throws if length is decimal', () => {
     const length = 3.5
-    const num = 1.5
+    const num = 1
     expect(() => padZeros(num, length)).toThrow()
 })
 
-it('should throw if length is less than or equal to 0', () => {
+it('throws if length is less than or equal to 0', () => {
     let length = 0
     let num = 0
     expect(() => padZeros(num, length)).toThrow()
