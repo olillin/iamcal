@@ -10,27 +10,33 @@ export const ONE_DAY_MS = 24 * ONE_HOUR_MS
 export interface ICalendarDate {
     /**
      * Create a property from this date.
-     * @param name the name of the property
+     * @param name The name of the property.
      */
     toProperty(name: string): Property
 
-    /** Get the string value of this date */
+    /**
+     * Get the string value of this date.
+     * @returns An RFC5545 compliant date or date-time string.
+     */
     getValue(): string
 
     /**
      * Get the date value of this date. For {@link CalendarDate} this is the
      * time at the start of the day.
+     * @returns The date value of this date.
      */
     getDate(): Date
 
     /**
-     * Returns `true` if this object is a {@link CalendarDate}.
+     * Check if this date represents a full day, as opposed to a date-time.
+     * @returns `true` if this object is a {@link CalendarDate}.
      */
     isFullDay(): boolean
 }
 
 /**
- * Represents a DATE value as defined by
+ * Represents a DATE value as defined by RFC5545.
+ * This is a date without a time, representing a whole day.
  */
 export class CalendarDate implements ICalendarDate {
     private date: Date

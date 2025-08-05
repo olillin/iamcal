@@ -1,15 +1,28 @@
-import { Component } from "../component"
-import { convertDate, ICalendarDate, parseDateProperty, toDateTimeString } from "../date"
+import { Component } from '../component'
+import {
+    convertDate,
+    ICalendarDate,
+    parseDateProperty,
+    toDateTimeString,
+} from '../date'
 
 /**
  * Represents a VEVENT component, representing an event in a calendar.
  */
 export class CalendarEvent extends Component {
-    name = 'VEVENT';
+    name = 'VEVENT'
 
-    constructor(uid: string, dtstamp: ICalendarDate | Date, dtstart: ICalendarDate | Date)
+    constructor(
+        uid: string,
+        dtstamp: ICalendarDate | Date,
+        dtstart: ICalendarDate | Date
+    )
     constructor(component: Component)
-    constructor(a: string | Component, b?: ICalendarDate | Date, c?: ICalendarDate | Date) {
+    constructor(
+        a: string | Component,
+        b?: ICalendarDate | Date,
+        c?: ICalendarDate | Date
+    ) {
         let component: Component
         if (b) {
             const uid = a as string
@@ -27,7 +40,9 @@ export class CalendarEvent extends Component {
 
     serialize(): string {
         if (!this.end() && !this.duration()) {
-            throw new Error('Failed to serialize calendar event, end or duration must be set')
+            throw new Error(
+                'Failed to serialize calendar event, end or duration must be set'
+            )
         }
         return super.serialize()
     }
@@ -86,22 +101,24 @@ export class CalendarEvent extends Component {
 
     /**
      * Get the start of the event.
+     * @returns The start date of the event as an {@link ICalendarDate}.
      */
     start(): ICalendarDate {
         return parseDateProperty(this.getProperty('DTSTART')!)
     }
 
-    /** Set the start of the event. */
+    /**
+     * Set the start of the event.
+     * @param value The start date of the event as an {@link ICalendarDate} or `Date`.
+     * @returns The CalendarEvent instance for chaining.
+     */
     setStart(value: ICalendarDate | Date): this {
         return this.setProperty('DTSTART', convertDate(value))
     }
 
-    removeStart() {
-        this.removePropertiesWithName('DTSTART')
-    }
-
     /**
      * Get the non-inclusive end of the event.
+     * @returns The end date of the event as an {@link ICalendarDate} or `undefined` if not set.
      */
     end(): ICalendarDate | undefined {
         const property = this.getProperty('DTEND')
@@ -111,41 +128,62 @@ export class CalendarEvent extends Component {
 
     /**
      * Set the exclusive end of the event.
-     * 
+     *
      * Will remove 'duration' if present.
+     * @param value The end date of the event as an {@link ICalendarDate} or `Date`.
+     * @returns The CalendarEvent instance for chaining.
+     * @throws If the end date is a full day date and the start date is a date-time, or vice versa.
      */
     setEnd(value: ICalendarDate | Date): this {
         const date = convertDate(value)
         const start = this.start()
         if (date.isFullDay() !== start.isFullDay()) {
-            throw new Error(`End must be same date type as start. Start is ${start.isFullDay() ? 'date' : 'datetime'} but new end value is ${date.isFullDay() ? 'date' : 'datetime'}`)
+            throw new Error(
+                `End must be same date type as start. Start is ${start.isFullDay() ? 'date' : 'datetime'} but new end value is ${date.isFullDay() ? 'date' : 'datetime'}`
+            )
         }
 
         this.removeDuration()
         return this.setProperty('DTEND', date)
     }
 
+    /**
+     * Remove the end of the event.
+     *
+     * NOTE: An event must have either an end or a duration set.
+     */
     removeEnd() {
         this.removePropertiesWithName('DTEND')
     }
 
     /**
      * Set the duration of the event.
-     * 
+     *
      * Will remove 'end' if present.
+     * @param value The duration of the event as a string in the format defined by RFC5545.
+     * @returns The CalendarEvent instance for chaining.
+     * @example
+     * // Set duration to 1 hour and 30 minutes.
+     * event.setDuration(`PT1H30M`)
      */
     setDuration(value: string): this {
-        this.removeDuration()
+        this.removeEnd()
         return this.setProperty('DURATION', value)
     }
 
     /**
-     * Get the duration of the event as the raw string value.
+     * Get the duration of the event.
+     * @returns The duration of the event as a string in the format defined by RFC5545, or `undefined` if not set.
      */
     duration(): string | undefined {
         return this.getProperty('DURATION')?.value
     }
 
+    /**
+     * Remove the duration of the event.
+     *
+     * NOTE: An event must have either an end or a duration set.
+     */
     removeDuration() {
         this.removePropertiesWithName('DURATION')
     }
@@ -168,7 +206,8 @@ export class CalendarEvent extends Component {
         const text = this.getProperty('GEO')?.value
         if (!text) return
         const validGeoPattern = /^[+-]?\d+(\.\d+)?;[+-]?\d+(\.\d+)?$/
-        if (!validGeoPattern.test(text)) throw new Error(`Failed to parse GEO property: ${text}`)
+        if (!validGeoPattern.test(text))
+            throw new Error(`Failed to parse GEO property: ${text}`)
         const [longitude, latitude] = text.split(',')
         return [parseFloat(longitude), parseFloat(latitude)]
     }

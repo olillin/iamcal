@@ -53,25 +53,41 @@ export class TimeZone extends Component {
         this.removePropertiesWithName('TZURL')
     }
 
-    /** Get all time offsets. */
+    /**
+     * Get all time offsets.
+     * @returns An array of time zone offsets defined in this time zone.
+     */
     offsets(): TimeZoneOffset[] {
         const offsets: TimeZoneOffset[] = []
         this.components.forEach(component => {
-            if (component.name === 'STANDARD' || component.name === 'DAYLIGHT') {
+            if (
+                component.name === 'STANDARD' ||
+                component.name === 'DAYLIGHT'
+            ) {
                 offsets.push(new TimeZoneOffset(component))
             }
         })
         return offsets
     }
 
-    /** Get standard/winter time offsets. */
+    /**
+     * Get standard/winter time offsets.
+     * @returns An array of time zone offsets defined in this time zone that are of type STANDARD.
+     */
     standardOffsets(): TimeZoneOffset[] {
-        return this.getComponentsWithName('STANDARD').map(c => new TimeZoneOffset(c))
+        return this.getComponentsWithName('STANDARD').map(
+            c => new TimeZoneOffset(c)
+        )
     }
 
-    /** Get daylight savings time offsets. */
+    /**
+     * Get daylight savings time offsets.
+     * @returns An array of time zone offsets defined in this time zone that are of type DAYLIGHT.
+     */
     daylightOffsets(): TimeZoneOffset[] {
-        return this.getComponentsWithName('DAYLIGHT').map(c => new TimeZoneOffset(c))
+        return this.getComponentsWithName('DAYLIGHT').map(
+            c => new TimeZoneOffset(c)
+        )
     }
 }
 
@@ -81,15 +97,24 @@ export type Offset = `${'-' | '+'}${Digit}${Digit}${Digit}${Digit}`
 /** Represents a STANDARD or DAYLIGHT component, defining a time zone offset. */
 class TimeZoneOffset extends Component {
     /**
-     *
      * @param type If this is a STANDARD or DAYLIGHT component.
      * @param start From when this offset is active.
      * @param offsetFrom The offset that is in use prior to this time zone observance.
      * @param offsetTo The offset that is in use during this time zone observance.
      */
-    constructor(type: OffsetType, start: ICalendarDate | Date, offsetFrom: Offset, offsetTo: Offset)
+    constructor(
+        type: OffsetType,
+        start: ICalendarDate | Date,
+        offsetFrom: Offset,
+        offsetTo: Offset
+    )
     constructor(component: Component)
-    constructor(a: OffsetType | Component, b?: ICalendarDate | Date, c?: Offset, d?: Offset) {
+    constructor(
+        a: OffsetType | Component,
+        b?: ICalendarDate | Date,
+        c?: Offset,
+        d?: Offset
+    ) {
         let component: Component
         if (a instanceof Component) {
             component = a as Component

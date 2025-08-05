@@ -1,4 +1,4 @@
-import { ICalendarDate } from "./date"
+import { ICalendarDate } from './date'
 
 // Max line length as defined by RFC 5545 3.1.
 const MAX_LINE_LENGTH = 75
@@ -14,7 +14,11 @@ export class Component {
     properties: Property[]
     components: Component[]
 
-    constructor(name: string, properties?: Property[], components?: Component[]) {
+    constructor(
+        name: string,
+        properties?: Property[],
+        components?: Component[]
+    ) {
         this.name = name
         if (properties) {
             this.properties = properties
@@ -81,18 +85,23 @@ export class Component {
                 return this
             }
         }
-        this.properties.push(typeof value === 'string' ? {
-            name: name,
-            params: [],
-            value: value,
-        } : value.toProperty(name))
+        this.properties.push(
+            typeof value === 'string'
+                ? {
+                      name: name,
+                      params: [],
+                      value: value,
+                  }
+                : value.toProperty(name)
+        )
         return this
     }
 
     hasProperty(name: string, value?: string): boolean {
         for (const property of this.properties) {
-            if (property.name === name
-                && (value === undefined || property.value === value)
+            if (
+                property.name === name &&
+                (value === undefined || property.value === value)
             ) {
                 return true
             }
@@ -136,8 +145,9 @@ export class Component {
     }
 
     /**
-     * Remove a component from this component
-     * @returns `true` if the component was removed. `false` if the component was not present
+     * Remove a component from this component.
+     * @param component The component to remove.
+     * @returns `true` if the component was removed. `false` if the component was not present.
      */
     removeComponent(component: Component): boolean {
         const index = this.components.indexOf(component)

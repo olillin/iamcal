@@ -5,21 +5,23 @@ import { CalendarEvent } from './CalendarEvent'
  * Represents a VCALENDAR component, the root component of an iCalendar file.
  */
 export class Calendar extends Component {
-    name = 'VCALENDAR';
+    name = 'VCALENDAR'
 
     /**
      * @param prodid A unique identifier of the program creating the calendar.
-     *
-     * Example: `-//Google Inc//Google Calendar 70.9054//EN`
+     * @example
+     * new Calendar('-//Google Inc//Google Calendar 70.9054//EN')
      */
     constructor(prodid: string)
+
     /**
      * @param prodid A unique identifier of the program creating the calendar.
-     *
-     * Example: `-//Google Inc//Google Calendar 70.9054//EN`
      * @param version The version of the iCalendar specification that this calendar uses.
+     * @example
+     * new Calendar('-//Google Inc//Google Calendar 70.9054//EN')
      */
     constructor(prodid: string, version: string)
+
     /**
      * @param component A VCALENDAR component.
      */
@@ -39,7 +41,9 @@ export class Calendar extends Component {
     }
 
     events(): CalendarEvent[] {
-        return this.getComponentsWithName('VEVENT').map(c => new CalendarEvent(c))
+        return this.getComponentsWithName('VEVENT').map(
+            c => new CalendarEvent(c)
+        )
     }
 
     removeEvent(event: CalendarEvent): boolean
