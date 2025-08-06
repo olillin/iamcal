@@ -1,5 +1,5 @@
 import { Component, ComponentValidationError } from '../component'
-import { ICalendarDate, convertDate, parseDateProperty } from '../date'
+import { CalendarDateOrTime, convertDate, parseDateProperty } from '../date'
 import { AllowedPropertyName } from '../property'
 
 export const knownOffsetTypes = ['DAYLIGHT', 'STANDARD']
@@ -19,14 +19,14 @@ export class TimeZoneOffset extends Component {
      */
     constructor(
         type: OffsetType,
-        start: ICalendarDate | Date,
+        start: CalendarDateOrTime | Date,
         offsetFrom: Offset,
         offsetTo: Offset
     )
     constructor(component: Component)
     constructor(
         a: OffsetType | Component,
-        b?: ICalendarDate | Date,
+        b?: CalendarDateOrTime | Date,
         c?: Offset,
         d?: Offset
     ) {
@@ -65,7 +65,7 @@ export class TimeZoneOffset extends Component {
      * Get the date or time when this time zone offset starts.
      * @returns The start date or time of this time zone offset.
      */
-    getStart(): ICalendarDate {
+    getStart(): CalendarDateOrTime {
         return parseDateProperty(this.getProperty('DTSTART')!)
     }
 
@@ -74,7 +74,7 @@ export class TimeZoneOffset extends Component {
      * @param value The start date or time.
      * @returns The TimeZoneOffset instance for chaining.
      */
-    setStart(value: ICalendarDate | Date): this {
+    setStart(value: CalendarDateOrTime | Date): this {
         return this.setProperty('DTSTART', convertDate(value))
     }
 

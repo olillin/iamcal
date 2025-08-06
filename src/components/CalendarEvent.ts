@@ -3,7 +3,7 @@ import { ComponentValidationError, Component } from '../component'
 import {
     CalendarDateTime,
     convertDate,
-    ICalendarDate,
+    CalendarDateOrTime,
     parseDateProperty,
     toDateTimeString,
 } from '../date'
@@ -17,13 +17,13 @@ export class CalendarEvent extends Component {
     constructor(
         uid: string,
         dtstamp: CalendarDateTime | Date,
-        dtstart: ICalendarDate | Date
+        dtstart: CalendarDateOrTime | Date
     )
     constructor(component: Component)
     constructor(
         a: string | Component,
         b?: CalendarDateTime | Date,
-        c?: ICalendarDate | Date
+        c?: CalendarDateOrTime | Date
     ) {
         let component: Component
         if (a instanceof Component) {
@@ -121,26 +121,26 @@ export class CalendarEvent extends Component {
 
     /**
      * Get the start date or time of the event.
-     * @returns The start date or time of the event as an {@link ICalendarDate}.
+     * @returns The start date or time of the event as a {@link CalendarDateOrTime}.
      */
-    getStart(): ICalendarDate {
+    getStart(): CalendarDateOrTime {
         return parseDateProperty(this.getProperty('DTSTART')!)
     }
 
     /**
      * Set the start date or time of the event.
-     * @param value The start date of the event as an {@link ICalendarDate} or `Date`.
+     * @param value The start date of the event as a {@link CalendarDateOrTime} or `Date`.
      * @returns The CalendarEvent instance for chaining.
      */
-    setStart(value: ICalendarDate | Date): this {
+    setStart(value: CalendarDateOrTime | Date): this {
         return this.setProperty('DTSTART', convertDate(value))
     }
 
     /**
      * Get the non-inclusive end of the event.
-     * @returns The end date of the event as an {@link ICalendarDate} or `undefined` if not set.
+     * @returns The end date of the event as a {@link CalendarDateOrTime} or `undefined` if not set.
      */
-    getEnd(): ICalendarDate | undefined {
+    getEnd(): CalendarDateOrTime | undefined {
         const property = this.getProperty('DTEND')
         if (!property) return
         return parseDateProperty(property)
@@ -150,11 +150,11 @@ export class CalendarEvent extends Component {
      * Set the exclusive end of the event.
      *
      * Will remove 'duration' if present.
-     * @param value The end date of the event as an {@link ICalendarDate} or `Date`.
+     * @param value The end date of the event as a {@link CalendarDateOrTime} or `Date`.
      * @returns The CalendarEvent instance for chaining.
      * @throws If the end date is a full day date and the start date is a date-time, or vice versa.
      */
-    setEnd(value: ICalendarDate | Date): this {
+    setEnd(value: CalendarDateOrTime | Date): this {
         const date = convertDate(value)
         const start = this.getStart()
         if (date.isFullDay() !== start.isFullDay()) {
@@ -208,7 +208,7 @@ export class CalendarEvent extends Component {
         this.removePropertiesWithName('DURATION')
     }
 
-    getCreated(): ICalendarDate | undefined {
+    getCreated(): CalendarDateOrTime | undefined {
         const property = this.getProperty('CREATED')
         if (!property) return
         return parseDateProperty(property)

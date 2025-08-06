@@ -1,4 +1,4 @@
-import { ICalendarDate } from './date'
+import { CalendarDateOrTime } from './date'
 import {
     AllowedPropertyName,
     KnownPropertyName,
@@ -82,7 +82,7 @@ export class Component {
         return null
     }
 
-    setProperty(name: string, value: string | ICalendarDate): this {
+    setProperty(name: string, value: string | CalendarDateOrTime): this {
         for (const property of this.properties) {
             if (property.name === name) {
                 if (typeof value === 'string') {

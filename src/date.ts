@@ -6,7 +6,7 @@ export const ONE_MINUTE_MS = 60 * ONE_SECOND_MS
 export const ONE_HOUR_MS = 60 * ONE_MINUTE_MS
 export const ONE_DAY_MS = 24 * ONE_HOUR_MS
 
-export interface ICalendarDate {
+export interface CalendarDateOrTime {
     /**
      * Create a property from this date.
      * @param name The name of the property.
@@ -37,15 +37,15 @@ export interface ICalendarDate {
  * Represents a DATE value as defined by RFC5545.
  * This is a date without a time, representing a whole day.
  */
-export class CalendarDate implements ICalendarDate {
+export class CalendarDate implements CalendarDateOrTime {
     private date: Date
 
-    constructor(date: Date | string | ICalendarDate) {
+    constructor(date: Date | string | CalendarDateOrTime) {
         if (typeof date === 'object') {
             if (Object.prototype.toString.call(date) === '[object Date]') {
                 this.date = date as Date
             } else {
-                this.date = (date as ICalendarDate).getDate()
+                this.date = (date as CalendarDateOrTime).getDate()
             }
         } else {
             try {
@@ -83,15 +83,15 @@ export class CalendarDate implements ICalendarDate {
     }
 }
 
-export class CalendarDateTime implements ICalendarDate {
+export class CalendarDateTime implements CalendarDateOrTime {
     private date: Date
 
-    constructor(date: Date | string | ICalendarDate) {
+    constructor(date: Date | string | CalendarDateOrTime) {
         if (typeof date === 'object') {
             if (Object.prototype.toString.call(date) === '[object Date]') {
                 this.date = date as Date
             } else {
-                this.date = (date as ICalendarDate).getDate()
+                this.date = (date as CalendarDateOrTime).getDate()
             }
         } else {
             try {
@@ -206,17 +206,17 @@ export function padSeconds(seconds: number): string {
 }
 
 /**
- * Parse a date property into an {@link ICalendarDate}.
+ * Parse a date property into a {@link CalendarDateOrTime}.
  * @param dateProperty The property to parse.
  * @param defaultType The default value type to be used if the property does not have an explicit value type.
- * @returns The parsed date as an {@link ICalendarDate}.
+ * @returns The parsed date as a {@link CalendarDateOrTime}.
  * @throws If the value is invalid for the value type.
  * @throws If the value type is not `DATE-TIME` or `DATE`.
  */
 export function parseDateProperty(
     dateProperty: Property,
     defaultType: 'DATE-TIME' | 'DATE' = 'DATE-TIME'
-): ICalendarDate {
+): CalendarDateOrTime {
     const value = dateProperty.value
     const valueType = getPropertyValueType(dateProperty, defaultType)
 
@@ -368,28 +368,28 @@ export function parseDateString(date: string): Date {
 }
 
 /**
- * Convert `Date` objects to an {@link ICalendarDate} object or return as
- * is if `date` is already an ICalendarDate.
+ * Convert `Date` objects to a {@link CalendarDateOrTime} object or return as
+ * is if `date` is already a {@link CalendarDateOrTime}.
  * @param date The date object to convert.
  * @param fullDay If `true`, a `Date` object is converted to {@link CalendarDate}, otherwise `Date` is converted to {@link CalendarDateTime}.
- * @returns An {@link ICalendarDate} as described above.
+ * @returns A {@link CalendarDateOrTime} as described above.
  */
-export function convertDate<T extends ICalendarDate>(
+export function convertDate<T extends CalendarDateOrTime>(
     date: Date | T,
     fullDay?: false
 ): T | CalendarDateTime
-export function convertDate<T extends ICalendarDate>(
+export function convertDate<T extends CalendarDateOrTime>(
     date: Date | T,
     fullDay: true
 ): T | CalendarDate
 export function convertDate(
-    date: Date | ICalendarDate,
+    date: Date | CalendarDateOrTime,
     fullDay: boolean = false
-): ICalendarDate {
+): CalendarDateOrTime {
     if (Object.prototype.toString.call(date) === '[object Date]') {
         if (fullDay) return new CalendarDate(date as Date)
         else return new CalendarDateTime(date as Date)
     } else {
-        return date as ICalendarDate
+        return date as CalendarDateOrTime
     }
 }

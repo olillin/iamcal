@@ -1,5 +1,5 @@
 import { Component, ComponentValidationError } from '../component'
-import { ICalendarDate, parseDateProperty } from '../date'
+import { CalendarDateOrTime, parseDateProperty } from '../date'
 import { KnownPropertyName } from '../property'
 import { TimeZoneOffset } from './TimeZoneOffset'
 
@@ -39,7 +39,7 @@ export class TimeZone extends Component {
         return this.setProperty('TZID', value)
     }
 
-    getLastModified(): ICalendarDate | undefined {
+    getLastModified(): CalendarDateOrTime | undefined {
         const text = this.getProperty('LAST-MODIFIED')
         if (!text) return
         return parseDateProperty(text)
