@@ -1,7 +1,7 @@
 import fs from 'fs'
 import readline from 'readline'
 import { Calendar } from './components/Calendar'
-import { DeserializationError, deserialize } from './parse'
+import { DeserializationError, deserializeComponent } from './parse'
 
 /**
  * Read a calendar from a iCalendar file.
@@ -16,7 +16,7 @@ export async function load(path: fs.PathLike): Promise<Calendar> {
         crlfDelay: Infinity,
     })
 
-    const component = await deserialize(lines)
+    const component = await deserializeComponent(lines)
 
     if (component.name != 'VCALENDAR') {
         throw new DeserializationError('Component must be a VCALENDAR')

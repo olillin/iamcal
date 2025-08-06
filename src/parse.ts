@@ -14,7 +14,7 @@ export class DeserializationError extends Error {
  * @returns The deserialized calendar component object.
  * @throws {DeserializationError} If the component is invalid.
  */
-export async function deserialize(
+export async function deserializeComponent(
     lines: readline.Interface
 ): Promise<Component> {
     const component = new Component('')
@@ -61,7 +61,7 @@ export async function deserialize(
             // Check the length of the stack after being popped
             if (stack.length == 1) {
                 subcomponentLines.push(line)
-                const subcomponent = await deserializeString(
+                const subcomponent = await deserializeComponentString(
                     subcomponentLines.join('\r\n')
                 )
                 subcomponentLines.length = 0
@@ -148,18 +148,44 @@ export async function deserialize(
 }
 
 /**
+ * Deserialize a calendar component.
+ * @param lines The serialized component as a **readline** interface.
+ * @returns The deserialized calendar component object.
+ * @throws {DeserializationError} If the component is invalid.
+ * @deprecated Use {@link deserializeComponent} instead.
+ */
+export async function deserialize(
+    lines: readline.Interface
+): Promise<Component> {
+    return deserializeComponent(lines)
+}
+
+/**
  * Deserialize a calendar component string.
  * @param text The serialized component.
  * @returns The deserialized component object.
  * @throws {DeserializationError} If the component is invalid.
  */
-export async function deserializeString(text: string): Promise<Component> {
+export async function deserializeComponentString(
+    text: string
+): Promise<Component> {
     const stream = Readable.from(text)
     const lines = readline.createInterface({
         input: stream,
         crlfDelay: Infinity,
     })
-    return deserialize(lines)
+    return deserializeComponent(lines)
+}
+
+/**
+ * Deserialize a calendar component string.
+ * @param text The serialized component.
+ * @returns The deserialized component object.
+ * @throws {DeserializationError} If the component is invalid.
+ * @deprecated Use {@link deserializeComponentString} instead.
+ */
+export async function deserializeString(text: string): Promise<Component> {
+    return deserializeComponentString(text)
 }
 
 /**
@@ -168,7 +194,7 @@ export async function deserializeString(text: string): Promise<Component> {
  * @returns The parsed calendar object.
  */
 export async function parseCalendar(text: string): Promise<Calendar> {
-    const component = await deserializeString(text)
+    const component = await deserializeComponentString(text)
     return new Calendar(component)
 }
 
@@ -178,6 +204,6 @@ export async function parseCalendar(text: string): Promise<Calendar> {
  * @returns The parsed event object.
  */
 export async function parseEvent(text: string): Promise<CalendarEvent> {
-    const component = await deserializeString(text)
+    const component = await deserializeComponentString(text)
     return new CalendarEvent(component)
 }
