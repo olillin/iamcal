@@ -292,6 +292,14 @@ export function parseDateString(date: string): Date {
  * {@link CalendarDate}, depending on `fullDay`. If `date` is an
  * {@link ICalendarDate} it is returned as is.
  */
+export function convertDate<T extends ICalendarDate>(
+    date: Date | T,
+    fullDay?: false
+): T | CalendarDateTime
+export function convertDate<T extends ICalendarDate>(
+    date: Date | T,
+    fullDay: true
+): T | CalendarDate
 export function convertDate(
     date: Date | ICalendarDate,
     fullDay: boolean = false

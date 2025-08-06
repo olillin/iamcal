@@ -1,4 +1,4 @@
-import { KnownPropertyName } from 'src/property'
+import { KnownPropertyName } from '../property'
 import { Component, ComponentValidationError } from '../component'
 import { convertDate, ICalendarDate, parseDateProperty } from '../date'
 

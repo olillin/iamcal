@@ -1,6 +1,7 @@
-import { KnownPropertyName } from 'src/property'
+import { KnownPropertyName, PropertyValidationError } from '../property'
 import { ComponentValidationError, Component } from '../component'
 import {
+    CalendarDateTime,
     convertDate,
     ICalendarDate,
     parseDateProperty,
@@ -15,13 +16,13 @@ export class CalendarEvent extends Component {
 
     constructor(
         uid: string,
-        dtstamp: ICalendarDate | Date,
+        dtstamp: CalendarDateTime | Date,
         dtstart: ICalendarDate | Date
     )
     constructor(component: Component)
     constructor(
         a: string | Component,
-        b?: ICalendarDate | Date,
+        b?: CalendarDateTime | Date,
         c?: ICalendarDate | Date
     ) {
         let component: Component
@@ -30,7 +31,7 @@ export class CalendarEvent extends Component {
             CalendarEvent.prototype.validate.call(component)
         } else {
             const uid = a as string
-            const dtstamp = convertDate(b!)
+            const dtstamp = convertDate(b!, false)
             const dtstart = convertDate(c!)
             component = new Component('VEVENT')
             component.setProperty('UID', uid)
@@ -60,12 +61,18 @@ export class CalendarEvent extends Component {
         this.validateAllProperties(requiredProperties)
     }
 
-    stamp(): ICalendarDate {
-        return parseDateProperty(this.getProperty('DTSTAMP')!)
+    stamp(): CalendarDateTime {
+        return parseDateProperty(
+            this.getProperty('DTSTAMP')!
+        ) as CalendarDateTime
     }
 
-    setStamp(value: ICalendarDate | Date): this {
-        return this.setProperty('DTSTAMP', convertDate(value))
+    setStamp(value: CalendarDateTime | Date): this {
+        const converted = convertDate(value, false)
+        if (converted.isFullDay()) {
+            throw new PropertyValidationError('DTSTAMP cannot be of type DATE')
+        }
+        return this.setProperty('DTSTAMP', converted)
     }
 
     uid(): string {
