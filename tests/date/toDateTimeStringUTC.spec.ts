@@ -1,4 +1,4 @@
-import { toDateTimeStringUTC } from '../../src/date'
+import { toDateTimeStringUTC } from '../../src'
 
 it('formats date as YYYYMMSSTHHmmSSZ', () => {
     const date = new Date('2025-10-29T12:34:56.789Z')

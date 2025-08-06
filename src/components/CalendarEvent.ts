@@ -1,4 +1,5 @@
-import { Component } from '../component'
+import { KnownPropertyName } from 'src/property'
+import { ComponentValidationError, Component } from '../component'
 import {
     convertDate,
     ICalendarDate,
@@ -24,7 +25,10 @@ export class CalendarEvent extends Component {
         c?: ICalendarDate | Date
     ) {
         let component: Component
-        if (b) {
+        if (a instanceof Component) {
+            component = a as Component
+            CalendarEvent.prototype.validate.call(component)
+        } else {
             const uid = a as string
             const dtstamp = convertDate(b!)
             const dtstart = convertDate(c!)
@@ -32,8 +36,6 @@ export class CalendarEvent extends Component {
             component.setProperty('UID', uid)
             component.setProperty('DTSTAMP', dtstamp)
             component.setProperty('DTSTART', dtstart)
-        } else {
-            component = a as Component
         }
         super(component.name, component.properties, component.components)
     }
@@ -45,6 +47,17 @@ export class CalendarEvent extends Component {
             )
         }
         return super.serialize()
+    }
+
+    validate() {
+        if (this.name !== 'VEVENT')
+            throw new ComponentValidationError('Component name must be VEVENT')
+        const requiredProperties: KnownPropertyName[] = [
+            'UID',
+            'DTSTAMP',
+            'DTSTART',
+        ]
+        this.validateAllProperties(requiredProperties)
     }
 
     stamp(): ICalendarDate {

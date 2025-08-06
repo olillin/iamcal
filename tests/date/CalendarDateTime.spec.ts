@@ -1,4 +1,4 @@
-import { CalendarDate, CalendarDateTime } from '../../src/date'
+import { CalendarDate, CalendarDateTime } from '../../src'
 
 describe('constructor', () => {
     it('can be created from a Date object', () => {

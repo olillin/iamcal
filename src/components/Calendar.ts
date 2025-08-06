@@ -1,4 +1,5 @@
-import { Component } from '../component'
+import { KnownPropertyName } from 'src/property'
+import { Component, ComponentValidationError } from '../component'
 import { CalendarEvent } from './CalendarEvent'
 
 /**
@@ -30,6 +31,7 @@ export class Calendar extends Component {
         let component: Component
         if (a instanceof Component) {
             component = a as Component
+            Calendar.prototype.validate.call(component)
         } else {
             const prodid = a as string
             const version = (b as string) ?? '2.0'
@@ -38,6 +40,15 @@ export class Calendar extends Component {
             component.setProperty('VERSION', version)
         }
         super(component.name, component.properties, component.components)
+    }
+
+    validate() {
+        if (this.name !== 'VCALENDAR')
+            throw new ComponentValidationError(
+                'Component name must be VCALENDAR'
+            )
+        const requiredProperties: KnownPropertyName[] = ['PRODID', 'VERSION']
+        this.validateAllProperties(requiredProperties)
     }
 
     events(): CalendarEvent[] {

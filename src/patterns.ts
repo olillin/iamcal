@@ -32,8 +32,30 @@ export const contentline = new RegExp(
     name.source + '(;' + param.source + ')*:' + xName.source + '\r\n'
 )
 
-export const date = /[0-9]{8}/
-export const dateTime = /[0-9]{8}T[0-9]{6}Z?/
+export const TSAFE_CHAR = new RegExp(
+    /[\x09\x20\x21\x23-\x2B\x2D-\x39\x3C-\x5B\x5D-\x7E]/.source +
+        '|' +
+        NON_US_ASCII.source
+)
+
+// Property value type patterns
+export const valueTypeBinary =
+    /([0-9a-zA-Z+/]{4})*([0-9a-zA-Z]{2}==|[0-9a-zA-Z]{3}=)?/
+export const valueTypeBoolean = /(TRUE|FALSE)/
+export const valueTypeDate = /[0-9]{8}/
+export const valueTypeDateTime = /[0-9]{8}T[0-9]{6}Z?/
+export const valueTypeDuration =
+    /(\+?|-)P([0-9]+D(T([0-9]+H([0-9]+M([0-9]+S)?)?|[0-9]+M([0-9]+S)?|[0-9]+S))?|T([0-9]+H([0-9]+M([0-9]+S)?)?|[0-9]+M([0-9]+S)?|[0-9]+S)|[0-9]+W)/
+export const valueTypeFloat = /(\+?|-)?[0-9]+(\.[0-9]+)?/
+export const valueTypeInteger = /(\+?|-)?[0-9]+/
+export const valueTypePeriod = new RegExp(
+    `${valueTypeDateTime.source}/(${valueTypeDateTime}|${valueTypeDuration.source})`
+)
+export const valueTypeText = new RegExp(
+    '((' + TSAFE_CHAR.source + ')|:|"|\\[\\;,Nn])*'
+)
+export const valueTypeTime = /[0-9]{6}Z?/
+export const valueTypeUtcOffset = /[+-]([0-9]{2}){2,3}/
 
 /**
  * Check if a string matches a pattern for the whole string.

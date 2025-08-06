@@ -1,9 +1,9 @@
-import { Property } from '../../src'
 import {
     CalendarDate,
     CalendarDateTime,
     parseDateProperty,
-} from '../../src/date'
+    Property,
+} from '../../src'
 
 it('returns a CalendarDateTime with value type DATE-TIME', () => {
     const property: Property = {

@@ -1,4 +1,4 @@
-import { CalendarDate, CalendarDateTime, convertDate } from '../../src/date'
+import { CalendarDate, CalendarDateTime, convertDate } from '../../src'
 
 it('returns a CalendarDate object as is', () => {
     const date = new CalendarDate('2023-10-01')

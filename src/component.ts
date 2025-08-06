@@ -1,13 +1,23 @@
 import { ICalendarDate } from './date'
+import {
+    AllowedPropertyName,
+    KnownPropertyName,
+    MissingPropertyError,
+    Property,
+    PropertyValidationError,
+    validateProperty,
+} from './property'
+
+/** Represents an error which occurs while validating a calendar component. */
+export class ComponentValidationError extends Error {
+    constructor(message: string) {
+        super(message)
+        this.name = 'ComponentValidationError'
+    }
+}
 
 // Max line length as defined by RFC 5545 3.1.
 const MAX_LINE_LENGTH = 75
-
-export interface Property {
-    name: string
-    params: string[]
-    value: string
-}
 
 export class Component {
     name: string
@@ -169,5 +179,68 @@ export class Component {
         }
 
         return components
+    }
+
+    /**
+     * Validate the component according to the rules of the iCalendar
+     * specification.
+     *
+     * This method should be overridden by subclasses to
+     * implement specific validation logic. The methods
+     * {@link validateRequiredProperty} and {@link validateOptionalProperty} may
+     * help with this.
+     * @throws {ComponentValidationError} If the component is invalid.
+     */
+    validate(): void {}
+
+    /**
+     * Validate that a property exists and is valid using {@link validateProperty}.
+     * @throws {MissingPropertyError} If the property doesn't exist.
+     * @throws {PropertyValidationError} If the property exists and is invalid.
+     */
+    validateRequiredProperty(propertyName: AllowedPropertyName) {
+        const property = this.getProperty(propertyName)
+        if (property == null)
+            throw new MissingPropertyError(
+                `Missing required property ${propertyName}`
+            )
+        validateProperty(property)
+    }
+
+    /**
+     * Validate that a property is valid using {@link validateProperty} if it exists.
+     * @throws {PropertyValidationError} If the property exists and is invalid.
+     */
+    validateOptionalProperty(propertyName: AllowedPropertyName) {
+        const property = this.getProperty(propertyName)
+        if (property != null) validateProperty(property)
+    }
+
+    /**
+     * Validate all properties on this component.
+     *
+     * If a property is in `requiredProperties` it is
+     * validated with {@link validateRequiredProperty}, otherwise it is
+     * validated with {@link validateOptionalProperty}.
+     * @param requiredProperties A list of property names which are required on this component.
+     */
+    validateAllProperties(requiredProperties?: AllowedPropertyName[]) {
+        requiredProperties?.forEach(propertyName => {
+            if (!this.hasProperty(propertyName)) {
+                throw new MissingPropertyError(
+                    `Missing required property ${propertyName}`
+                )
+            }
+        })
+
+        this.properties.forEach(property => {
+            if (
+                requiredProperties?.includes(property.name as KnownPropertyName)
+            ) {
+                this.validateRequiredProperty(property.name)
+            } else {
+                this.validateOptionalProperty(property.name)
+            }
+        })
     }
 }

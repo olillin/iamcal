@@ -1,4 +1,4 @@
-import { toTimeString } from '../../src/date'
+import { toTimeString } from '../../src'
 
 it('formats time as HHmmSS', () => {
     const date = new Date(2025, 6, 29, 12, 34, 56, 789)

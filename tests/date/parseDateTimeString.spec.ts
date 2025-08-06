@@ -1,4 +1,4 @@
-import { parseDateTimeString } from '../../src/date'
+import { parseDateTimeString } from '../../src'
 
 it('throws if the date is invalid', () => {
     const date = 'Invalid Date'

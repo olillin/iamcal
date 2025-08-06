@@ -1,6 +1,5 @@
-import type { Property } from './component'
-import { getPropertyValueType } from './parse'
 import * as patterns from './patterns'
+import { getPropertyValueType, type Property } from './property'
 
 export const ONE_SECOND_MS = 1000
 export const ONE_MINUTE_MS = 60 * ONE_SECOND_MS
@@ -217,7 +216,7 @@ export function toDateTimeStringUTC(date: Date): string {
  * @param dateTime a date-time string formatted according to RFC5545
  */
 export function parseDateTimeString(dateTime: string): Date {
-    if (!patterns.dateTime.test(dateTime)) {
+    if (!patterns.valueTypeDateTime.test(dateTime)) {
         throw new Error('Date-time has invalid format')
     }
 
@@ -268,7 +267,7 @@ export function parseDateTimeString(dateTime: string): Date {
  * @param date a date-time string formatted according to RFC5545
  */
 export function parseDateString(date: string): Date {
-    if (!patterns.matchesWholeString(patterns.date, date)) {
+    if (!patterns.matchesWholeString(patterns.valueTypeDate, date)) {
         throw new Error('Date has invalid format')
     }
 

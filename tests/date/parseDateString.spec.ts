@@ -1,4 +1,4 @@
-import { parseDateString } from '../../src/date'
+import { parseDateString } from '../../src'
 
 it('throws if the date format is invalid', () => {
     const date = 'Invalid Date'

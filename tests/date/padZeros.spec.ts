@@ -1,4 +1,4 @@
-import { padZeros } from '../../src/date'
+import { padZeros } from '../../src'
 
 it('returns 00123 for 123 with length 5', () => {
     const length = 5

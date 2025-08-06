@@ -1,22 +1,33 @@
-import { Component } from '../component'
+import { KnownPropertyName } from 'src/property'
+import { Component, ComponentValidationError } from '../component'
 import { convertDate, ICalendarDate, parseDateProperty } from '../date'
 
 /**
  * Represents a VTIMEZONE component, containing time zone definitions.
  */
 export class TimeZone extends Component {
+    name = 'VTIMEZONE'
+
     constructor(id: string)
     constructor(component: Component)
     constructor(a: string | Component) {
         let component: Component
         if (a instanceof Component) {
             component = a as Component
+            TimeZone.prototype.validate.call(component)
         } else {
             const tzid = a as string
             component = new Component('VTIMEZONE')
             component.setProperty('TZID', tzid)
         }
         super(component.name, component.properties, component.components)
+    }
+
+    validate() {
+        if (this.name !== 'VTIMEZONE')
+            throw new ComponentValidationError('Component name must be VEVENT')
+        const requiredProperties: KnownPropertyName[] = ['TZID']
+        this.validateAllProperties(requiredProperties)
     }
 
     id(): string {

@@ -1,4 +1,4 @@
-import { toDateString } from '../../src/date'
+import { toDateString } from '../../src'
 
 it('formats date as YYYYMMSS', () => {
     const date = new Date(2025, 9, 29, 12, 34, 56, 789)
