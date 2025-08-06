@@ -1,40 +1,78 @@
-import { Component } from "../component"
-import { parseDate, toDateString, toDateTimeString } from "../parse"
+import { KnownPropertyName, PropertyValidationError } from '../property'
+import { ComponentValidationError, Component } from '../component'
+import {
+    CalendarDateTime,
+    convertDate,
+    ICalendarDate,
+    parseDateProperty,
+    toDateTimeString,
+} from '../date'
 
 /**
  * Represents a VEVENT component, representing an event in a calendar.
  */
 export class CalendarEvent extends Component {
-    name = 'VEVENT';
+    name = 'VEVENT'
 
-    constructor(uid: string, dtstamp: Date)
+    constructor(
+        uid: string,
+        dtstamp: CalendarDateTime | Date,
+        dtstart: ICalendarDate | Date
+    )
     constructor(component: Component)
-    constructor(a: string | Component, b?: Date) {
-        var component: Component
-        if (b) {
+    constructor(
+        a: string | Component,
+        b?: CalendarDateTime | Date,
+        c?: ICalendarDate | Date
+    ) {
+        let component: Component
+        if (a instanceof Component) {
+            component = a as Component
+            CalendarEvent.prototype.validate.call(component)
+        } else {
             const uid = a as string
-            const dtstamp = b as Date
+            const dtstamp = convertDate(b!, false)
+            const dtstart = convertDate(c!)
             component = new Component('VEVENT')
             component.setProperty('UID', uid)
-            component.setProperty('DTSTAMP', toDateTimeString(dtstamp))
-        } else {
-            component = a as Component
+            component.setProperty('DTSTAMP', dtstamp)
+            component.setProperty('DTSTART', dtstart)
         }
         super(component.name, component.properties, component.components)
     }
 
-    stamp(): Date {
-        return parseDate(this.getProperty('DTSTAMP')!)
+    serialize(): string {
+        if (!this.end() && !this.duration()) {
+            throw new Error(
+                'Failed to serialize calendar event, end or duration must be set'
+            )
+        }
+        return super.serialize()
     }
 
-    setStamp(value: Date, fullDay: boolean = false): this {
-        if (fullDay) {
-            this.setProperty('DTSTAMP', toDateString(value))
-            this.setPropertyParams('DTSTAMP', ['VALUE=DATE'])
-        } else {
-            this.setProperty('DTSTAMP', toDateTimeString(value))
+    validate() {
+        if (this.name !== 'VEVENT')
+            throw new ComponentValidationError('Component name must be VEVENT')
+        const requiredProperties: KnownPropertyName[] = [
+            'UID',
+            'DTSTAMP',
+            'DTSTART',
+        ]
+        this.validateAllProperties(requiredProperties)
+    }
+
+    stamp(): CalendarDateTime {
+        return parseDateProperty(
+            this.getProperty('DTSTAMP')!
+        ) as CalendarDateTime
+    }
+
+    setStamp(value: CalendarDateTime | Date): this {
+        const converted = convertDate(value, false)
+        if (converted.isFullDay()) {
+            throw new PropertyValidationError('DTSTAMP cannot be of type DATE')
         }
-        return this
+        return this.setProperty('DTSTAMP', converted)
     }
 
     uid(): string {
@@ -83,60 +121,97 @@ export class CalendarEvent extends Component {
 
     /**
      * Get the start of the event.
-     * If set as a full day the time will be at the start of the day.
+     * @returns The start date of the event as an {@link ICalendarDate}.
      */
-    start(): Date | undefined {
-        const property = this.getProperty('DTSTART')
-        if (!property) return
-        return parseDate(property)
+    start(): ICalendarDate {
+        return parseDateProperty(this.getProperty('DTSTART')!)
     }
 
-    /** Set the start of the event. */
-    setStart(value: Date, fullDay: boolean = false): this {
-        if (fullDay) {
-            this.setProperty('DTSTART', toDateString(value))
-            this.setPropertyParams('DTSTART', ['VALUE=DATE'])
-        } else {
-            this.setProperty('DTSTART', toDateTimeString(value))
-        }
-        return this
-    }
-
-    removeStart() {
-        this.removePropertiesWithName('DTSTART')
+    /**
+     * Set the start of the event.
+     * @param value The start date of the event as an {@link ICalendarDate} or `Date`.
+     * @returns The CalendarEvent instance for chaining.
+     */
+    setStart(value: ICalendarDate | Date): this {
+        return this.setProperty('DTSTART', convertDate(value))
     }
 
     /**
      * Get the non-inclusive end of the event.
-     * If set as a full day the time will be at the start of the day.
+     * @returns The end date of the event as an {@link ICalendarDate} or `undefined` if not set.
      */
-    end(): Date | undefined {
+    end(): ICalendarDate | undefined {
         const property = this.getProperty('DTEND')
         if (!property) return
-        return parseDate(property)
+        return parseDateProperty(property)
     }
 
     /**
-     * Set the non-inclusive end of the event.
+     * Set the exclusive end of the event.
+     *
+     * Will remove 'duration' if present.
+     * @param value The end date of the event as an {@link ICalendarDate} or `Date`.
+     * @returns The CalendarEvent instance for chaining.
+     * @throws If the end date is a full day date and the start date is a date-time, or vice versa.
      */
-    setEnd(value: Date, fullDay: boolean = false): this {
-        if (fullDay) {
-            this.setProperty('DTEND', toDateString(value))
-            this.setPropertyParams('DTEND', ['VALUE=DATE'])
-        } else {
-            this.setProperty('DTEND', toDateTimeString(value))
+    setEnd(value: ICalendarDate | Date): this {
+        const date = convertDate(value)
+        const start = this.start()
+        if (date.isFullDay() !== start.isFullDay()) {
+            throw new Error(
+                `End must be same date type as start. Start is ${start.isFullDay() ? 'date' : 'datetime'} but new end value is ${date.isFullDay() ? 'date' : 'datetime'}`
+            )
         }
-        return this
+
+        this.removeDuration()
+        return this.setProperty('DTEND', date)
     }
 
+    /**
+     * Remove the end of the event.
+     *
+     * NOTE: An event must have either an end or a duration set.
+     */
     removeEnd() {
         this.removePropertiesWithName('DTEND')
     }
 
-    created(): Date | undefined {
+    /**
+     * Set the duration of the event.
+     *
+     * Will remove 'end' if present.
+     * @param value The duration of the event as a string in the format defined by RFC5545.
+     * @returns The CalendarEvent instance for chaining.
+     * @example
+     * // Set duration to 1 hour and 30 minutes.
+     * event.setDuration(`PT1H30M`)
+     */
+    setDuration(value: string): this {
+        this.removeEnd()
+        return this.setProperty('DURATION', value)
+    }
+
+    /**
+     * Get the duration of the event.
+     * @returns The duration of the event as a string in the format defined by RFC5545, or `undefined` if not set.
+     */
+    duration(): string | undefined {
+        return this.getProperty('DURATION')?.value
+    }
+
+    /**
+     * Remove the duration of the event.
+     *
+     * NOTE: An event must have either an end or a duration set.
+     */
+    removeDuration() {
+        this.removePropertiesWithName('DURATION')
+    }
+
+    created(): ICalendarDate | undefined {
         const property = this.getProperty('CREATED')
         if (!property) return
-        return parseDate(property)
+        return parseDateProperty(property)
     }
 
     setCreated(value: Date): this {
@@ -150,15 +225,16 @@ export class CalendarEvent extends Component {
     geo(): [number, number] | undefined {
         const text = this.getProperty('GEO')?.value
         if (!text) return
-        const pattern = /^[+-]?\d+(\.\d+)?,[+-]?\d+(\.\d+)?$/
-        if (!pattern.test(text)) throw new Error(`Failed to parse GEO property: ${text}`)
+        const validGeoPattern = /^[+-]?\d+(\.\d+)?;[+-]?\d+(\.\d+)?$/
+        if (!validGeoPattern.test(text))
+            throw new Error(`Failed to parse GEO property: ${text}`)
         const [longitude, latitude] = text.split(',')
         return [parseFloat(longitude), parseFloat(latitude)]
     }
 
     setGeo(latitude: number, longitude: number): this {
-        const text = `${latitude},${longitude}`
-        return this
+        const text = `${latitude};${longitude}`
+        return this.setProperty('GEO', text)
     }
 
     removeGeo() {

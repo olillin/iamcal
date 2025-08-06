@@ -1,22 +1,33 @@
-import { Component } from '../component'
-import { parseDate, toDateString, toDateTimeString } from '../parse'
+import { KnownPropertyName } from '../property'
+import { Component, ComponentValidationError } from '../component'
+import { convertDate, ICalendarDate, parseDateProperty } from '../date'
 
 /**
  * Represents a VTIMEZONE component, containing time zone definitions.
  */
 export class TimeZone extends Component {
+    name = 'VTIMEZONE'
+
     constructor(id: string)
     constructor(component: Component)
     constructor(a: string | Component) {
-        var component: Component
+        let component: Component
         if (a instanceof Component) {
             component = a as Component
+            TimeZone.prototype.validate.call(component)
         } else {
             const tzid = a as string
             component = new Component('VTIMEZONE')
             component.setProperty('TZID', tzid)
         }
         super(component.name, component.properties, component.components)
+    }
+
+    validate() {
+        if (this.name !== 'VTIMEZONE')
+            throw new ComponentValidationError('Component name must be VEVENT')
+        const requiredProperties: KnownPropertyName[] = ['TZID']
+        this.validateAllProperties(requiredProperties)
     }
 
     id(): string {
@@ -27,10 +38,10 @@ export class TimeZone extends Component {
         return this.setProperty('TZID', value)
     }
 
-    lastMod(): Date | undefined {
+    lastMod(): ICalendarDate | undefined {
         const text = this.getProperty('LAST-MOD')
         if (!text) return
-        return parseDate(text)
+        return parseDateProperty(text)
     }
 
     setLastMod(value: Date): this {
@@ -53,25 +64,41 @@ export class TimeZone extends Component {
         this.removePropertiesWithName('TZURL')
     }
 
-    /** Get all time offsets. */
+    /**
+     * Get all time offsets.
+     * @returns An array of time zone offsets defined in this time zone.
+     */
     offsets(): TimeZoneOffset[] {
         const offsets: TimeZoneOffset[] = []
         this.components.forEach(component => {
-            if (component.name === 'STANDARD' || component.name === 'DAYLIGHT') {
+            if (
+                component.name === 'STANDARD' ||
+                component.name === 'DAYLIGHT'
+            ) {
                 offsets.push(new TimeZoneOffset(component))
             }
         })
         return offsets
     }
 
-    /** Get standard/winter time offsets. */
+    /**
+     * Get standard/winter time offsets.
+     * @returns An array of time zone offsets defined in this time zone that are of type STANDARD.
+     */
     standardOffsets(): TimeZoneOffset[] {
-        return this.getComponentsWithName('STANDARD').map(c => new TimeZoneOffset(c))
+        return this.getComponentsWithName('STANDARD').map(
+            c => new TimeZoneOffset(c)
+        )
     }
 
-    /** Get daylight savings time offsets. */
+    /**
+     * Get daylight savings time offsets.
+     * @returns An array of time zone offsets defined in this time zone that are of type DAYLIGHT.
+     */
     daylightOffsets(): TimeZoneOffset[] {
-        return this.getComponentsWithName('DAYLIGHT').map(c => new TimeZoneOffset(c))
+        return this.getComponentsWithName('DAYLIGHT').map(
+            c => new TimeZoneOffset(c)
+        )
     }
 }
 
@@ -81,43 +108,46 @@ export type Offset = `${'-' | '+'}${Digit}${Digit}${Digit}${Digit}`
 /** Represents a STANDARD or DAYLIGHT component, defining a time zone offset. */
 class TimeZoneOffset extends Component {
     /**
-     *
      * @param type If this is a STANDARD or DAYLIGHT component.
      * @param start From when this offset is active.
      * @param offsetFrom The offset that is in use prior to this time zone observance.
      * @param offsetTo The offset that is in use during this time zone observance.
      */
-    constructor(type: OffsetType, start: Date, offsetFrom: Offset, offsetTo: Offset)
+    constructor(
+        type: OffsetType,
+        start: ICalendarDate | Date,
+        offsetFrom: Offset,
+        offsetTo: Offset
+    )
     constructor(component: Component)
-    constructor(a: OffsetType | Component, b?: Date, c?: Offset, d?: Offset) {
-        var component: Component
+    constructor(
+        a: OffsetType | Component,
+        b?: ICalendarDate | Date,
+        c?: Offset,
+        d?: Offset
+    ) {
+        let component: Component
         if (a instanceof Component) {
             component = a as Component
         } else {
             const name = a as OffsetType
-            const start = b as Date
+            const start = convertDate(b!)
             const offsetFrom = c as Offset
             const offsetTo = d as Offset
             component = new Component(name)
-            component.setProperty('DTSTART', toDateTimeString(start))
+            component.setProperty('DTSTART', start)
             component.setProperty('TZOFFSETFROM', offsetFrom)
             component.setProperty('TZOFFSETTO', offsetTo)
         }
         super(component.name, component.properties, component.components)
     }
 
-    start(): Date {
-        return parseDate(this.getProperty('DTSTART')!)
+    start(): ICalendarDate {
+        return parseDateProperty(this.getProperty('DTSTART')!)
     }
 
-    setStart(value: Date, fullDay: boolean = false): this {
-        if (fullDay) {
-            this.setProperty('DTSTART', toDateString(value))
-            this.setPropertyParams('DTSTART', ['VALUE=DATE'])
-        } else {
-            this.setProperty('DTSTART', toDateTimeString(value))
-        }
-        return this
+    setStart(value: ICalendarDate | Date): this {
+        return this.setProperty('DTSTART', convertDate(value))
     }
 
     offsetFrom(): Offset {

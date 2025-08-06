@@ -1,6 +1,6 @@
-import { Component, Property } from './component'
 import readline from 'readline'
 import { Readable } from 'stream'
+import { Component } from './component'
 import { Calendar, CalendarEvent } from './components'
 
 export class DeserializationError extends Error {
@@ -11,7 +11,9 @@ export class DeserializationError extends Error {
  * Deserialize a calendar component
  * @param lines the serialized component as a readline interface
  */
-export async function deserialize(lines: readline.Interface): Promise<Component> {
+export async function deserialize(
+    lines: readline.Interface
+): Promise<Component> {
     const component = new Component('')
     let done = false
 
@@ -52,7 +54,9 @@ export async function deserialize(lines: readline.Interface): Promise<Component>
             // Check the length of the stack after being popped
             if (stack.length == 1) {
                 subcomponentLines.push(line)
-                const subcomponent = await deserializeString(subcomponentLines.join('\r\n'))
+                const subcomponent = await deserializeString(
+                    subcomponentLines.join('\r\n')
+                )
                 subcomponentLines.length = 0
 
                 component.components.push(subcomponent)
@@ -62,7 +66,8 @@ export async function deserialize(lines: readline.Interface): Promise<Component>
                 done = true
             }
         } else {
-            if (stack.length == 0) throw new DeserializationError('Property outside of components')
+            if (stack.length == 0)
+                throw new DeserializationError('Property outside of components')
 
             if (stack.length > 1) {
                 // Line of subcomponent
@@ -71,7 +76,9 @@ export async function deserialize(lines: readline.Interface): Promise<Component>
                 // Property
                 const colon = line.indexOf(':')
                 if (colon === -1) {
-                    throw new DeserializationError(`Invalid content line: ${line}`)
+                    throw new DeserializationError(
+                        `Invalid content line: ${line}`
+                    )
                 }
                 const name = line.slice(0, colon)
                 const value = line.slice(colon + 1)
@@ -137,7 +144,10 @@ export async function deserialize(lines: readline.Interface): Promise<Component>
  */
 export async function deserializeString(text: string): Promise<Component> {
     const stream = Readable.from(text)
-    const lines = readline.createInterface({ input: stream, crlfDelay: Infinity })
+    const lines = readline.createInterface({
+        input: stream,
+        crlfDelay: Infinity,
+    })
     return deserialize(lines)
 }
 
@@ -148,8 +158,8 @@ export async function deserializeString(text: string): Promise<Component> {
  */
 export async function parseCalendar(text: string): Promise<Calendar> {
     const component = await deserializeString(text)
-    if (component.name !== "VCALENDAR")
-        throw new DeserializationError("Not a calendar")
+    if (component.name !== 'VCALENDAR')
+        throw new DeserializationError('Not a calendar')
     return new Calendar(component)
 }
 
@@ -160,30 +170,7 @@ export async function parseCalendar(text: string): Promise<Calendar> {
  */
 export async function parseEvent(text: string): Promise<CalendarEvent> {
     const component = await deserializeString(text)
-    if (component.name !== "VEVENT")
-        throw new DeserializationError("Not an event")
+    if (component.name !== 'VEVENT')
+        throw new DeserializationError('Not an event')
     return new CalendarEvent(component)
-}
-
-export function parseDate(dateProperty: Property): Date {
-    const value = dateProperty.value.trim()
-    if (dateProperty.params.includes('VALUE=DATE')) {
-        // Parse date only
-        return new Date(`${value.substring(0, 4)}-${value.substring(4, 6)}-${value.substring(6, 8)}`)
-    } else {
-        // Parse date and time
-        return new Date(`${value.substring(0, 4)}-${value.substring(4, 6)}-${value.substring(6, 8)} ${value.substring(9, 11)}:${value.substring(11, 13)}:${value.substring(13, 15)}`)
-    }
-}
-
-export function toTimeString(date: Date): string {
-    return `${date.getHours().toString().padStart(2, '0')}${date.getMinutes().toString().padStart(2, '0')}${date.getSeconds().toString().padStart(2, '0')}`
-}
-
-export function toDateString(date: Date): string {
-    return `${date.getFullYear().toString().padStart(4, '0')}${date.getMonth().toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`
-}
-
-export function toDateTimeString(date: Date): string {
-    return `${toDateString(date)}T${toTimeString(date)}`
 }

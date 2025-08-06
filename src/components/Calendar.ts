@@ -1,33 +1,37 @@
-import { Component } from '../component'
+import { KnownPropertyName } from '../property'
+import { Component, ComponentValidationError } from '../component'
 import { CalendarEvent } from './CalendarEvent'
 
 /**
  * Represents a VCALENDAR component, the root component of an iCalendar file.
  */
 export class Calendar extends Component {
-    name = 'VCALENDAR';
+    name = 'VCALENDAR'
 
     /**
      * @param prodid A unique identifier of the program creating the calendar.
-     *
-     * Example: `-//Google Inc//Google Calendar 70.9054//EN`
+     * @example
+     * new Calendar('-//Google Inc//Google Calendar 70.9054//EN')
      */
     constructor(prodid: string)
+
     /**
      * @param prodid A unique identifier of the program creating the calendar.
-     *
-     * Example: `-//Google Inc//Google Calendar 70.9054//EN`
      * @param version The version of the iCalendar specification that this calendar uses.
+     * @example
+     * new Calendar('-//Google Inc//Google Calendar 70.9054//EN')
      */
     constructor(prodid: string, version: string)
+
     /**
      * @param component A VCALENDAR component.
      */
     constructor(component: Component)
     constructor(a?: string | Component, b?: string) {
-        var component: Component
+        let component: Component
         if (a instanceof Component) {
             component = a as Component
+            Calendar.prototype.validate.call(component)
         } else {
             const prodid = a as string
             const version = (b as string) ?? '2.0'
@@ -38,8 +42,19 @@ export class Calendar extends Component {
         super(component.name, component.properties, component.components)
     }
 
+    validate() {
+        if (this.name !== 'VCALENDAR')
+            throw new ComponentValidationError(
+                'Component name must be VCALENDAR'
+            )
+        const requiredProperties: KnownPropertyName[] = ['PRODID', 'VERSION']
+        this.validateAllProperties(requiredProperties)
+    }
+
     events(): CalendarEvent[] {
-        return this.getComponentsWithName('VEVENT').map(c => new CalendarEvent(c))
+        return this.getComponentsWithName('VEVENT').map(
+            c => new CalendarEvent(c)
+        )
     }
 
     removeEvent(event: CalendarEvent): boolean
