@@ -84,7 +84,7 @@ describe('getValue', () => {
 
     it('returns same day when time is midnight', () => {
         const date = new Date('2025-08-05T00:00:00')
-        const calendarDate = new CalendarDate(date)
+        const calendarDate = new CalendarDateTime(date)
         expect(calendarDate.getValue()).toBe('20250805T000000')
     })
 

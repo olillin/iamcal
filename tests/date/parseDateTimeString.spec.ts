@@ -51,7 +51,7 @@ describe('dates', () => {
     })
 
     it("doesn't throw on the last day of March", () => {
-        const date = '20250331' // March has 31 days
+        const date = '20250331T123456' // March has 31 days
         expect(() => parseDateTimeString(date)).not.toThrow()
     })
 
