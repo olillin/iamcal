@@ -42,7 +42,7 @@ export class CalendarEvent extends Component {
     }
 
     serialize(): string {
-        if (!this.end() && !this.duration()) {
+        if (!this.getEnd() && !this.duration()) {
             throw new Error(
                 'Failed to serialize calendar event, end or duration must be set'
             )
@@ -61,7 +61,7 @@ export class CalendarEvent extends Component {
         this.validateAllProperties(requiredProperties)
     }
 
-    stamp(): CalendarDateTime {
+    getStamp(): CalendarDateTime {
         return parseDateProperty(
             this.getProperty('DTSTAMP')!
         ) as CalendarDateTime
@@ -75,7 +75,7 @@ export class CalendarEvent extends Component {
         return this.setProperty('DTSTAMP', converted)
     }
 
-    uid(): string {
+    getUid(): string {
         return this.getProperty('UID')!.value
     }
 
@@ -83,7 +83,7 @@ export class CalendarEvent extends Component {
         return this.setProperty('UID', value)
     }
 
-    summary(): string | undefined {
+    getSummary(): string | undefined {
         return this.getProperty('SUMMARY')?.value
     }
 
@@ -95,7 +95,7 @@ export class CalendarEvent extends Component {
         this.removePropertiesWithName('SUMMARY')
     }
 
-    description(): string | undefined {
+    getDescription(): string | undefined {
         return this.getProperty('DESCRIPTION')?.value
     }
 
@@ -107,7 +107,7 @@ export class CalendarEvent extends Component {
         this.removePropertiesWithName('DESCRIPTION')
     }
 
-    location(): string | undefined {
+    getLocation(): string | undefined {
         return this.getProperty('LOCATION')?.value
     }
 
@@ -123,7 +123,7 @@ export class CalendarEvent extends Component {
      * Get the start of the event.
      * @returns The start date of the event as an {@link ICalendarDate}.
      */
-    start(): ICalendarDate {
+    getStart(): ICalendarDate {
         return parseDateProperty(this.getProperty('DTSTART')!)
     }
 
@@ -140,7 +140,7 @@ export class CalendarEvent extends Component {
      * Get the non-inclusive end of the event.
      * @returns The end date of the event as an {@link ICalendarDate} or `undefined` if not set.
      */
-    end(): ICalendarDate | undefined {
+    getEnd(): ICalendarDate | undefined {
         const property = this.getProperty('DTEND')
         if (!property) return
         return parseDateProperty(property)
@@ -156,7 +156,7 @@ export class CalendarEvent extends Component {
      */
     setEnd(value: ICalendarDate | Date): this {
         const date = convertDate(value)
-        const start = this.start()
+        const start = this.getStart()
         if (date.isFullDay() !== start.isFullDay()) {
             throw new Error(
                 `End must be same date type as start. Start is ${start.isFullDay() ? 'date' : 'datetime'} but new end value is ${date.isFullDay() ? 'date' : 'datetime'}`
@@ -177,6 +177,14 @@ export class CalendarEvent extends Component {
     }
 
     /**
+     * Get the duration of the event.
+     * @returns The duration of the event as a string in the format defined by RFC5545, or `undefined` if not set.
+     */
+    getDuration(): string | undefined {
+        return this.getProperty('DURATION')?.value
+    }
+
+    /**
      * Set the duration of the event.
      *
      * Will remove 'end' if present.
@@ -192,14 +200,6 @@ export class CalendarEvent extends Component {
     }
 
     /**
-     * Get the duration of the event.
-     * @returns The duration of the event as a string in the format defined by RFC5545, or `undefined` if not set.
-     */
-    duration(): string | undefined {
-        return this.getProperty('DURATION')?.value
-    }
-
-    /**
      * Remove the duration of the event.
      *
      * NOTE: An event must have either an end or a duration set.
@@ -208,7 +208,7 @@ export class CalendarEvent extends Component {
         this.removePropertiesWithName('DURATION')
     }
 
-    created(): ICalendarDate | undefined {
+    getCreated(): ICalendarDate | undefined {
         const property = this.getProperty('CREATED')
         if (!property) return
         return parseDateProperty(property)
@@ -222,7 +222,7 @@ export class CalendarEvent extends Component {
         this.removePropertiesWithName('CREATED')
     }
 
-    geo(): [number, number] | undefined {
+    getGeographicPosition(): [number, number] | undefined {
         const text = this.getProperty('GEO')?.value
         if (!text) return
         const validGeoPattern = /^[+-]?\d+(\.\d+)?;[+-]?\d+(\.\d+)?$/
@@ -232,12 +232,37 @@ export class CalendarEvent extends Component {
         return [parseFloat(longitude), parseFloat(latitude)]
     }
 
-    setGeo(latitude: number, longitude: number): this {
+    setGeographicPosition(latitude: number, longitude: number): this {
         const text = `${latitude};${longitude}`
         return this.setProperty('GEO', text)
     }
 
-    removeGeo() {
+    removeGeographicLocation() {
         this.removePropertiesWithName('GEO')
     }
+
+    /** @deprecated use {@link getStamp} instead */
+    stamp = this.getStamp
+    /** @deprecated use {@link getUid} instead */
+    uid = this.getUid
+    /** @deprecated use {@link getSummary} instead */
+    summary = this.getSummary
+    /** @deprecated use {@link getDescription} instead */
+    description = this.getDescription
+    /** @deprecated use {@link getLocation} instead */
+    location = this.getLocation
+    /** @deprecated use {@link getStart} instead */
+    start = this.getStart
+    /** @deprecated use {@link getEnd} instead */
+    end = this.getEnd
+    /** @deprecated use {@link getDuration} instead */
+    duration = this.getDuration
+    /** @deprecated use {@link getCreated} instead */
+    created = this.getCreated
+    /** @deprecated use {@link getGeographicPosition} instead */
+    geo = this.getGeographicPosition
+    /** @deprecated use {@link setGeographicPosition} instead */
+    setGeo = this.setGeographicPosition
+    /** @deprecated use {@link removeGeographicLocation} instead */
+    removeGeo = this.removeGeographicLocation
 }

@@ -51,7 +51,7 @@ export class Calendar extends Component {
         this.validateAllProperties(requiredProperties)
     }
 
-    events(): CalendarEvent[] {
+    getEvents(): CalendarEvent[] {
         return this.getComponentsWithName('VEVENT').map(
             c => new CalendarEvent(c)
         )
@@ -65,23 +65,23 @@ export class Calendar extends Component {
             return this.removeComponent(event)
         } else {
             const uid = a as string
-            for (const event of this.events()) {
-                if (event.uid() !== uid) continue
+            for (const event of this.getEvents()) {
+                if (event.getUid() !== uid) continue
                 return this.removeComponent(event)
             }
         }
         return false
     }
 
-    prodId(): string {
+    getProductId(): string {
         return this.getProperty('PRODID')!.value
     }
 
-    setProdId(value: string): this {
+    setProductId(value: string): this {
         return this.setProperty('PRODID', value)
     }
 
-    version(): string {
+    getVersion(): string {
         return this.getProperty('VERSION')!.value
     }
 
@@ -89,19 +89,19 @@ export class Calendar extends Component {
         return this.setProperty('VERSION', value)
     }
 
-    calScale(): string | undefined {
+    getCalendarScale(): string | undefined {
         return this.getProperty('CALSCALE')?.value
     }
 
-    setCalScale(value: string): this {
+    setCalendarScale(value: string): this {
         return this.setProperty('CALSCALE', value)
     }
 
-    removeCalScale() {
+    removeCalendarScale() {
         this.removePropertiesWithName('CALSCALE')
     }
 
-    method(): string | undefined {
+    getMethod(): string | undefined {
         return this.getProperty('METHOD')?.value
     }
 
@@ -113,7 +113,7 @@ export class Calendar extends Component {
         this.removePropertiesWithName('METHOD')
     }
 
-    calendarName(): string | undefined {
+    getCalendarName(): string | undefined {
         return this.getProperty('X-WR-CALNAME')?.value
     }
 
@@ -125,7 +125,7 @@ export class Calendar extends Component {
         this.removePropertiesWithName('X-WR-CALNAME')
     }
 
-    calendarDescription(): string | undefined {
+    getCalendarDescription(): string | undefined {
         return this.getProperty('X-WR-CALDESC')?.value
     }
 
@@ -136,4 +136,25 @@ export class Calendar extends Component {
     removeCalendarDescription() {
         this.removePropertiesWithName('X-WR-CALDESC')
     }
+
+    /** @deprecated use {@link getEvents} instead */
+    events = this.getEvents
+    /** @deprecated use {@link getProductId} instead */
+    prodId = this.getProductId
+    /** @deprecated use {@link setProductId} instead */
+    setProdId = this.setProductId
+    /** @deprecated use {@link getVersion} instead */
+    version = this.getVersion
+    /** @deprecated use {@link getCalendarScale} instead */
+    calScale = this.getCalendarScale
+    /** @deprecated use {@link setCalendarScale} instead */
+    setCalScale = this.setCalendarScale
+    /** @deprecated use {@link removeCalendarScale} instead */
+    removeCalScale = this.removeCalendarScale
+    /** @deprecated use {@link getMethod} instead */
+    method = this.getMethod
+    /** @deprecated use {@link getCalendarName} instead */
+    calendarName = this.getCalendarName
+    /** @deprecated use {@link getCalendarDescription} instead */
+    calendarDescription = this.getCalendarDescription
 }

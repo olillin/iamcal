@@ -1,4 +1,4 @@
-import { KnownPropertyName } from '../property'
+import { AllowedPropertyName, KnownPropertyName } from '../property'
 import { Component, ComponentValidationError } from '../component'
 import { convertDate, ICalendarDate, parseDateProperty } from '../date'
 
@@ -30,7 +30,7 @@ export class TimeZone extends Component {
         this.validateAllProperties(requiredProperties)
     }
 
-    id(): string {
+    getId(): string {
         return this.getProperty('TZID')!.value
     }
 
@@ -38,21 +38,21 @@ export class TimeZone extends Component {
         return this.setProperty('TZID', value)
     }
 
-    lastMod(): ICalendarDate | undefined {
-        const text = this.getProperty('LAST-MOD')
+    getLastModified(): ICalendarDate | undefined {
+        const text = this.getProperty('LAST-MODIFIED')
         if (!text) return
         return parseDateProperty(text)
     }
 
-    setLastMod(value: Date): this {
-        return this.setProperty('LAST-MOD', value.toISOString())
+    setLastModified(value: Date): this {
+        return this.setProperty('LAST-MODIFIED', value.toISOString())
     }
 
-    removeLastMod() {
+    removeLastModified() {
         this.removePropertiesWithName('LAST-MOD')
     }
 
-    url(): string | undefined {
+    getUrl(): string | undefined {
         return this.getProperty('TZURL')?.value
     }
 
@@ -68,7 +68,7 @@ export class TimeZone extends Component {
      * Get all time offsets.
      * @returns An array of time zone offsets defined in this time zone.
      */
-    offsets(): TimeZoneOffset[] {
+    getOffsets(): TimeZoneOffset[] {
         const offsets: TimeZoneOffset[] = []
         this.components.forEach(component => {
             if (
@@ -85,7 +85,7 @@ export class TimeZone extends Component {
      * Get standard/winter time offsets.
      * @returns An array of time zone offsets defined in this time zone that are of type STANDARD.
      */
-    standardOffsets(): TimeZoneOffset[] {
+    getStandardOffsets(): TimeZoneOffset[] {
         return this.getComponentsWithName('STANDARD').map(
             c => new TimeZoneOffset(c)
         )
@@ -95,14 +95,32 @@ export class TimeZone extends Component {
      * Get daylight savings time offsets.
      * @returns An array of time zone offsets defined in this time zone that are of type DAYLIGHT.
      */
-    daylightOffsets(): TimeZoneOffset[] {
+    getDaylightOffsets(): TimeZoneOffset[] {
         return this.getComponentsWithName('DAYLIGHT').map(
             c => new TimeZoneOffset(c)
         )
     }
+
+    /** @deprecated use {@link getId} instead */
+    id = this.getId
+    /** @deprecated use {@link getLastModified} instead */
+    lastMod = this.getLastModified
+    /** @deprecated use {@link setLastModified} instead */
+    setLastMod = this.setLastModified
+    /** @deprecated use {@link removeLastModified} instead */
+    removeLastMod = this.removeLastModified
+    /** @deprecated use {@link getUrl} instead */
+    url = this.getUrl
+    /** @deprecated use {@link getOffsets} instead */
+    offsets = this.getOffsets
+    /** @deprecated use {@link getStandardOffsets} instead */
+    standardOffsets = this.getStandardOffsets
+    /** @deprecated use {@link getDaylightOffsets} instead */
+    daylightOffsets = this.getDaylightOffsets
 }
 
-export type OffsetType = 'DAYLIGHT' | 'STANDARD'
+export const knownOffsetTypes = ['DAYLIGHT', 'STANDARD']
+export type OffsetType = (typeof knownOffsetTypes)[number]
 type Digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
 export type Offset = `${'-' | '+'}${Digit}${Digit}${Digit}${Digit}`
 /** Represents a STANDARD or DAYLIGHT component, defining a time zone offset. */
@@ -129,6 +147,7 @@ class TimeZoneOffset extends Component {
         let component: Component
         if (a instanceof Component) {
             component = a as Component
+            TimeZoneOffset.prototype.validate.call(component)
         } else {
             const name = a as OffsetType
             const start = convertDate(b!)
@@ -142,7 +161,21 @@ class TimeZoneOffset extends Component {
         super(component.name, component.properties, component.components)
     }
 
-    start(): ICalendarDate {
+    validate(): void {
+        if (!knownOffsetTypes.includes(this.name)) {
+            throw new ComponentValidationError(
+                'Component name must be STANDARD or DAYLIGHT'
+            )
+        }
+        const requiredProperties: AllowedPropertyName[] = [
+            'DTSTART',
+            'TZOFFSETFROM',
+            'TZOFFSETTO',
+        ]
+        this.validateAllProperties(requiredProperties)
+    }
+
+    getStart(): ICalendarDate {
         return parseDateProperty(this.getProperty('DTSTART')!)
     }
 
@@ -150,7 +183,7 @@ class TimeZoneOffset extends Component {
         return this.setProperty('DTSTART', convertDate(value))
     }
 
-    offsetFrom(): Offset {
+    getOffsetFrom(): Offset {
         return this.getProperty('TZOFFSETFROM')!.value as Offset
     }
 
@@ -158,7 +191,7 @@ class TimeZoneOffset extends Component {
         return this.setProperty('TZOFFSETFROM', value)
     }
 
-    offsetTo(): Offset {
+    getOffsetTo(): Offset {
         return this.getProperty('TZOFFSETTO')!.value as Offset
     }
 
@@ -166,7 +199,7 @@ class TimeZoneOffset extends Component {
         return this.setProperty('TZOFFSETTO', value)
     }
 
-    comment(): string | undefined {
+    getComment(): string | undefined {
         return this.getProperty('COMMENT')?.value
     }
 
@@ -178,7 +211,7 @@ class TimeZoneOffset extends Component {
         this.removePropertiesWithName('COMMENT')
     }
 
-    timeZoneName(): string | undefined {
+    getTimeZoneName(): string | undefined {
         return this.getProperty('TZNAME')?.value
     }
 
@@ -189,4 +222,15 @@ class TimeZoneOffset extends Component {
     removeTimeZoneName() {
         this.removePropertiesWithName('TZNAME')
     }
+
+    /** @deprecated use {@link getStart} instead */
+    start = this.getStart
+    /** @deprecated use {@link getOffsetFrom} instead */
+    offsetFrom = this.getOffsetFrom
+    /** @deprecated use {@link getOffsetTo} instead */
+    offsetTo = this.getOffsetTo
+    /** @deprecated use {@link getComment} instead */
+    comment = this.getComment
+    /** @deprecated use {@link getTimeZoneName} instead */
+    timeZoneName = this.getTimeZoneName
 }
