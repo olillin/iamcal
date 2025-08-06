@@ -3,13 +3,16 @@ import { Readable } from 'stream'
 import { Component } from './component'
 import { Calendar, CalendarEvent } from './components'
 
+/** Represents an error that occurs when deserializing a calendar component. */
 export class DeserializationError extends Error {
     name = 'DeserializationError'
 }
 
 /**
- * Deserialize a calendar component
- * @param lines the serialized component as a readline interface
+ * Deserialize a calendar component.
+ * @param lines The serialized component as a **readline** interface.
+ * @returns The deserialized calendar component object.
+ * @throws {DeserializationError} If the component is invalid.
  */
 export async function deserialize(
     lines: readline.Interface
@@ -22,11 +25,13 @@ export async function deserialize(
 
     const subcomponentLines = new Array<string>()
 
-    async function processLine(line: string) {
+    const processLine = async (line: string) => {
         if (line.trim() === '') return
 
         if (done) {
-            throw new DeserializationError('Trailing data after component end')
+            throw new DeserializationError(
+                'Found trailing data after component end'
+            )
         }
 
         if (line.startsWith('BEGIN:')) {
@@ -42,7 +47,9 @@ export async function deserialize(
         } else if (line.startsWith('END:')) {
             // End component
             if (stack.length == 0) {
-                throw new DeserializationError('Component end before begin')
+                throw new DeserializationError(
+                    'Unexpected component end outside of components'
+                )
             }
 
             const stackName = stack.pop()
@@ -67,7 +74,9 @@ export async function deserialize(
             }
         } else {
             if (stack.length == 0)
-                throw new DeserializationError('Property outside of components')
+                throw new DeserializationError(
+                    'Found stray property outside of components'
+                )
 
             if (stack.length > 1) {
                 // Line of subcomponent
@@ -132,15 +141,17 @@ export async function deserialize(
 
     // Check that component has been closed
     if (!done) {
-        throw new DeserializationError('No component end')
+        throw new DeserializationError('Component has no end')
     }
 
     return component
 }
 
 /**
- * Deserialize a calendar component
- * @param text the serialized component
+ * Deserialize a calendar component string.
+ * @param text The serialized component.
+ * @returns The deserialized component object.
+ * @throws {DeserializationError} If the component is invalid.
  */
 export async function deserializeString(text: string): Promise<Component> {
     const stream = Readable.from(text)
@@ -152,25 +163,21 @@ export async function deserializeString(text: string): Promise<Component> {
 }
 
 /**
- * Parse a calendar in ICalendar format
- * @param text the serialized calendar
- * @returns the parsed calendar
+ * Parse a serialized calendar.
+ * @param text A serialized calendar as you would see in an iCalendar file.
+ * @returns The parsed calendar object.
  */
 export async function parseCalendar(text: string): Promise<Calendar> {
     const component = await deserializeString(text)
-    if (component.name !== 'VCALENDAR')
-        throw new DeserializationError('Not a calendar')
     return new Calendar(component)
 }
 
 /**
- * Parse an event in ICalendar format
- * @param text the serialized event
- * @returns the parsed event
+ * Parse a serialized calendar event.
+ * @param text A serialized event as you would see in an iCalendar file.
+ * @returns The parsed event object.
  */
 export async function parseEvent(text: string): Promise<CalendarEvent> {
     const component = await deserializeString(text)
-    if (component.name !== 'VEVENT')
-        throw new DeserializationError('Not an event')
     return new CalendarEvent(component)
 }

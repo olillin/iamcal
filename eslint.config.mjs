@@ -26,6 +26,11 @@ export default tseslint.config(
             'jsdoc/require-description-complete-sentence': 'warn',
             'jsdoc/sort-tags': 'warn',
             'jsdoc/require-example': 'off',
+            'jsdoc/match-description': 'off',
+            'jsdoc/require-param': [
+                'warn',
+                { checkGetters: true, checkSetters: true },
+            ],
         },
     },
     tseslint.configs.recommended

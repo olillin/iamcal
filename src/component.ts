@@ -195,8 +195,9 @@ export class Component {
 
     /**
      * Validate that a property exists and is valid using {@link validateProperty}.
-     * @throws {MissingPropertyError} If the property doesn't exist.
-     * @throws {PropertyValidationError} If the property exists and is invalid.
+     * @param propertyName The name of the property to validate.
+     * @throws {MissingPropertyError} If the property doesn't exist on this component.
+     * @throws {PropertyValidationError} If the property exists but is invalid.
      */
     validateRequiredProperty(propertyName: AllowedPropertyName) {
         const property = this.getProperty(propertyName)
@@ -209,6 +210,7 @@ export class Component {
 
     /**
      * Validate that a property is valid using {@link validateProperty} if it exists.
+     * @param propertyName The name of the property to validate.
      * @throws {PropertyValidationError} If the property exists and is invalid.
      */
     validateOptionalProperty(propertyName: AllowedPropertyName) {

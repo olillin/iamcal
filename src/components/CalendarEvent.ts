@@ -120,15 +120,15 @@ export class CalendarEvent extends Component {
     }
 
     /**
-     * Get the start of the event.
-     * @returns The start date of the event as an {@link ICalendarDate}.
+     * Get the start date or time of the event.
+     * @returns The start date or time of the event as an {@link ICalendarDate}.
      */
     getStart(): ICalendarDate {
         return parseDateProperty(this.getProperty('DTSTART')!)
     }
 
     /**
-     * Set the start of the event.
+     * Set the start date or time of the event.
      * @param value The start date of the event as an {@link ICalendarDate} or `Date`.
      * @returns The CalendarEvent instance for chaining.
      */
@@ -177,8 +177,8 @@ export class CalendarEvent extends Component {
     }
 
     /**
-     * Get the duration of the event.
-     * @returns The duration of the event as a string in the format defined by RFC5545, or `undefined` if not set.
+     * Get the duration of the event as a string formatted according to the iCalendar specification.
+     * @returns The duration of the event, or `undefined` if not set.
      */
     getDuration(): string | undefined {
         return this.getProperty('DURATION')?.value
@@ -240,6 +240,8 @@ export class CalendarEvent extends Component {
     removeGeographicLocation() {
         this.removePropertiesWithName('GEO')
     }
+
+    /* eslint-disable */
 
     /** @deprecated use {@link getStamp} instead */
     stamp = this.getStamp

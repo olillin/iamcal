@@ -60,6 +60,12 @@ it("doesn't throw if with length 1 and num 0", () => {
     expect(() => padZeros(num, length)).not.toThrow()
 })
 
+it('throws if number is NaN', () => {
+    const length = 1
+    const num = NaN
+    expect(() => padZeros(num, length)).toThrow()
+})
+
 it('throws if number is decimal', () => {
     const length = 4
     const num = 1.5
@@ -69,6 +75,12 @@ it('throws if number is decimal', () => {
 it('throws if number is negative', () => {
     const length = 3
     const num = -5
+    expect(() => padZeros(num, length)).toThrow()
+})
+
+it('throws if length is NaN', () => {
+    const length = NaN
+    const num = 1
     expect(() => padZeros(num, length)).toThrow()
 })
 
@@ -85,7 +97,7 @@ it('throws if length is negative', () => {
 })
 
 it('throws if length is equal to 0', () => {
-    let length = 0
-    let num = 5
+    const length = 0
+    const num = 5
     expect(() => padZeros(num, length)).toThrow()
 })

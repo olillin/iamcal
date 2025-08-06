@@ -15,7 +15,7 @@ export interface ICalendarDate {
 
     /**
      * Get the string value of this date.
-     * @returns An RFC5545 compliant date or date-time string.
+     * @returns An iCalendar date or date-time string.
      */
     getValue(): string
 
@@ -127,7 +127,18 @@ export class CalendarDateTime implements ICalendarDate {
     }
 }
 
+/**
+ * Pad a number with leading zeros.
+ * @param num The number to pad with zeros.
+ * @param length How many digits the resulting string should have.
+ * @returns The padded string.
+ * @throws If the digits of `num` is greater than `length`.
+ * @throws If `num` is NaN, a decimal or negative.
+ * @throws If `length` is not NaN, a decimal or less than 1.
+ */
 export function padZeros(num: number, length: number): string {
+    if (isNaN(num)) throw new Error('Number must not be NaN')
+    if (isNaN(length)) throw new Error('Length must not be NaN')
     if (num < 0) throw new Error('Number must not be negative')
     if (length <= 0) throw new Error('Length must not be less than 1')
     if (num % 1 !== 0) throw new Error('Number must be an integer')
@@ -139,25 +150,69 @@ export function padZeros(num: number, length: number): string {
 
     return String(num).padStart(length, '0')
 }
+
+/**
+ * Pad zeros for the year component of a date string.
+ * @param year The year, should be positive.
+ * @returns The 4-digit padded year.
+ */
 export function padYear(year: number): string {
     return padZeros(year, 4)
 }
+
+/**
+ * Pad zeros for the month component of a date string.
+ * @param month The month, should be between 1 and 12.
+ * @returns The 2-digit padded month.
+ */
 export function padMonth(month: number): string {
     return padZeros(month, 2)
 }
+
+/**
+ * Pad zeros for the day component of a date string.
+ * @param day The day, should be between 1 and 31.
+ * @returns The 2-digit padded day.
+ */
 export function padDay(day: number): string {
     return padZeros(day, 2)
 }
+
+/**
+ * Pad zeros for the hours component of a time string.
+ * @param hours The hours, should be between 0 and 23.
+ * @returns The 2-digit padded hours.
+ */
 export function padHours(hours: number): string {
     return padZeros(hours, 2)
 }
+
+/**
+ * Pad zeros for the minutes component of a time string.
+ * @param minutes The minutes, should be between 0 and 59.
+ * @returns The 2-digit padded minutes.
+ */
 export function padMinutes(minutes: number): string {
     return padZeros(minutes, 2)
 }
+
+/**
+ * Pad zeros for the seconds component of a time string.
+ * @param seconds The seconds, should be between 0 and 59.
+ * @returns The 2-digit padded seconds.
+ */
 export function padSeconds(seconds: number): string {
     return padZeros(seconds, 2)
 }
 
+/**
+ * Parse a date property into an {@link ICalendarDate}.
+ * @param dateProperty The property to parse.
+ * @param defaultType The default value type to be used if the property does not have an explicit value type.
+ * @returns The parsed date as an {@link ICalendarDate}.
+ * @throws If the value is invalid for the value type.
+ * @throws If the value type is not `DATE-TIME` or `DATE`.
+ */
 export function parseDateProperty(
     dateProperty: Property,
     defaultType: 'DATE-TIME' | 'DATE' = 'DATE-TIME'
@@ -174,21 +229,34 @@ export function parseDateProperty(
     }
 }
 
+/**
+ * Format a date as an iCalendar compatible time string. The day of the date is
+ * ignored.
+ * @param date The date to convert to a time string.
+ * @returns The time of the date formatted according to the iCalendar specification.
+ * @throws If the date is invalid.
+ */
 export function toTimeString(date: Date): string {
     if (isNaN(date.getTime())) throw new Error('Date is invalid')
     return `${padHours(date.getHours())}${padMinutes(date.getMinutes())}${padSeconds(date.getSeconds())}`
 }
 
+/**
+ * Format a date as an iCalendar compatible date string.
+ * @param date The date to convert to a date string.
+ * @returns A date string formatted according to the iCalendar specification.
+ * @throws If the date is invalid.
+ */
 export function toDateString(date: Date): string {
     if (isNaN(date.getTime())) throw new Error('Date is invalid')
     return `${padYear(date.getFullYear())}${padMonth(date.getMonth() + 1)}${padDay(date.getDate())}`
 }
 
 /**
- * Format a date as an RFC5545 compliant date-time string.
- *
- * @param date the date to convert to a date-time string
- * @returns a date-time string formatted according to RFC5545
+ * Format a date as an iCalendar compatible date-time string.
+ * @param date The date to convert to a date-time string.
+ * @returns A date-time string formatted according to the iCalendar specification.
+ * @throws If the date is invalid.
  */
 export function toDateTimeString(date: Date): string {
     if (isNaN(date.getTime())) throw new Error('Date is invalid')
@@ -196,24 +264,35 @@ export function toDateTimeString(date: Date): string {
 }
 
 /**
- * Format a date as an RFC5545 compliant date-time string. Uses the timezone
- * offset of the date to adjust the time to UTC.
- *
- * @param date the date to convert to a date-time string
- * @param timezoneOffset the timezone offset in minutes, uses the local timezone offset by default
- * @returns a UTC date-time string formatted according to RFC5545
+ * Format a date as an iCalendar compatible date-time string. Offsets the date
+ * to UTC using `timeZoneOffset`.
+ * @param date The date in local time to convert to UTC and a date-time string.
+ * @param timeZoneOffset The timezone offset in minutes.
+ * @returns A UTC date-time string formatted according to the iCalendar specification.
+ * @throws If the date is invalid.
+ * @throws If the offset is invalid.
+ * @example
+ * // The timezone offset for CET (Central European Time)
+ * const timeZoneOffsetCET = -60 // +01:00
+ * const date = new Date('2025-08-07T12:00:00') // The time in CET
+ * // Returns "20250807T110000Z"
+ * const utcDate = toDateTimeStringUTC(date, timeZoneOffsetCET)
  */
-export function toDateTimeStringUTC(date: Date): string {
+export function toDateTimeStringUTC(
+    date: Date,
+    timeZoneOffset: number
+): string {
     if (isNaN(date.getTime())) throw new Error('Date is invalid')
-    const offset = date.getTimezoneOffset()
-    const offsetDate = new Date(date.getTime() + offset * ONE_MINUTE_MS)
-    return `${toDateString(offsetDate)}T${toTimeString(offsetDate)}Z`
+    if (isNaN(timeZoneOffset)) throw new Error('Time zone offset cannot be NaN')
+    const utcDate = new Date(date.getTime() + timeZoneOffset * ONE_MINUTE_MS)
+    return `${toDateString(utcDate)}T${toTimeString(utcDate)}Z`
 }
 
 /**
- * Parse a date-time string to a Date.
- *
- * @param dateTime a date-time string formatted according to RFC5545
+ * Parse a date-time string to a `Date`.
+ * @param dateTime A date-time string formatted according to the iCalendar specification.
+ * @returns The parsed date-time.
+ * @throws If the date is invalid.
  */
 export function parseDateTimeString(dateTime: string): Date {
     if (!patterns.valueTypeDateTime.test(dateTime)) {
@@ -262,9 +341,10 @@ export function parseDateTimeString(dateTime: string): Date {
 }
 
 /**
- * Parse a date string to a Date.
- *
- * @param date a date-time string formatted according to RFC5545
+ * Parse a date string to a `Date`.
+ * @param date A date-time string formatted according to the iCalendar specification.
+ * @returns The parsed date.
+ * @throws If the date is invalid.
  */
 export function parseDateString(date: string): Date {
     if (!patterns.matchesWholeString(patterns.valueTypeDate, date)) {
@@ -288,9 +368,11 @@ export function parseDateString(date: string): Date {
 }
 
 /**
- * Convert {@link Date} objects to {@link CalendarDateTime} or
- * {@link CalendarDate}, depending on `fullDay`. If `date` is an
- * {@link ICalendarDate} it is returned as is.
+ * Convert `Date` objects to an {@link ICalendarDate} object or return as
+ * is if `date` is already an ICalendarDate.
+ * @param date The date object to convert.
+ * @param fullDay If `true`, a `Date` object is converted to {@link CalendarDate}, otherwise `Date` is converted to {@link CalendarDateTime}.
+ * @returns An {@link ICalendarDate} as described above.
  */
 export function convertDate<T extends ICalendarDate>(
     date: Date | T,

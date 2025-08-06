@@ -36,7 +36,7 @@ it('cannot be set with a CalendarDate object', () => {
     const event = new CalendarEvent('1234', new Date(0), start)
 
     expect(() => {
-        // @ts-expect-error
+        // @ts-expect-error the type CalendarDateTime is not allowed but we want to validate that it will throw if using JavaScript
         event.setStamp(stamp)
     }).toThrow()
 })

@@ -137,6 +137,8 @@ export class Calendar extends Component {
         this.removePropertiesWithName('X-WR-CALDESC')
     }
 
+    /* eslint-disable */
+
     /** @deprecated use {@link getEvents} instead */
     events = this.getEvents
     /** @deprecated use {@link getProductId} instead */

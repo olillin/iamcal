@@ -1,7 +1,6 @@
-import { ComponentValidationError } from './component'
 import { parseDateString, parseDateTimeString } from './date'
-import { matchesWholeString } from './patterns'
 import * as patterns from './patterns'
+import { matchesWholeString } from './patterns'
 
 export interface Property {
     name: string
@@ -138,15 +137,22 @@ export const supportedValueTypes: {
 }
 
 /**
- * Get the parameter value of the property VALUE parameter.
+ * Get the value type of a property, as defined by the VALUE parameter.
  * @param property The property to get the value type of.
- * @param defaultValue The default value to return if the property VALUE parameter is not present.
- * @returns The value type if present, else `defaultValue` or `undefined`.
- * @throws If the parameter value is invalid.
+ * @returns The value type if present, else `undefined`.
+ * @throws If the parameter value is misformed.
  */
 export function getPropertyValueType(
     property: Property
 ): AllowedValueType | undefined
+
+/**
+ * Get the value type of a property, as defined by the VALUE parameter.
+ * @param property The property to get the value type of.
+ * @param defaultValue The default value to return if the property VALUE parameter is not present.
+ * @returns The value type if present, else `defaultValue` or `undefined`.
+ * @throws If the parameter value is misformed.
+ */
 export function getPropertyValueType(
     property: Property,
     defaultValue: AllowedValueType
@@ -163,7 +169,7 @@ export function getPropertyValueType(
     if (!found) return defaultValue
 
     if (!patterns.matchesWholeString(patterns.paramValue, found)) {
-        throw new Error('Invalid parameter value')
+        throw new Error('Parameter value is misformed')
     }
 
     // Return as uppercase if known value
@@ -191,6 +197,11 @@ export class MissingPropertyError extends Error {
     }
 }
 
+/**
+ * Validate if a property value is a valid binary string.
+ * @param value The property value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
 export function validateBinary(value: string) {
     if (!matchesWholeString(patterns.valueTypeBinary, value))
         throw new PropertyValidationError(
@@ -198,6 +209,11 @@ export function validateBinary(value: string) {
         )
 }
 
+/**
+ * Validate if a property value is a valid boolean.
+ * @param value The property value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
 export function validateBoolean(value: string) {
     if (!matchesWholeString(patterns.valueTypeBoolean, value))
         throw new PropertyValidationError(
@@ -205,7 +221,12 @@ export function validateBoolean(value: string) {
         )
 }
 
-export function validateCalAddress(value: string) {
+/**
+ * Validate if a property value is a valid calendar user address.
+ * @param value The property value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
+export function validateCalendarUserAddress(value: string) {
     try {
         new URL(value)
     } catch {
@@ -215,6 +236,11 @@ export function validateCalAddress(value: string) {
     }
 }
 
+/**
+ * Validate if a property value is a valid date.
+ * @param value The property value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
 export function validateDate(value: string) {
     try {
         parseDateString(value)
@@ -225,6 +251,11 @@ export function validateDate(value: string) {
     }
 }
 
+/**
+ * Validate if a property value is a valid date-time.
+ * @param value The property value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
 export function validateDateTime(value: string) {
     try {
         parseDateTimeString(value)
@@ -235,6 +266,11 @@ export function validateDateTime(value: string) {
     }
 }
 
+/**
+ * Validate if a property value is a valid duration.
+ * @param value The property value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
 export function validateDuration(value: string) {
     if (!matchesWholeString(patterns.valueTypeDuration, value))
         throw new PropertyValidationError(
@@ -242,6 +278,11 @@ export function validateDuration(value: string) {
         )
 }
 
+/**
+ * Validate if a property value is a valid float.
+ * @param value The property value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
 export function validateFloat(value: string) {
     if (!matchesWholeString(patterns.valueTypeFloat, value))
         throw new PropertyValidationError(
@@ -249,6 +290,11 @@ export function validateFloat(value: string) {
         )
 }
 
+/**
+ * Validate if a property value is a valid integer.
+ * @param value The property value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
 export function validateInteger(value: string) {
     if (!matchesWholeString(patterns.valueTypeInteger, value))
         throw new PropertyValidationError(
@@ -256,6 +302,11 @@ export function validateInteger(value: string) {
         )
 }
 
+/**
+ * Validate if a property value is a valid period.
+ * @param value The property value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
 export function validatePeriod(value: string) {
     if (!matchesWholeString(patterns.valueTypePeriod, value))
         throw new PropertyValidationError(
@@ -263,10 +314,21 @@ export function validatePeriod(value: string) {
         )
 }
 
-export function validateRecur(value: string) {
+/**
+ * Validate if a property value is a valid recurrence rule.
+ * @param value The property value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function validateRecurrenceRule(value: string) {
     // TODO: Not implemented
 }
 
+/**
+ * Validate if a property value is valid text.
+ * @param value The property value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
 export function validateText(value: string) {
     if (!matchesWholeString(patterns.valueTypeText, value))
         throw new PropertyValidationError(
@@ -274,6 +336,11 @@ export function validateText(value: string) {
         )
 }
 
+/**
+ * Validate if a property value is a valid time.
+ * @param value The property value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
 export function validateTime(value: string) {
     if (!matchesWholeString(patterns.valueTypeTime, value))
         throw new PropertyValidationError(
@@ -281,6 +348,11 @@ export function validateTime(value: string) {
         )
 }
 
+/**
+ * Validate if a property value is a valid URI.
+ * @param value The property value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
 export function validateUri(value: string) {
     try {
         new URL(value)
@@ -291,6 +363,11 @@ export function validateUri(value: string) {
     }
 }
 
+/**
+ * Validate if a property value is a valid UTC offset.
+ * @param value The property value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
 export function validateUtcOffset(value: string) {
     if (!matchesWholeString(patterns.valueTypeUtcOffset, value))
         throw new PropertyValidationError(
@@ -298,6 +375,12 @@ export function validateUtcOffset(value: string) {
         )
 }
 
+/**
+ * Validate a property value for a set value type.
+ * @param value The property value to validate.
+ * @param type The property value type which `value` will be validated against.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
 export function validateValue(value: string, type: AllowedValueType) {
     switch (type) {
         case 'BINARY':
@@ -307,7 +390,7 @@ export function validateValue(value: string, type: AllowedValueType) {
             validateBoolean(value)
             break
         case 'CAL-ADDRESS':
-            validateCalAddress(value)
+            validateCalendarUserAddress(value)
             break
         case 'DATE':
             validateDate(value)
@@ -328,7 +411,7 @@ export function validateValue(value: string, type: AllowedValueType) {
             validatePeriod(value)
             break
         case 'RECUR':
-            validateRecur(value)
+            validateRecurrenceRule(value)
             break
         case 'TEXT':
             validateText(value)
@@ -348,6 +431,24 @@ export function validateValue(value: string, type: AllowedValueType) {
     }
 }
 
+/* eslint-disable jsdoc/require-description-complete-sentence --
+ * Does not allow line to end with ':'.
+ **/
+
+/**
+ * Validate the value of a property based on it's value type.
+ *
+ * The validation will fail if the property:
+ *
+ * - has a value which is not valid for its value type.
+ * - has a value type which is not valid for that property.
+ * - has no known value type and is invalid TEXT. (see below)
+ *
+ * Unknown properties are validated as TEXT by if no value type is set, as
+ * defined by {@link https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.8|RFC5545#3.8.8.}
+ * @param property The property to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
 export function validateProperty(property: Property) {
     // Get supported and default types
     let supportedTypes: AllowedValueType[] | undefined = undefined
@@ -388,3 +489,4 @@ export function validateProperty(property: Property) {
     // Validate according to value type
     validateValue(property.value, valueType)
 }
+/* eslint-enable jsdoc/require-description-complete-sentence */
