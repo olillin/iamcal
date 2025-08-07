@@ -30,7 +30,7 @@ export interface CalendarDateOrTime {
      * Check if this date represents a full day, as opposed to a date-time.
      * @returns `true` if this object is a {@link CalendarDate}.
      */
-    isFullDay(): boolean
+    isFullDay(): this is CalendarDate
 }
 
 /**
@@ -78,8 +78,17 @@ export class CalendarDate implements CalendarDateOrTime {
         return new Date(this.date)
     }
 
-    isFullDay(): boolean {
+    isFullDay(): this is CalendarDate {
         return true
+    }
+
+    [Symbol.toPrimitive](hint: string): number | string | null {
+        if (hint === 'string') {
+            return this.getValue()
+        } else if (hint === 'number') {
+            return this.date.getTime()
+        }
+        return null
     }
 }
 
@@ -122,8 +131,17 @@ export class CalendarDateTime implements CalendarDateOrTime {
         return new Date(this.date)
     }
 
-    isFullDay(): boolean {
+    isFullDay(): this is CalendarDate {
         return false
+    }
+
+    [Symbol.toPrimitive](hint: string): number | string | null {
+        if (hint === 'string') {
+            return this.getValue()
+        } else if (hint === 'number') {
+            return this.date.getTime()
+        }
+        return null
     }
 }
 

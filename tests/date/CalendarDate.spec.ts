@@ -121,3 +121,21 @@ describe('isFullDay', () => {
         expect(date.isFullDay()).toBe(true)
     })
 })
+
+describe('toPrimitive', () => {
+    it('can be converted to a string', () => {
+        const date = new CalendarDate('20250807')
+        expect(String(date)).toBe('20250807')
+    })
+
+    it('can be converted to a number', () => {
+        const timestamp = new Date('2025-08-07T00:00:00').getTime()
+        const date = new CalendarDate(new Date(timestamp))
+        expect(Number(date)).toBe(timestamp)
+    })
+
+    it('to be truthy', () => {
+        const date = new CalendarDate('20250807')
+        expect(Boolean(date)).toBeTruthy()
+    })
+})
