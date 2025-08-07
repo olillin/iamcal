@@ -7,11 +7,11 @@ DTSTAMP:20250707T150000
 DTSTART:20250707T160000
 DTEND:20250707T163000
 SUMMARY:Lorem ipsum dolor sit amet
-DESCRIPTION:Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed lo
+DESCRIPTION:Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Sed lo
  bortis dui ac efficitur molestie. Cras tempor at neque id feugiat. Ut moll
- is a eros sed tincidunt. Maecenas ac magna ornare, cursus ipsum in, dictum
+ is a eros sed tincidunt. Maecenas ac magna ornare\, cursus ipsum in\, dictum
   eros. Ut nec metus nec enim dictum interdum non sed erat. Nullam eu lorem
-  laoreet, elementum metus sit amet, posuere nisl.
+  laoreet\, elementum metus sit amet\, posuere nisl.
 LOCATION:Lorem ipsum
 END:VEVENT
 BEGIN:VEVENT
@@ -20,6 +20,6 @@ DTSTAMP:20250707T150000
 DTSTART;VALUE=DATE:20250707
 DTEND;VALUE=DATE:20250707
 SUMMARY:Lorem ipsum dolor sit amet
-DESCRIPTION:Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+DESCRIPTION:Lorem ipsum dolor sit amet\, consectetur adipiscing elit.
 END:VEVENT
 END:VCALENDAR
