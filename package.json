@@ -20,7 +20,7 @@
         "test": "jest",
         "coverage": "jest --coverage",
         "lint": "eslint .",
-        "format": "prettier . --write"
+        "format": "prettier . --write -l"
     },
     "repository": {
         "type": "git",
