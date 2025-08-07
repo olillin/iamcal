@@ -42,8 +42,8 @@ export class CalendarDate implements CalendarDateOrTime {
 
     constructor(date: Date | string | CalendarDateOrTime) {
         if (typeof date === 'object') {
-            if (Object.prototype.toString.call(date) === '[object Date]') {
-                this.date = date as Date
+            if (isDateObject(date)) {
+                this.date = date
             } else {
                 this.date = (date as CalendarDateOrTime).getDate()
             }
@@ -88,8 +88,8 @@ export class CalendarDateTime implements CalendarDateOrTime {
 
     constructor(date: Date | string | CalendarDateOrTime) {
         if (typeof date === 'object') {
-            if (Object.prototype.toString.call(date) === '[object Date]') {
-                this.date = date as Date
+            if (isDateObject(date)) {
+                this.date = date
             } else {
                 this.date = (date as CalendarDateOrTime).getDate()
             }
@@ -125,6 +125,15 @@ export class CalendarDateTime implements CalendarDateOrTime {
     isFullDay(): boolean {
         return false
     }
+}
+
+/**
+ * Check if an object is a JavaScript `Date`.
+ * @param maybeDate The object to check.
+ * @returns `true` if the object is a `Date`, `false` otherwise.
+ */
+export function isDateObject(maybeDate: unknown): maybeDate is Date {
+    return Object.prototype.toString.call(maybeDate) === '[object Date]'
 }
 
 /**
@@ -386,9 +395,9 @@ export function convertDate(
     date: Date | CalendarDateOrTime,
     fullDay: boolean = false
 ): CalendarDateOrTime {
-    if (Object.prototype.toString.call(date) === '[object Date]') {
-        if (fullDay) return new CalendarDate(date as Date)
-        else return new CalendarDateTime(date as Date)
+    if (isDateObject(date)) {
+        if (fullDay) return new CalendarDate(date)
+        else return new CalendarDateTime(date)
     } else {
         return date as CalendarDateOrTime
     }
