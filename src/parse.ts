@@ -1,17 +1,22 @@
-import { Component, Property } from './component'
 import readline from 'readline'
 import { Readable } from 'stream'
+import { Component } from './component'
 import { Calendar, CalendarEvent } from './components'
 
+/** Represents an error that occurs when deserializing a calendar component. */
 export class DeserializationError extends Error {
     name = 'DeserializationError'
 }
 
 /**
- * Deserialize a calendar component
- * @param lines the serialized component as a readline interface
+ * Deserialize a calendar component.
+ * @param lines The serialized component as a **readline** interface.
+ * @returns The deserialized calendar component object.
+ * @throws {DeserializationError} If the component is invalid.
  */
-export async function deserialize(lines: readline.Interface): Promise<Component> {
+export async function deserializeComponent(
+    lines: readline.Interface
+): Promise<Component> {
     const component = new Component('')
     let done = false
 
@@ -20,11 +25,13 @@ export async function deserialize(lines: readline.Interface): Promise<Component>
 
     const subcomponentLines = new Array<string>()
 
-    async function processLine(line: string) {
+    const processLine = async (line: string) => {
         if (line.trim() === '') return
 
         if (done) {
-            throw new DeserializationError('Trailing data after component end')
+            throw new DeserializationError(
+                'Found trailing data after component end'
+            )
         }
 
         if (line.startsWith('BEGIN:')) {
@@ -40,7 +47,9 @@ export async function deserialize(lines: readline.Interface): Promise<Component>
         } else if (line.startsWith('END:')) {
             // End component
             if (stack.length == 0) {
-                throw new DeserializationError('Component end before begin')
+                throw new DeserializationError(
+                    'Unexpected component end outside of components'
+                )
             }
 
             const stackName = stack.pop()
@@ -52,7 +61,9 @@ export async function deserialize(lines: readline.Interface): Promise<Component>
             // Check the length of the stack after being popped
             if (stack.length == 1) {
                 subcomponentLines.push(line)
-                const subcomponent = await deserializeString(subcomponentLines.join('\r\n'))
+                const subcomponent = await deserializeComponentString(
+                    subcomponentLines.join('\r\n')
+                )
                 subcomponentLines.length = 0
 
                 component.components.push(subcomponent)
@@ -62,7 +73,10 @@ export async function deserialize(lines: readline.Interface): Promise<Component>
                 done = true
             }
         } else {
-            if (stack.length == 0) throw new DeserializationError('Property outside of components')
+            if (stack.length == 0)
+                throw new DeserializationError(
+                    'Found stray property outside of components'
+                )
 
             if (stack.length > 1) {
                 // Line of subcomponent
@@ -71,7 +85,9 @@ export async function deserialize(lines: readline.Interface): Promise<Component>
                 // Property
                 const colon = line.indexOf(':')
                 if (colon === -1) {
-                    throw new DeserializationError(`Invalid content line: ${line}`)
+                    throw new DeserializationError(
+                        `Invalid content line: ${line}`
+                    )
                 }
                 const name = line.slice(0, colon)
                 const value = line.slice(colon + 1)
@@ -125,65 +141,69 @@ export async function deserialize(lines: readline.Interface): Promise<Component>
 
     // Check that component has been closed
     if (!done) {
-        throw new DeserializationError('No component end')
+        throw new DeserializationError('Component has no end')
     }
 
     return component
 }
 
 /**
- * Deserialize a calendar component
- * @param text the serialized component
+ * Deserialize a calendar component.
+ * @param lines The serialized component as a **readline** interface.
+ * @returns The deserialized calendar component object.
+ * @throws {DeserializationError} If the component is invalid.
+ * @deprecated Use {@link deserializeComponent} instead.
  */
-export async function deserializeString(text: string): Promise<Component> {
-    const stream = Readable.from(text)
-    const lines = readline.createInterface({ input: stream, crlfDelay: Infinity })
-    return deserialize(lines)
+export async function deserialize(
+    lines: readline.Interface
+): Promise<Component> {
+    return deserializeComponent(lines)
 }
 
 /**
- * Parse a calendar in ICalendar format
- * @param text the serialized calendar
- * @returns the parsed calendar
+ * Deserialize a calendar component string.
+ * @param text The serialized component.
+ * @returns The deserialized component object.
+ * @throws {DeserializationError} If the component is invalid.
+ */
+export async function deserializeComponentString(
+    text: string
+): Promise<Component> {
+    const stream = Readable.from(text)
+    const lines = readline.createInterface({
+        input: stream,
+        crlfDelay: Infinity,
+    })
+    return deserializeComponent(lines)
+}
+
+/**
+ * Deserialize a calendar component string.
+ * @param text The serialized component.
+ * @returns The deserialized component object.
+ * @throws {DeserializationError} If the component is invalid.
+ * @deprecated Use {@link deserializeComponentString} instead.
+ */
+export async function deserializeString(text: string): Promise<Component> {
+    return deserializeComponentString(text)
+}
+
+/**
+ * Parse a serialized calendar.
+ * @param text A serialized calendar as you would see in an iCalendar file.
+ * @returns The parsed calendar object.
  */
 export async function parseCalendar(text: string): Promise<Calendar> {
-    const component = await deserializeString(text)
-    if (component.name !== "VCALENDAR")
-        throw new DeserializationError("Not a calendar")
+    const component = await deserializeComponentString(text)
     return new Calendar(component)
 }
 
 /**
- * Parse an event in ICalendar format
- * @param text the serialized event
- * @returns the parsed event
+ * Parse a serialized calendar event.
+ * @param text A serialized event as you would see in an iCalendar file.
+ * @returns The parsed event object.
  */
 export async function parseEvent(text: string): Promise<CalendarEvent> {
-    const component = await deserializeString(text)
-    if (component.name !== "VEVENT")
-        throw new DeserializationError("Not an event")
+    const component = await deserializeComponentString(text)
     return new CalendarEvent(component)
-}
-
-export function parseDate(dateProperty: Property): Date {
-    const value = dateProperty.value.trim()
-    if (dateProperty.params.includes('VALUE=DATE')) {
-        // Parse date only
-        return new Date(`${value.substring(0, 4)}-${value.substring(4, 6)}-${value.substring(6, 8)}`)
-    } else {
-        // Parse date and time
-        return new Date(`${value.substring(0, 4)}-${value.substring(4, 6)}-${value.substring(6, 8)} ${value.substring(9, 11)}:${value.substring(11, 13)}:${value.substring(13, 15)}`)
-    }
-}
-
-export function toTimeString(date: Date): string {
-    return `${date.getHours().toString().padStart(2, '0')}${date.getMinutes().toString().padStart(2, '0')}${date.getSeconds().toString().padStart(2, '0')}`
-}
-
-export function toDateString(date: Date): string {
-    return `${date.getFullYear().toString().padStart(4, '0')}${date.getMonth().toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`
-}
-
-export function toDateTimeString(date: Date): string {
-    return `${toDateString(date)}T${toTimeString(date)}`
 }

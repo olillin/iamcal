@@ -1,6 +1,6 @@
-# This workflow will run tests using node
+# This workflow will run the linter using node
 
-name: Test Node.js Package
+name: Lint Node.js Package
 
 on:
     push:
@@ -15,4 +15,4 @@ jobs:
                   node-version: 20
             - run: npm ci -D
             - run: npm run build
-            - run: npm test
+            - run: npm run lint
