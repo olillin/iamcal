@@ -1,4 +1,4 @@
-import { getPropertyValueType, Property } from "../../src"
+import { getPropertyValueType, Property } from '../../src'
 
 it('returns undefined when parameter missing', () => {
     let property: Property = {
@@ -67,26 +67,34 @@ it('throws if contains illegal characters', () => {
         params: ['VALUE=;'],
         value: '20250729',
     }
-    expect(() => { getPropertyValueType(property) }).toThrow()
+    expect(() => {
+        getPropertyValueType(property)
+    }).toThrow()
 
     property = {
         name: 'DTSTART',
         params: ['VALUE="'],
         value: '20250729',
     }
-    expect(() => { getPropertyValueType(property) }).toThrow()
+    expect(() => {
+        getPropertyValueType(property)
+    }).toThrow()
 
     property = {
         name: 'DTSTART',
         params: ['VALUE=:'],
         value: '20250729',
     }
-    expect(() => { getPropertyValueType(property) }).toThrow()
+    expect(() => {
+        getPropertyValueType(property)
+    }).toThrow()
 
     property = {
         name: 'DTSTART',
         params: ['VALUE=,'],
         value: '20250729',
     }
-    expect(() => { getPropertyValueType(property) }).toThrow()
+    expect(() => {
+        getPropertyValueType(property)
+    }).toThrow()
 })
