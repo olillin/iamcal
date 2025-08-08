@@ -52,7 +52,7 @@ export const valueTypePeriod = new RegExp(
     `${valueTypeDateTime.source}/(${valueTypeDateTime}|${valueTypeDuration.source})`
 )
 export const valueTypeText = new RegExp(
-    '((' + TSAFE_CHAR.source + ')|:|"|\\[\\;,Nn])*'
+    '((' + TSAFE_CHAR.source + String.raw`)|:|"|\\[\\;,Nn])*`
 )
 export const valueTypeTime = /[0-9]{6}Z?/
 export const valueTypeUtcOffset = /[+-]([0-9]{2}){2,3}/

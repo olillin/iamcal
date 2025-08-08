@@ -1,6 +1,6 @@
 {
     "name": "iamcal",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "description": "Read and write ICalendar files",
     "files": [
         "/lib",
@@ -20,7 +20,7 @@
         "test": "jest",
         "coverage": "jest --coverage",
         "lint": "eslint .",
-        "format": "prettier . --write"
+        "format": "prettier . --write -l"
     },
     "repository": {
         "type": "git",
