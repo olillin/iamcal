@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- `default` export is now last in `package.json` to avoid confusing Webpack.
+
 ## [v2.1.1] - 2025-08-08
 
 ### Added
