@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [v2.1.2] - 2025-08-14
+
+### Changed
+
+- `default` export is now last in `package.json` to avoid confusing Webpack.
+
 ## [v2.1.1] - 2025-08-08
 
 ### Added
@@ -172,7 +178,8 @@ and this project adheres to
   - Has getters/setters for the following properties: `DTSTART`, `DTEND`,
     `SUMMARY`, `DESCRIPTION` and `LOCATION`.
 
-[unreleased]: https://github.com/olillin/iamcal/compare/v2.1.0...dev
+[unreleased]: https://github.com/olillin/iamcal/compare/v2.1.2...dev
+[v2.1.2]: https://github.com/olillin/iamcal/compare/v2.1.1...v2.1.2
 [v2.1.1]: https://github.com/olillin/iamcal/compare/v2.1.0...v2.1.1
 [v2.1.0]: https://github.com/olillin/iamcal/compare/v2.0.0...v2.1.0
 [v2.0.0]: https://github.com/olillin/iamcal/compare/v1.1.1...v2.0.0
