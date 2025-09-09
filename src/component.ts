@@ -54,9 +54,11 @@ export class Component {
                 property['value']
 
             // Wrap lines
-            while (line.length > MAX_LINE_LENGTH) {
-                lines.push(line.substring(0, MAX_LINE_LENGTH))
-                line = ' ' + line.substring(MAX_LINE_LENGTH)
+            // We remove 2 from MAX_LINE_LENGTH to account for the CRLF line end
+            const effectiveMaxLineLength = MAX_LINE_LENGTH - 2
+            while (line.length > effectiveMaxLineLength) {
+                lines.push(line.substring(0, effectiveMaxLineLength))
+                line = ' ' + line.substring(effectiveMaxLineLength)
             }
             lines.push(line)
         }
@@ -68,7 +70,7 @@ export class Component {
         lines.push(`END:${this.name}`)
 
         // Join lines
-        const serialized = lines.join('\n')
+        const serialized = lines.join('\r\n')
 
         return serialized
     }
