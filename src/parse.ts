@@ -2,6 +2,10 @@ import readline from 'readline'
 import { Readable } from 'stream'
 import { Component } from './component'
 import { Calendar, CalendarEvent } from './components'
+import {
+    unescapePropertyParameterValue,
+    unescapePropertyValue,
+} from './property'
 
 /** Represents an error that occurs when deserializing a calendar component. */
 export class DeserializationError extends Error {
@@ -95,8 +99,8 @@ export async function deserializeComponent(
                 const params = name.split(';')
                 const property = {
                     name: params[0],
-                    params: params.slice(1),
-                    value: value,
+                    params: params.slice(1).map(unescapePropertyParameterValue),
+                    value: unescapePropertyValue(value),
                 }
 
                 component.properties.push(property)

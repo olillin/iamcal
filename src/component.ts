@@ -1,7 +1,7 @@
 import { CalendarDateOrTime } from './date'
 import {
     AllowedPropertyName,
-    escapePropertyParam,
+    escapePropertyParameterValue,
     escapePropertyValue,
     KnownPropertyName,
     MissingPropertyError,
@@ -52,7 +52,7 @@ export class Component {
             let line =
                 property['name'] + //
                 property.params
-                    .map(p => ';' + escapePropertyParam(p))
+                    .map(p => ';' + escapePropertyParameterValue(p))
                     .join('') +
                 ':' +
                 escapePropertyValue(property['value'])

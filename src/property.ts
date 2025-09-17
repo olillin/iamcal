@@ -2,10 +2,86 @@ import { parseDateString, parseDateTimeString } from './date'
 import * as patterns from './patterns'
 import { matchesWholeString } from './patterns'
 
+/** @deprecated Use {@link ComponentProperty} instead. */
 export interface Property {
     name: string
     params: string[]
     value: string
+}
+
+/**
+ * Represents a property of a calendar component described by RFC 5545 in
+ * Section 3.5.
+ */
+export class ComponentProperty {
+    name: string
+    params: string[]
+    value: string
+
+    constructor(name: string, value: string) {
+        this.name = name
+        this.value = value
+        this.params = []
+    }
+
+    /**
+     * Shorthand to create a ComponentProperty from a Property object until
+     * Property is removed.
+     * @param property The property to convert.
+     * @returns The converted property.
+     * @see {@link Property}
+     * @deprecated Use the constructor instead.
+     */
+    static fromProperty(property: Property): ComponentProperty {
+        const prop = new ComponentProperty(property.name, property.value)
+        for (const param of property.params) {
+            const [paramName, paramValue] = param.split('=')
+            prop.setParameter(paramName, paramValue)
+        }
+        return prop
+    }
+
+    setParameter(name: string, value: string) {
+        const index = this.params.indexOf(name)
+        if (index === -1) {
+            this.params.push(name, value)
+            return
+        }
+        this.params[index + 1] = value
+    }
+
+    getParameter(name: string): string | undefined {
+        const index = this.params.indexOf(name)
+        return this.params[index + 1]
+    }
+
+    hasParameter(name: string): boolean {
+        return this.getParameter(name) !== undefined
+    }
+
+    serialize(): string {
+        const escapedParams = []
+        for (let i = 0; i < this.params.length; i += 2) {
+            const paramName = this.params[i]
+            const paramValue = this.params[i + 1]
+            const escapedParamValue = escapePropertyParameterValue(paramValue)
+            escapedParams.push(`;${paramName}=${escapedParamValue}`)
+        }
+        return (
+            this.name +
+            escapedParams.join() +
+            ':' +
+            escapePropertyValue(this.value)
+        )
+    }
+
+    setValueType(valueType: AllowedValueType) {
+        this.setParameter('VALUE', valueType)
+    }
+
+    getValueType(): AllowedValueType | undefined {
+        return this.getParameter('VALUE')
+    }
 }
 
 export const knownPropertyNames = [
@@ -511,7 +587,14 @@ export function unescapePropertyValue(value: string): string {
     return value.replace(/(?<!\\)\\(?=[,;:\\"])/g, '')
 }
 
-export function escapePropertyParam(param: string): string {
+/**
+ * Escape a property parameter value.
+ * @param param The parameter value to escape.
+ * @returns The escaped parameter value.
+ * @throws If the parameter value contains a DQUOTE (") character.
+ * @see {@link unescapePropertyParameterValue}
+ */
+export function escapePropertyParameterValue(param: string): string {
     // Property parameter values MUST NOT contain the DQUOTE character.  The
     // DQUOTE character is used as a delimiter for parameter values that
     // contain restricted characters or URI text.
@@ -523,6 +606,19 @@ export function escapePropertyParam(param: string): string {
     // character separators MUST be specified as quoted-string text values.
     if (/[:;,]/.test(param)) {
         return `"${param}"`
+    }
+    return param
+}
+
+/**
+ * Unescape a property parameter value.
+ * @param param The parameter value to unescape.
+ * @returns The unescaped parameter value.
+ * @see {@link escapePropertyParameterValue}
+ */
+export function unescapePropertyParameterValue(param: string): string {
+    if (param.startsWith('"') && param.endsWith('"')) {
+        return param.slice(1, -1)
     }
     return param
 }

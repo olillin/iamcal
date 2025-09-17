@@ -10,10 +10,10 @@ and this project adheres to
 
 ### Added
 
-- Automatic serialization of special characters (`,`, `;`, `:` and `\`) in
-  component property values.
-- Automatic serialization of special characters (`,`, `;`, `:` and `\`) in
-  component property parameter values.
+- Automatic escaping of special characters (`,`, `;`, `:` and `\`) in
+  property values during serialization.
+- Automatic quoting of property parameter values containing special characters
+  (`,`, `;` and `:`) during serialization.
 
 ## [v2.1.2] - 2025-08-14
 
