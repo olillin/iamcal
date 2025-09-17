@@ -490,3 +490,39 @@ export function validateProperty(property: Property) {
     validateValue(property.value, valueType)
 }
 /* eslint-enable jsdoc/require-description-complete-sentence */
+
+/**
+ * Escape special characters in a property value.
+ * @param value The property value to escape.
+ * @returns The escaped property value.
+ * @see {@link unescapePropertyValue}
+ */
+export function escapePropertyValue(value: string): string {
+    return value.replace(/(?<!\\)(?=[,;:\\"])/g, '\\')
+}
+
+/**
+ * Unescape special characters in a property value.
+ * @param value The property value to unescape.
+ * @returns The unescaped property value.
+ * @see {@link escapePropertyValue}
+ */
+export function unescapePropertyValue(value: string): string {
+    return value.replace(/(?<!\\)\\(?=[,;:\\"])/g, '')
+}
+
+export function escapePropertyParam(param: string): string {
+    // Property parameter values MUST NOT contain the DQUOTE character.  The
+    // DQUOTE character is used as a delimiter for parameter values that
+    // contain restricted characters or URI text.
+    if (param.includes('"')) {
+        throw new Error('Parameter value must not contain DQUOTE (").')
+    }
+
+    // Property parameter values that contain the COLON, SEMICOLON, or COMMA
+    // character separators MUST be specified as quoted-string text values.
+    if (/[:;,]/.test(param)) {
+        return `"${param}"`
+    }
+    return param
+}

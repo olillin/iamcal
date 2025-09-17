@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Automatic serialization of special characters (`,`, `;`, `:` and `\`) in
+  component property values.
+- Automatic serialization of special characters (`,`, `;`, `:` and `\`) in
+  component property parameter values.
+
 ## [v2.1.2] - 2025-08-14
 
 ### Changed

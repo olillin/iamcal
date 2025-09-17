@@ -1,6 +1,8 @@
 import { CalendarDateOrTime } from './date'
 import {
     AllowedPropertyName,
+    escapePropertyParam,
+    escapePropertyValue,
     KnownPropertyName,
     MissingPropertyError,
     Property,
@@ -49,9 +51,11 @@ export class Component {
         for (const property of this.properties) {
             let line =
                 property['name'] + //
-                property.params.map(p => ';' + p).join('') +
+                property.params
+                    .map(p => ';' + escapePropertyParam(p))
+                    .join('') +
                 ':' +
-                property['value']
+                escapePropertyValue(property['value'])
 
             // Wrap lines
             while (line.length > MAX_LINE_LENGTH) {
