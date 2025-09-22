@@ -15,13 +15,17 @@ export interface Property {
  */
 export class ComponentProperty {
     name: string
-    params: string[]
     value: string
+    private params: string[]
 
-    constructor(name: string, value: string) {
+    constructor(
+        name: string,
+        value: string,
+        params: { [k: string]: string } = {}
+    ) {
         this.name = name
         this.value = value
-        this.params = []
+        this.params = Object.entries(params).flat(1)
     }
 
     /**
