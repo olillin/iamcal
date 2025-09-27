@@ -13,19 +13,35 @@ export interface Property {
  * Represents a property of a calendar component described by RFC 5545 in
  * Section 3.5.
  */
-export class ComponentProperty {
+export class ComponentProperty implements Property {
     name: string
     value: string
-    private params: string[]
+    private _parameters: Map<string, string[]>
+    /** @deprecated */
+    public get params(): string[] {
+        const params: string[] = []
+        for (const [key, values] of this._parameters.entries()) {
+            for (const value of values) {
+                params.push(`${key}=${value}`)
+            }
+        }
+        return params
+    }
 
     constructor(
         name: string,
         value: string,
-        params: { [k: string]: string } = {}
+        params: { [k: string]: string | string[] } = {}
     ) {
         this.name = name
         this.value = value
-        this.params = Object.entries(params).flat(1)
+        this._parameters = new Map()
+        for (const [key, value] of Object.entries(params)) {
+            this._parameters.set(
+                key,
+                typeof value === 'string' ? [value] : value
+            )
+        }
     }
 
     /**
@@ -36,7 +52,7 @@ export class ComponentProperty {
      * @see {@link Property}
      * @deprecated Use the constructor instead.
      */
-    static fromProperty(property: Property): ComponentProperty {
+    static fromObject(property: Property): ComponentProperty {
         const prop = new ComponentProperty(property.name, property.value)
         for (const param of property.params) {
             const [paramName, paramValue] = param.split('=')
@@ -54,9 +70,8 @@ export class ComponentProperty {
         this.params[index + 1] = value
     }
 
-    getParameter(name: string): string | undefined {
-        const index = this.params.indexOf(name)
-        return this.params[index + 1]
+    getParameter(name: string): string | string[] | undefined {
+        return this._parameters.get(name)
     }
 
     hasParameter(name: string): boolean {
@@ -84,7 +99,7 @@ export class ComponentProperty {
     }
 
     getValueType(): AllowedValueType | undefined {
-        return this.getParameter('VALUE')
+        return this.getParameter('VALUE') as string | undefined
     }
 }
 
@@ -578,7 +593,7 @@ export function validateProperty(property: Property) {
  * @see {@link unescapePropertyValue}
  */
 export function escapePropertyValue(value: string): string {
-    return value.replace(/(?<!\\)(?=[,;:\\"])/g, '\\')
+    return value.replace(/(?=[,;:\\"])/g, '\\')
 }
 
 /**

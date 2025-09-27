@@ -1,6 +1,7 @@
 import { CalendarDateOrTime } from './date'
 import {
     AllowedPropertyName,
+    ComponentProperty,
     escapePropertyParameterValue,
     escapePropertyValue,
     KnownPropertyName,
@@ -23,17 +24,21 @@ const MAX_LINE_LENGTH = 75
 
 export class Component {
     name: string
-    properties: Property[]
+    properties: ComponentProperty[]
     components: Component[]
 
     constructor(
         name: string,
-        properties?: Property[],
+        properties?: (Property | ComponentProperty)[],
         components?: Component[]
     ) {
         this.name = name
         if (properties) {
-            this.properties = properties
+            this.properties = properties.map(property =>
+                property instanceof ComponentProperty
+                    ? property
+                    : ComponentProperty.fromObject(property)
+            )
         } else {
             this.properties = []
         }
@@ -49,13 +54,7 @@ export class Component {
         const lines = [`BEGIN:${this.name}`]
 
         for (const property of this.properties) {
-            let line =
-                property['name'] + //
-                property.params
-                    .map(p => ';' + escapePropertyParameterValue(p))
-                    .join('') +
-                ':' +
-                escapePropertyValue(property['value'])
+            let line = property.serialize()
 
             // Wrap lines
             while (line.length > MAX_LINE_LENGTH) {
@@ -93,7 +92,11 @@ export class Component {
                     property.value = value
                 } else {
                     const prop = value.toProperty(name)
-                    property.params = prop.params
+                    for (const param of prop.params) {
+                        property.setParameter(
+                            ...(param.split('=') as [string, string])
+                        )
+                    }
                     property.value = prop.value
                 }
                 return this
@@ -101,12 +104,8 @@ export class Component {
         }
         this.properties.push(
             typeof value === 'string'
-                ? {
-                      name: name,
-                      params: [],
-                      value: value,
-                  }
-                : value.toProperty(name)
+                ? new ComponentProperty(name, value)
+                : ComponentProperty.fromObject(value.toProperty(name))
         )
         return this
     }
@@ -142,7 +141,11 @@ export class Component {
     setPropertyParams(name: string, params: string[]): this {
         for (const property of this.properties) {
             if (property.name === name) {
-                property.params = params
+                params.forEach(param => {
+                    property.setParameter(
+                        ...(param.split('=') as [string, string])
+                    )
+                })
             }
         }
         return this
