@@ -13,7 +13,13 @@ export default tseslint.config(
         files: ['**/*.ts'],
     },
     {
-        languageOptions: { globals: globals.node },
+        languageOptions: {
+            globals: globals.node,
+            parserOptions: {
+                project: ['./tsconfig.json', './tsconfig.test.json'],
+                tsconfigRootDir: import.meta.dirname,
+            },
+        },
     },
     eslint.configs.recommended,
     jsdoc.configs['flat/contents-typescript'],
@@ -22,16 +28,19 @@ export default tseslint.config(
     jsdoc.configs['flat/stylistic-typescript'],
     {
         rules: {
-            'jsdoc/require-throws': 'warn',
+            'max-depth': ['error', { max: 3 }],
+            '@typescript-eslint/no-deprecated': 'warn',
+            'jsdoc/require-throws': 'error',
             'jsdoc/require-description-complete-sentence': 'warn',
             'jsdoc/sort-tags': 'warn',
             'jsdoc/require-example': 'off',
             'jsdoc/match-description': 'off',
             'jsdoc/require-param': [
-                'warn',
+                'error',
                 { checkGetters: true, checkSetters: true },
             ],
         },
     },
-    tseslint.configs.recommended
+    tseslint.configs.recommended,
+    tseslint.configs.recommendedTypeChecked
 )
