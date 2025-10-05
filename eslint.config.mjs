@@ -11,8 +11,6 @@ export default tseslint.config(
     includeIgnoreFile(gitignorePath, 'Imported .gitignore patterns'),
     {
         files: ['**/*.ts'],
-    },
-    {
         languageOptions: {
             globals: globals.node,
             parserOptions: {
@@ -20,13 +18,15 @@ export default tseslint.config(
                 tsconfigRootDir: import.meta.dirname,
             },
         },
-    },
-    eslint.configs.recommended,
-    jsdoc.configs['flat/contents-typescript'],
-    jsdoc.configs['flat/logical-typescript'],
-    jsdoc.configs['flat/requirements-typescript'],
-    jsdoc.configs['flat/stylistic-typescript'],
-    {
+        extends: [
+            eslint.configs.recommended,
+            ...tseslint.configs.recommended,
+            ...tseslint.configs.recommendedTypeChecked,
+            jsdoc.configs['flat/contents-typescript'],
+            jsdoc.configs['flat/logical-typescript'],
+            jsdoc.configs['flat/requirements-typescript'],
+            jsdoc.configs['flat/stylistic-typescript'],
+        ],
         rules: {
             'max-depth': ['error', { max: 3 }],
             '@typescript-eslint/no-deprecated': 'warn',
@@ -40,7 +40,5 @@ export default tseslint.config(
                 { checkGetters: true, checkSetters: true },
             ],
         },
-    },
-    tseslint.configs.recommended,
-    tseslint.configs.recommendedTypeChecked
+    }
 )

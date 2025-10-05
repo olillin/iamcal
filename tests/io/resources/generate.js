@@ -1,6 +1,3 @@
-/* eslint-disable */
-
-const AdmZip = require('adm-zip')
 const {
     Calendar,
     CalendarDate,
