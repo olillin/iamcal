@@ -1,19 +1,30 @@
 import { CalendarDateOrTime } from './date'
+import { Property } from './property/Property'
+import type { AllowedPropertyName, KnownPropertyName } from './property/names'
 import {
-    AllowedPropertyName,
-    ComponentProperty,
-    KnownPropertyName,
     MissingPropertyError,
-    Property,
+    PropertyValidationError,
     validateProperty,
-    type PropertyValidationError,
-} from './property'
+} from './property/validate'
 
-/** Represents an error which occurs while validating a calendar component. */
+/**
+ * Represents an error which occurs while validating a calendar component.
+ */
 export class ComponentValidationError extends Error {
     constructor(message: string) {
         super(message)
         this.name = 'ComponentValidationError'
+    }
+}
+
+/**
+ * Represents an error which occurs when trying to perform an operation which
+ * would break the state of a calendar component.
+ */
+export class IllegalOperationError extends Error {
+    constructor(message: string) {
+        super(message)
+        this.name = 'IllegalOperationError'
     }
 }
 
@@ -22,7 +33,7 @@ const MAX_LINE_LENGTH = 75
 
 export class Component {
     name: string
-    properties: ComponentProperty[]
+    properties: Property[]
     components: Component[]
 
     constructor(
@@ -32,11 +43,10 @@ export class Component {
     ) {
         this.name = name
         if (properties) {
-            this.properties = properties.map(property =>
-                property instanceof ComponentProperty
-                    ? property
-                    : ComponentProperty.fromObject(property)
-            )
+            this.properties = []
+            properties.forEach(property => {
+                this.addProperty(property)
+            })
         } else {
             this.properties = []
         }
@@ -107,12 +117,30 @@ export class Component {
         // Property is new
         this.properties.push(
             typeof value === 'string'
-                ? new ComponentProperty(name, value)
+                ? new Property(name, value)
                 : value.toProperty(name)
         )
         return this
     }
 
+    /**
+     * Add a property to this component.
+     * @param property The property to add.
+     * @returns This component for chaining.
+     * @throws {IllegalOperationError} If the property cannot be added to this component.
+     */
+    addProperty(property: Property): this {
+        // TODO: Validate if property can be added to this component.
+        this.properties.push(property)
+        return this
+    }
+
+    /**
+     * Check whether this component has a certain property.
+     * @param name The property name to check.
+     * @param value An optional value to check against the property. If this is specified the property value must equal this value.
+     * @returns Whether the property is present and matches the value if given.
+     */
     hasProperty(name: string, value?: string): boolean {
         for (const property of this.properties) {
             if (
@@ -130,31 +158,6 @@ export class Component {
         if (index === -1) return
         // Remove property at index
         this.properties.splice(index, 1)
-    }
-
-    getPropertyParams(name: string): string[] | null {
-        for (const property of this.properties) {
-            if (property.name === name) {
-                return property.params
-            }
-        }
-        return null
-    }
-
-    /**
-     * @deprecated Modify property after getting with {@link getProperty} instead.
-     */
-    setPropertyParams(name: string, params: string[]): this {
-        for (const property of this.properties) {
-            if (property.name === name) {
-                params.forEach(param => {
-                    property.setParameter(
-                        ...(param.split('=') as [string, string])
-                    )
-                })
-            }
-        }
-        return this
     }
 
     addComponent(component: Component): this {

@@ -1,6 +1,6 @@
 import { Component, ComponentValidationError } from '../component'
 import { CalendarDateOrTime, convertDate, parseDateProperty } from '../date'
-import { AllowedPropertyName } from '../property'
+import { AllowedPropertyName } from '../property/names'
 
 export const knownOffsetTypes = ['DAYLIGHT', 'STANDARD']
 export type OffsetType = (typeof knownOffsetTypes)[number]
@@ -149,39 +149,4 @@ export class TimeZoneOffset extends Component {
     removeTimeZoneName() {
         this.removePropertiesWithName('TZNAME')
     }
-
-    /* eslint-disable */
-
-    /**
-     * Get the date or time when this time zone offset starts.
-     * @returns The start date or time of this time zone offset.
-     * @deprecated Use {@link getStart} instead.
-     */
-    start = this.getStart
-
-    /**
-     * Get the offset which is offset from during this time zone offset.
-     * @returns The offset in a format such as "+0100" or "-0230".
-     * @deprecated Use {@link getOffsetFrom} instead.
-     */
-    offsetFrom = this.getOffsetFrom
-
-    /**
-     * Get the offset which is offset to during this time zone offset.
-     * @returns The offset in a format such as "+0100" or "-0230".
-     * @deprecated Use {@link getOffsetTo} instead.
-     */
-    offsetTo = this.getOffsetTo
-
-    /**
-     * @deprecated Use {@link getComment} instead.
-     */
-    comment = this.getComment
-
-    /**
-     * Get the name of this time zone offset.
-     * @returns The time zone offset name if it exists.
-     * @deprecated Use {@link getTimeZoneName} instead.
-     */
-    timeZoneName = this.getTimeZoneName
 }

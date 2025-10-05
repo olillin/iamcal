@@ -2,11 +2,11 @@ import readline from 'readline'
 import { Readable } from 'stream'
 import { Component } from './component'
 import { Calendar, CalendarEvent } from './components'
+import { Property } from './property/Property'
 import {
-    ComponentProperty,
     unescapePropertyParameterValue,
     unescapeTextPropertyValue,
-} from './property'
+} from './property/escape'
 
 /** Represents an error that occurs when deserializing a calendar component. */
 export class DeserializationError extends Error {
@@ -88,30 +88,7 @@ export async function deserializeComponent(
                 subcomponentLines.push(line)
             } else {
                 // Property
-                const colon = line.indexOf(':')
-                if (colon === -1) {
-                    throw new DeserializationError(
-                        `Invalid content line: ${line}`
-                    )
-                }
-                const name = line.slice(0, colon)
-                const value = line.slice(colon + 1)
-
-                const [propertyName, ...params] = name.split(';')
-                const property = new ComponentProperty(
-                    propertyName,
-                    unescapeTextPropertyValue(value),
-                    Object.fromEntries(
-                        params.map(param => {
-                            const [paramName, paramValue] = param.split('=')
-                            return [
-                                paramName,
-                                unescapePropertyParameterValue(paramValue),
-                            ]
-                        })
-                    )
-                )
-
+                const property = deserializeProperty(line)
                 component.properties.push(property)
             }
         }
@@ -161,19 +138,6 @@ export async function deserializeComponent(
 }
 
 /**
- * Deserialize a calendar component.
- * @param lines The serialized component as a **readline** interface.
- * @returns The deserialized calendar component object.
- * @throws {DeserializationError} If the component is invalid.
- * @deprecated Use {@link deserializeComponent} instead.
- */
-export async function deserialize(
-    lines: readline.Interface
-): Promise<Component> {
-    return deserializeComponent(lines)
-}
-
-/**
  * Deserialize a calendar component string.
  * @param text The serialized component.
  * @returns The deserialized component object.
@@ -188,17 +152,6 @@ export async function deserializeComponentString(
         crlfDelay: Infinity,
     })
     return deserializeComponent(lines)
-}
-
-/**
- * Deserialize a calendar component string.
- * @param text The serialized component.
- * @returns The deserialized component object.
- * @throws {DeserializationError} If the component is invalid.
- * @deprecated Use {@link deserializeComponentString} instead.
- */
-export async function deserializeString(text: string): Promise<Component> {
-    return deserializeComponentString(text)
 }
 
 /**
@@ -219,4 +172,32 @@ export async function parseCalendar(text: string): Promise<Calendar> {
 export async function parseEvent(text: string): Promise<CalendarEvent> {
     const component = await deserializeComponentString(text)
     return new CalendarEvent(component)
+}
+
+/**
+ * Deserialize a component property.
+ * @param line The serialized content line that defines this property. Must not be wrapped.
+ * @returns The deserialized property.
+ * @throws {DeserializationError} If content line is invalid.
+ */
+export function deserializeProperty(line: string): Property {
+    const colon = line.indexOf(':')
+    if (colon === -1) {
+        throw new DeserializationError(`Invalid content line: ${line}`)
+    }
+    const name = line.slice(0, colon)
+    const value = line.slice(colon + 1)
+
+    const [propertyName, ...params] = name.split(';')
+
+    return new Property(
+        propertyName,
+        unescapeTextPropertyValue(value),
+        Object.fromEntries(
+            params.map(param => {
+                const [paramName, paramValue] = param.split('=')
+                return [paramName, unescapePropertyParameterValue(paramValue)]
+            })
+        )
+    )
 }

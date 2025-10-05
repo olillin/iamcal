@@ -1,4 +1,4 @@
-import { escapeTextPropertyValue } from '../../src/property'
+import { escapeTextPropertyValue } from '../../../src/property/escape'
 
 it('converts , to \\,', () => {
     const value = 'a,b'

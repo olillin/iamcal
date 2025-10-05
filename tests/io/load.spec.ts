@@ -12,7 +12,7 @@ const destinationPath = __dirname + '/resources/temp'
 async function loadCompressed(filename: string): Promise<number> {
     const zip = new AdmZip(filename)
     zip.extractAllTo(destinationPath)
-    const name = filename.split(/\/(?=[^\/]*$)/)[1]
+    const name = filename.split(/\/(?=[^/]*$)/)[1]
     const calendarPath = `${destinationPath}/${name.replace(/\.zip$/, '')}`
 
     const start = performance.now()
