@@ -1130,8 +1130,20 @@ export function escapeTextPropertyValue(value: string): string {
  * @see {@link unescapeTextPropertyValue}
  */
 export function unescapeTextPropertyValue(value: string): string {
+    const broadBadEscapePattern = /(?<!\\)\\(\\\\)*[^\\,;:"nN]/
+    const broadBadEscape = broadBadEscapePattern.exec(value)
+    if (broadBadEscape) {
+        const badEscape = value
+            .substring(broadBadEscape.index)
+            .match(/\\[^\\,;:"nN@]/)!
+        const position = broadBadEscape.index + badEscape.index!
+        throw new SyntaxError(
+            `Bad escaped character '${badEscape[0]}' at position ${position}`
+        )
+    }
+
     const jsonValue = value.replace(/\\N/, '\\n').replace(/\\(?=[,;:"])/g, '')
-    return JSON.parse(`"${jsonValue}"`).replace('\t', '\\t')
+    return JSON.parse(`"${jsonValue}"`)
 }
 
 /**

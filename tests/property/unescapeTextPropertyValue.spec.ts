@@ -48,9 +48,23 @@ it('converts \\\\\\n to \\LF', () => {
     expect(unescaped).toBe('a\\\nb')
 })
 
-// Maybe this should actually throw?
-it('does not convert \\t', () => {
+it('throws on \\t', () => {
     const value = 'a\\tb'
-    const unescaped = unescapeTextPropertyValue(value)
-    expect(unescaped).toBe(value)
+    expect(() => {
+        unescapeTextPropertyValue(value)
+    }).toThrow(new SyntaxError("Bad escaped character '\\t' at position 1"))
+})
+
+it('throws on \\a', () => {
+    const value = '\\a'
+    expect(() => {
+        unescapeTextPropertyValue(value)
+    }).toThrow(new SyntaxError("Bad escaped character '\\a' at position 0"))
+})
+
+it('calculates bad escape index correctly', () => {
+    const value = '\\\\b \\\\\\a'
+    expect(() => {
+        unescapeTextPropertyValue(value)
+    }).toThrow(new SyntaxError("Bad escaped character '\\a' at position 6"))
 })
