@@ -2,12 +2,9 @@ import { CalendarDateOrTime } from './date'
 import {
     AllowedPropertyName,
     ComponentProperty,
-    escapePropertyParameterValue,
-    escapePropertyValue,
     KnownPropertyName,
     MissingPropertyError,
     Property,
-    PropertyValidationError,
     validateProperty,
 } from './property'
 
@@ -87,25 +84,30 @@ export class Component {
 
     setProperty(name: string, value: string | CalendarDateOrTime): this {
         for (const property of this.properties) {
-            if (property.name === name) {
-                if (typeof value === 'string') {
-                    property.value = value
-                } else {
-                    const prop = value.toProperty(name)
-                    for (const param of prop.params) {
-                        property.setParameter(
-                            ...(param.split('=') as [string, string])
-                        )
-                    }
-                    property.value = prop.value
-                }
+            if (property.name !== name) continue
+
+            if (typeof value === 'string') {
+                property.value = value
                 return this
             }
+
+            const dateProperty = value.toProperty(name)
+
+            // Update value type
+            if (dateProperty.getValueType() === 'DATE')
+                property.setValueType('DATE')
+            else property.removeValueType()
+
+            // Update value
+            property.value = dateProperty.value
+
+            return this
         }
+        // Property is new
         this.properties.push(
             typeof value === 'string'
                 ? new ComponentProperty(name, value)
-                : ComponentProperty.fromObject(value.toProperty(name))
+                : value.toProperty(name)
         )
         return this
     }
@@ -138,6 +140,9 @@ export class Component {
         return null
     }
 
+    /**
+     * @deprecated Modify property after getting with {@link getProperty} instead.
+     */
     setPropertyParams(name: string, params: string[]): this {
         for (const property of this.properties) {
             if (property.name === name) {

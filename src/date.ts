@@ -1,5 +1,9 @@
 import * as patterns from './patterns'
-import { getPropertyValueType, type Property } from './property'
+import {
+    ComponentProperty,
+    getPropertyValueType,
+    type Property,
+} from './property'
 
 export const ONE_SECOND_MS = 1000
 export const ONE_MINUTE_MS = 60 * ONE_SECOND_MS
@@ -11,7 +15,7 @@ export interface CalendarDateOrTime {
      * Create a property from this date.
      * @param name The name of the property.
      */
-    toProperty(name: string): Property
+    toProperty(name: string): ComponentProperty
 
     /**
      * Get the string value of this date.
@@ -62,12 +66,8 @@ export class CalendarDate implements CalendarDateOrTime {
         this.date.setHours(0, 0, 0, 0)
     }
 
-    toProperty(name: string): Property {
-        return {
-            name,
-            params: ['VALUE=DATE'],
-            value: this.getValue(),
-        }
+    toProperty(name: string): ComponentProperty {
+        return new ComponentProperty(name, this.getValue(), { VALUE: 'DATE' })
     }
 
     getValue(): string {
@@ -106,12 +106,8 @@ export class CalendarDateTime implements CalendarDateOrTime {
         }
     }
 
-    toProperty(name: string): Property {
-        return {
-            name,
-            params: [],
-            value: this.getValue(),
-        }
+    toProperty(name: string): ComponentProperty {
+        return new ComponentProperty(name, this.getValue())
     }
 
     getValue(): string {

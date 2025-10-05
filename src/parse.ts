@@ -4,7 +4,7 @@ import { Component } from './component'
 import { Calendar, CalendarEvent } from './components'
 import {
     unescapePropertyParameterValue,
-    unescapePropertyValue,
+    unescapeTextPropertyValue,
 } from './property'
 
 /** Represents an error that occurs when deserializing a calendar component. */
@@ -100,7 +100,7 @@ export async function deserializeComponent(
                 const property = {
                     name: params[0],
                     params: params.slice(1).map(unescapePropertyParameterValue),
-                    value: unescapePropertyValue(value),
+                    value: unescapeTextPropertyValue(value),
                 }
 
                 component.properties.push(property)

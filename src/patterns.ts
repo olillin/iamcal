@@ -57,6 +57,12 @@ export const valueTypeText = new RegExp(
 export const valueTypeTime = /[0-9]{6}Z?/
 export const valueTypeUtcOffset = /[+-]([0-9]{2}){2,3}/
 
+// Content type as defined by RFC 4288 4.2
+export const regName = /[a-zA-Z0-9!#$&.+^_-]{1,127}/
+export const contentType = new RegExp(
+    '(' + regName.source + ')/(' + regName.source + ')'
+)
+
 /**
  * Check if a string matches a pattern for the whole string.
  * @param pattern The RegExp pattern to match against.
