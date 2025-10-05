@@ -17,7 +17,7 @@ it('sets DTEND', () => {
     event.setEnd(end)
 
     const expected = new ComponentProperty('DTEND', '20250101T123456')
-    expect(event.getProperty('DTEND')).toEqual(expected)
+    expect(event.getProperty('DTEND')).toStrictEqual(expected)
 })
 
 it('can be set with a Date object', () => {

@@ -13,7 +13,7 @@ it('sets the UID property', () => {
     const event = new CalendarEvent(uid, stamp, start)
 
     const expected = new ComponentProperty('UID', uid)
-    expect(event.getProperty('UID')).toEqual(expected)
+    expect(event.getProperty('UID')).toStrictEqual(expected)
 })
 
 it('sets the DTSTAMP property', () => {
@@ -24,7 +24,7 @@ it('sets the DTSTAMP property', () => {
     const event = new CalendarEvent(uid, stamp, start)
 
     const expected = new ComponentProperty('DTSTAMP', '20250705T160000')
-    expect(event.getProperty('DTSTAMP')).toEqual(expected)
+    expect(event.getProperty('DTSTAMP')).toStrictEqual(expected)
 })
 
 it('sets the DTSTART property', () => {
@@ -35,7 +35,7 @@ it('sets the DTSTART property', () => {
     const event = new CalendarEvent(uid, stamp, start)
 
     const expected = new ComponentProperty('DTSTART', '20250806T173000')
-    expect(event.getProperty('DTSTART')).toEqual(expected)
+    expect(event.getProperty('DTSTART')).toStrictEqual(expected)
 })
 
 it('can be created from a CalendarEvent', () => {
@@ -51,7 +51,7 @@ it('can be created from a CalendarEvent', () => {
     }).not.toThrow()
     if (event != null) {
         expect(event).toBeInstanceOf(CalendarEvent)
-        expect(event).toEqual(base)
+        expect(event).toStrictEqual(base)
     }
 })
 

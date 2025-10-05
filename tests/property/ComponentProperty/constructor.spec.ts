@@ -1,4 +1,4 @@
-import { ComponentProperty, Property } from '../../../src/property'
+import { ComponentProperty } from '../../../src/property'
 
 it('can be created with no property parameters', () => {
     const property = new ComponentProperty('X-PROP', 'My value')
@@ -11,6 +11,6 @@ it('can be created with property parameters', () => {
         LANGUAGE: 'en',
         ENCODING: 'utf8',
     })
-    expect(property.getParameter('LANGUAGE')).toEqual(['en'])
-    expect(property.getParameter('ENCODING')).toEqual(['utf8'])
+    expect(property.getParameter('LANGUAGE')).toStrictEqual(['en'])
+    expect(property.getParameter('ENCODING')).toStrictEqual(['utf8'])
 })

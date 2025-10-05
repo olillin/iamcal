@@ -27,10 +27,10 @@ export class CalendarEvent extends Component {
     ) {
         let component: Component
         if (a instanceof Component) {
-            component = a as Component
+            component = a
             CalendarEvent.prototype.validate.call(component)
         } else {
-            const uid = a as string
+            const uid = a
             const dtstamp = convertDate(b!, false)
             const dtstart = convertDate(c!)
             component = new Component('VEVENT')
@@ -42,7 +42,7 @@ export class CalendarEvent extends Component {
     }
 
     serialize(): string {
-        if (!this.getEnd() && !this.duration()) {
+        if (!this.getEnd() && !this.getDuration()) {
             throw new Error(
                 'Failed to serialize calendar event, end or duration must be set'
             )

@@ -30,7 +30,6 @@ describe('constructor', () => {
 
     it('throws if created from Invalid Date object', () => {
         const date = new Date('Invalid Date')
-        console.log(date)
         expect(() => {
             new CalendarDate(date)
         }).toThrow('Invalid date provided')
@@ -64,10 +63,10 @@ describe('toProperty', () => {
         expect(property.name).toBe('CREATED')
     })
 
-    it('returns a property with the params ["VALUE=DATE"]', () => {
+    it('returns a property with value type DATE', () => {
         const date = new CalendarDate('20250804')
         const property = date.toProperty('DTSTART')
-        expect(property.params).toStrictEqual(['VALUE=DATE'])
+        expect(property.parameters.get('VALUE')).toStrictEqual(['DATE'])
     })
 
     it('returns a property with the value in YYYYMMDD format', () => {
@@ -102,7 +101,7 @@ describe('getDate', () => {
         const calendarDate = new CalendarDate(date)
         const returned = calendarDate.getDate()
         const expected = new Date('2025-08-04T00:00:00')
-        expect(returned).toEqual(expected)
+        expect(returned).toStrictEqual(expected)
     })
 
     it('returns the same object when created with a calendar date string', () => {
@@ -111,7 +110,7 @@ describe('getDate', () => {
         const returnedA = calendarDateA.getDate()
         const calendarDateB = new CalendarDate('20250804')
         const returnedB = calendarDateB.getDate()
-        expect(returnedA).toEqual(returnedB)
+        expect(returnedA).toStrictEqual(returnedB)
     })
 })
 

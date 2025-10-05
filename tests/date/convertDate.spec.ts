@@ -16,21 +16,21 @@ it('converts a Date object to CalendarDateTime by default', () => {
     const date = new Date('2023-10-01T12:34:56')
     const result = convertDate(date)
     expect(result).toBeInstanceOf(CalendarDateTime)
-    expect(result.getDate()).toEqual(date)
+    expect(result.getDate()).toStrictEqual(date)
 })
 
 it('converts a Date object to CalendarDateTime when fullDay is false', () => {
     const date = new Date('2023-10-01T12:34:56')
     const result = convertDate(date, false)
     expect(result).toBeInstanceOf(CalendarDateTime)
-    expect(result.getDate()).toEqual(date)
+    expect(result.getDate()).toStrictEqual(date)
 })
 
 it('converts a Date object to CalendarDate when fullDay is true', () => {
     const date = new Date('2023-10-01T00:00:00')
     const result = convertDate(date, true)
     expect(result).toBeInstanceOf(CalendarDate)
-    expect(result.getDate()).toEqual(date)
+    expect(result.getDate()).toStrictEqual(date)
 })
 
 it('throws if the date is invalid', () => {

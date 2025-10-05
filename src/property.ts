@@ -69,8 +69,8 @@ export class ComponentProperty implements Property {
     }
 
     /**
-     * Get the value of a parameter on this property.
-     * @param name The name of the parameter.
+     * Get the values of a parameter on this property.
+     * @param name The name of the parameter to get the values of.
      * @returns The values of the parameter, or undefined if the parameter is unset.
      */
     getParameter(name: string): string[] | undefined {
@@ -78,20 +78,35 @@ export class ComponentProperty implements Property {
     }
 
     /**
-     *
-     * @param name The name of the parameter.
-     * @returns The first value of the parameter if there are any.
+     * Get the first value of a parameter.
+     * @param name The parameter name.
+     * @returns The first value of the parameter if the parameter is set, else undefined.
      */
     getFirstParameter(name: string): string | undefined {
         return this.getParameter(name)?.[0]
     }
 
-    removeParameter(name: string) {}
+    /**
+     * Remove all values of a parameter.
+     * @param name The name of the parameter to remove.
+     */
+    removeParameter(name: string) {
+        this._parameters.delete(name)
+    }
 
+    /**
+     * Check whether this property has a parameter.
+     * @param name The parameter name.
+     * @returns Whether the parameter is present.
+     */
     hasParameter(name: string): boolean {
         return this.getParameter(name) !== undefined
     }
 
+    /**
+     * Serialize this property into a contennt line.
+     * @returns The serialized content line.
+     */
     serialize(): string {
         const escapedParams = []
         for (const [paramName, paramValues] of this._parameters.entries()) {
@@ -107,10 +122,19 @@ export class ComponentProperty implements Property {
         return this.name + escapedParams.join() + ':' + serializedValue
     }
 
+    /**
+     * Set the value type of this property.
+     * @param valueType The new value of the VALUE parameter.
+     */
     setValueType(valueType: AllowedValueType) {
         this.setParameter('VALUE', valueType)
     }
 
+    /**
+     * Remove the explicit value type of this property.
+     *
+     * Note that this will not remove the inferred value type of this property.
+     */
     removeValueType() {
         this.removeParameter('VALUE')
     }
@@ -773,7 +797,7 @@ export function getPropertyValueType(
 ): AllowedValueType | undefined
 export function getPropertyValueType(
     property: Property,
-    defaultValue?: AllowedValueType | undefined
+    defaultValue?: AllowedValueType
 ): AllowedValueType | undefined {
     const found = property.params.find(param => /^VALUE=.+$/i.test(param))
     if (!found) return defaultValue
@@ -1127,6 +1151,7 @@ export function escapeTextPropertyValue(value: string): string {
  * Unescape special characters in a TEXT property value.
  * @param value The property value to unescape.
  * @returns The unescaped property value.
+ * @throws If the value contains a bad escaped character (i.e. a character that should not be escaped).
  * @see {@link unescapeTextPropertyValue}
  */
 export function unescapeTextPropertyValue(value: string): string {
@@ -1143,7 +1168,7 @@ export function unescapeTextPropertyValue(value: string): string {
     }
 
     const jsonValue = value.replace(/\\N/, '\\n').replace(/\\(?=[,;:"])/g, '')
-    return JSON.parse(`"${jsonValue}"`)
+    return JSON.parse(`"${jsonValue}"`) as string
 }
 
 /**

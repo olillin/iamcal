@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-deprecated */
 import { ComponentProperty, Property } from '../../../src/property'
 
 const property: Property = {
@@ -19,5 +20,5 @@ it('sets the correct value', () => {
 it('sets the correct parameters', () => {
     const cp = ComponentProperty.fromObject(property)
     expect(cp.hasParameter('LANGUAGE')).toBeTruthy()
-    expect(cp.getParameter('LANGUAGE')).toEqual(['en'])
+    expect(cp.getParameter('LANGUAGE')).toStrictEqual(['en'])
 })

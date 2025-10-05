@@ -6,6 +6,7 @@ import {
     MissingPropertyError,
     Property,
     validateProperty,
+    type PropertyValidationError,
 } from './property'
 
 /** Represents an error which occurs while validating a calendar component. */
@@ -26,7 +27,7 @@ export class Component {
 
     constructor(
         name: string,
-        properties?: (Property | ComponentProperty)[],
+        properties?: Property[],
         components?: Component[]
     ) {
         this.name = name

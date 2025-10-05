@@ -14,10 +14,10 @@ export class TimeZone extends Component {
     constructor(a: string | Component) {
         let component: Component
         if (a instanceof Component) {
-            component = a as Component
+            component = a
             TimeZone.prototype.validate.call(component)
         } else {
-            const tzid = a as string
+            const tzid = a
             component = new Component('VTIMEZONE')
             component.setProperty('TZID', tzid)
         }

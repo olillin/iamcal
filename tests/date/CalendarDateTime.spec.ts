@@ -66,7 +66,7 @@ describe('toProperty', () => {
     it('returns a property with no params', () => {
         const date = new CalendarDateTime('20250804T220000')
         const property = date.toProperty('DTSTART')
-        expect(property.params).toHaveLength(0)
+        expect(property.parameters.size).toBe(0)
     })
 
     it('returns a property with the value in YYYYMMDDTHHmmSS format', () => {
@@ -100,7 +100,7 @@ describe('getDate', () => {
         const date = new Date('2025-08-04T12:34:56')
         const calendarDate = new CalendarDateTime(date)
         const returned = calendarDate.getDate()
-        expect(returned).toEqual(date)
+        expect(returned).toStrictEqual(date)
     })
 
     it('returns the same object when created with a calendar date time string or with a Date object', () => {
@@ -109,7 +109,7 @@ describe('getDate', () => {
         const returnedA = calendarDateA.getDate()
         const calendarDateB = new CalendarDateTime('20250804T123456')
         const returnedB = calendarDateB.getDate()
-        expect(returnedA).toEqual(returnedB)
+        expect(returnedA).toStrictEqual(returnedB)
     })
 })
 

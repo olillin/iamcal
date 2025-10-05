@@ -32,13 +32,13 @@ export class TimeZoneOffset extends Component {
     ) {
         let component: Component
         if (a instanceof Component) {
-            component = a as Component
+            component = a
             TimeZoneOffset.prototype.validate.call(component)
         } else {
-            const name = a as OffsetType
+            const name: OffsetType = a
             const start = convertDate(b!)
-            const offsetFrom = c as Offset
-            const offsetTo = d as Offset
+            const offsetFrom = c!
+            const offsetTo = d!
             component = new Component(name)
             component.setProperty('DTSTART', start)
             component.setProperty('TZOFFSETFROM', offsetFrom)
