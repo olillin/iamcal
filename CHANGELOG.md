@@ -10,10 +10,20 @@ and this project adheres to
 
 ### Added
 
-- Automatic escaping of special characters (`,`, `;`, `:` and `\`) in
-  property values during serialization.
+- Automatic escaping of special characters (`,`, `;`, `\` and `\n`) in
+  property values of type `TEXT` during serialization.
+- Automatic unescaping of special characters (`,`, `;`, `\` and `\n`) in
+  property values of type `TEXT` during deserialization.
 - Automatic quoting of property parameter values containing special characters
   (`,`, `;` and `:`) during serialization.
+- Automatic unquoting of property parameter values containing special characters
+  (`,`, `;` and `:`) during deserialization.
+- `ComponentProperty` class, representing a property on a calendar component.
+  - Property parameters are stored as a map of the parameter name to a list of
+    values.
+  - Has getters, setters and removers for each known parameter specified by
+    RFC 5545.
+  - Can be (de)serialized independently of calendar components.
 
 ## [v2.1.2] - 2025-08-14
 

@@ -1139,12 +1139,14 @@ export function validateProperty(property: Property) {
 
 /**
  * Escape special characters in a TEXT property value.
+ *
+ * Note: This method converts both CRLF and LF to '\n'.
  * @param value The property value to escape.
  * @returns The escaped property value.
  * @see {@link unescapeTextPropertyValue}
  */
 export function escapeTextPropertyValue(value: string): string {
-    return value.replace(/(?=[,;:\\"])/g, '\\').replace(/\r?\n/g, '\\n')
+    return value.replace(/(?=[,;\\])/g, '\\').replace(/\r?\n/g, '\\n')
 }
 
 /**
@@ -1155,12 +1157,12 @@ export function escapeTextPropertyValue(value: string): string {
  * @see {@link unescapeTextPropertyValue}
  */
 export function unescapeTextPropertyValue(value: string): string {
-    const broadBadEscapePattern = /(?<!\\)\\(\\\\)*[^\\,;:"nN]/
+    const broadBadEscapePattern = /(?<!\\)\\(\\\\)*[^,;\\nN]/
     const broadBadEscape = broadBadEscapePattern.exec(value)
     if (broadBadEscape) {
         const badEscape = value
             .substring(broadBadEscape.index)
-            .match(/\\[^\\,;:"nN@]/)!
+            .match(/\\[^,;\\nN]/)!
         const position = broadBadEscape.index + badEscape.index!
         throw new SyntaxError(
             `Bad escaped character '${badEscape[0]}' at position ${position}`

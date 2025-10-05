@@ -53,3 +53,15 @@ it('does not convert HT', () => {
     const escaped = escapeTextPropertyValue(value)
     expect(escaped).toBe(value)
 })
+
+it('does not convert :', () => {
+    const value = 'a:b'
+    const escaped = escapeTextPropertyValue(value)
+    expect(escaped).toBe('a:b')
+})
+
+it('does not convert "', () => {
+    const value = 'a"b'
+    const escaped = escapeTextPropertyValue(value)
+    expect(escaped).toBe('a"b')
+})

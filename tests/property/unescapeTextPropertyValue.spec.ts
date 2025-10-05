@@ -62,6 +62,20 @@ it('throws on \\a', () => {
     }).toThrow(new SyntaxError("Bad escaped character '\\a' at position 0"))
 })
 
+it('throws on \\:', () => {
+    const value = 'a\\:b'
+    expect(() => {
+        unescapeTextPropertyValue(value)
+    }).toThrow(new SyntaxError("Bad escaped character '\\:' at position 1"))
+})
+
+it('throws on \\"', () => {
+    const value = '\\"'
+    expect(() => {
+        unescapeTextPropertyValue(value)
+    }).toThrow(new SyntaxError("Bad escaped character '\\\"' at position 0"))
+})
+
 it('calculates bad escape index correctly', () => {
     const value = '\\\\b \\\\\\a'
     expect(() => {
