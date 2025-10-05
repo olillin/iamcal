@@ -2,7 +2,7 @@ import {
     CalendarDate,
     CalendarDateTime,
     CalendarEvent,
-    Property,
+    ComponentProperty,
 } from '../../../src'
 
 it('sets DTSTAMP', () => {
@@ -12,11 +12,7 @@ it('sets DTSTAMP', () => {
 
     event.setStamp(stamp)
 
-    const expected: Property = {
-        name: 'DTSTAMP',
-        params: [],
-        value: '20250101T123456',
-    }
+    const expected = new ComponentProperty('DTSTAMP', '20250101T123456')
     expect(event.getProperty('DTSTAMP')).toEqual(expected)
 })
 

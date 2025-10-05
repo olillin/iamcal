@@ -2,7 +2,7 @@ import {
     CalendarDateTime,
     CalendarEvent,
     Component,
-    type Property,
+    ComponentProperty,
 } from '../../../src'
 
 it('sets the UID property', () => {
@@ -12,11 +12,7 @@ it('sets the UID property', () => {
 
     const event = new CalendarEvent(uid, stamp, start)
 
-    const expected: Property = {
-        name: 'UID',
-        params: [],
-        value: uid,
-    }
+    const expected = new ComponentProperty('UID', uid)
     expect(event.getProperty('UID')).toEqual(expected)
 })
 
@@ -27,11 +23,7 @@ it('sets the DTSTAMP property', () => {
 
     const event = new CalendarEvent(uid, stamp, start)
 
-    const expected: Property = {
-        name: 'DTSTAMP',
-        params: [],
-        value: '20250705T160000',
-    }
+    const expected = new ComponentProperty('DTSTAMP', '20250705T160000')
     expect(event.getProperty('DTSTAMP')).toEqual(expected)
 })
 
@@ -42,11 +34,7 @@ it('sets the DTSTART property', () => {
 
     const event = new CalendarEvent(uid, stamp, start)
 
-    const expected: Property = {
-        name: 'DTSTART',
-        params: [],
-        value: '20250806T173000',
-    }
+    const expected = new ComponentProperty('DTSTART', '20250806T173000')
     expect(event.getProperty('DTSTART')).toEqual(expected)
 })
 

@@ -11,6 +11,6 @@ it('can be created with property parameters', () => {
         LANGUAGE: 'en',
         ENCODING: 'utf8',
     })
-    expect(property.getParameter('LANGUAGE')).toBe('en')
-    expect(property.getParameter('ENCODING')).toBe('utf8')
+    expect(property.getParameter('LANGUAGE')).toEqual(['en'])
+    expect(property.getParameter('ENCODING')).toEqual(['utf8'])
 })

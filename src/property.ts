@@ -102,7 +102,7 @@ export class ComponentProperty implements Property {
         }
         const serializedValue =
             this.getValueType() === 'TEXT'
-                ? unescapeTextPropertyValue(this.value)
+                ? escapeTextPropertyValue(this.value)
                 : this.value
         return this.name + escapedParams.join() + ':' + serializedValue
     }

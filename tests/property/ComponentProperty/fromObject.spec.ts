@@ -19,5 +19,5 @@ it('sets the correct value', () => {
 it('sets the correct parameters', () => {
     const cp = ComponentProperty.fromObject(property)
     expect(cp.hasParameter('LANGUAGE')).toBeTruthy()
-    expect(cp.getParameter('LANGUAGE')).toBe('en')
+    expect(cp.getParameter('LANGUAGE')).toEqual(['en'])
 })

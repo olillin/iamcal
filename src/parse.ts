@@ -3,6 +3,7 @@ import { Readable } from 'stream'
 import { Component } from './component'
 import { Calendar, CalendarEvent } from './components'
 import {
+    ComponentProperty,
     unescapePropertyParameterValue,
     unescapeTextPropertyValue,
 } from './property'
@@ -96,12 +97,20 @@ export async function deserializeComponent(
                 const name = line.slice(0, colon)
                 const value = line.slice(colon + 1)
 
-                const params = name.split(';')
-                const property = {
-                    name: params[0],
-                    params: params.slice(1).map(unescapePropertyParameterValue),
-                    value: unescapeTextPropertyValue(value),
-                }
+                const [propertyName, ...params] = name.split(';')
+                const property = new ComponentProperty(
+                    propertyName,
+                    unescapeTextPropertyValue(value),
+                    Object.fromEntries(
+                        params.map(param => {
+                            const [paramName, paramValue] = param.split('=')
+                            return [
+                                paramName,
+                                unescapePropertyParameterValue(paramValue),
+                            ]
+                        })
+                    )
+                )
 
                 component.properties.push(property)
             }
