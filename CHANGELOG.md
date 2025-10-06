@@ -24,11 +24,14 @@ and this project adheres to
   - Has getters, setters and removers for each known parameter specified by
     RFC 5545.
   - Can be (de)serialized independently of calendar components.
+  - Has a `fromDate` factory method which replaces the
+    `CalendarDateOrTime.toProperty` method.
 
 ### Removed
 
 - `Property` interface in favor of `Property` class.
-- Previously deprecated APIs.
+- Previously deprecated APIs from v2.1.0.
+- `CalendarDateOrTime.toProperty` in favor of `Property.fromDate`.
 
 ## [v2.1.2] - 2025-08-14
 

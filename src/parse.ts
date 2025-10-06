@@ -6,6 +6,7 @@ import { Property } from './property/Property'
 import {
     unescapePropertyParameterValue,
     unescapeTextPropertyValue,
+    unfoldLine,
 } from './property/escape'
 
 /** Represents an error that occurs when deserializing a calendar component. */
@@ -176,11 +177,13 @@ export async function parseEvent(text: string): Promise<CalendarEvent> {
 
 /**
  * Deserialize a component property.
- * @param line The serialized content line that defines this property. Must not be wrapped.
+ * @param line The serialized content line that defines this property.
  * @returns The deserialized property.
  * @throws {DeserializationError} If content line is invalid.
  */
 export function deserializeProperty(line: string): Property {
+    line = unfoldLine(line)
+
     const colon = line.indexOf(':')
     if (colon === -1) {
         throw new DeserializationError(`Invalid content line: ${line}`)

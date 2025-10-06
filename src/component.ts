@@ -27,10 +27,6 @@ export class IllegalOperationError extends Error {
         this.name = 'IllegalOperationError'
     }
 }
-
-// Max line length as defined by RFC 5545 3.1.
-const MAX_LINE_LENGTH = 75
-
 export class Component {
     name: string
     properties: Property[]
@@ -62,13 +58,7 @@ export class Component {
         const lines = [`BEGIN:${this.name}`]
 
         for (const property of this.properties) {
-            let line = property.serialize()
-
-            // Wrap lines
-            while (line.length > MAX_LINE_LENGTH) {
-                lines.push(line.substring(0, MAX_LINE_LENGTH))
-                line = ' ' + line.substring(MAX_LINE_LENGTH)
-            }
+            const line = property.serialize()
             lines.push(line)
         }
 
@@ -102,7 +92,7 @@ export class Component {
                 return this
             }
 
-            const dateProperty = value.toProperty(name)
+            const dateProperty = Property.fromDate(name, value)
 
             // Update value type
             if (dateProperty.getValueType() === 'DATE')
@@ -118,7 +108,7 @@ export class Component {
         this.properties.push(
             typeof value === 'string'
                 ? new Property(name, value)
-                : value.toProperty(name)
+                : Property.fromDate(name, value)
         )
         return this
     }

@@ -69,3 +69,34 @@ export function unescapePropertyParameterValue(param: string): string {
     }
     return param
 }
+
+// Max line length as defined by RFC 5545 3.1.
+export const MAX_LINE_LENGTH = 75
+
+/**
+ * Fold a single line as specified in RFC 5545 3.1.
+ * @param line The line to fold.
+ * @returns The folded line.
+ */
+export function foldLine(line: string): string {
+    if (line.length < MAX_LINE_LENGTH) return line
+
+    const lines = [line.substring(0, MAX_LINE_LENGTH)]
+    const matches = line
+        .substring(MAX_LINE_LENGTH)
+        .matchAll(new RegExp(`.{${MAX_LINE_LENGTH - 2}}`, 'g'))
+    for (const match of matches) {
+        lines.push(match[0])
+    }
+
+    return lines.join('\r\n ')
+}
+
+/**
+ * Unfold a single line as specified in RFC 5545 3.1.
+ * @param lines The lines to unfold.
+ * @returns The unfolded line.
+ */
+export function unfoldLine(lines: string): string {
+    return lines.replace(/\r\n /g, '')
+}

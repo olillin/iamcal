@@ -1,5 +1,9 @@
 import { CalendarDateOrTime } from 'src/date'
-import { escapePropertyParameterValue, escapeTextPropertyValue } from './escape'
+import {
+    escapePropertyParameterValue,
+    escapeTextPropertyValue,
+    foldLine,
+} from './escape'
 import {
     AlarmTriggerRelationship,
     CalendarUserType,
@@ -116,7 +120,8 @@ export class Property {
             this.getValueType() === 'TEXT'
                 ? escapeTextPropertyValue(this.value)
                 : this.value
-        return this.name + escapedParams.join() + ':' + serializedValue
+        const line = this.name + escapedParams.join() + ':' + serializedValue
+        return foldLine(line)
     }
 
     /**

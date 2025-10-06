@@ -8,13 +8,6 @@ export const ONE_DAY_MS = 24 * ONE_HOUR_MS
 
 export interface CalendarDateOrTime {
     /**
-     * Create a property from this date.
-     * @param name The name of the property.
-     * @deprecated Use {@link Property.fromDate} instead.
-     */
-    toProperty(name: string): Property
-
-    /**
      * Get the string value of this date.
      * @returns An iCalendar date or date-time string.
      */
@@ -63,10 +56,6 @@ export class CalendarDate implements CalendarDateOrTime {
         this.date.setHours(0, 0, 0, 0)
     }
 
-    toProperty(name: string): Property {
-        return Property.fromDate(name, this)
-    }
-
     getValue(): string {
         return toDateString(this.date)
     }
@@ -101,10 +90,6 @@ export class CalendarDateTime implements CalendarDateOrTime {
         if (!this.date || isNaN(this.date.getTime())) {
             throw new Error('Invalid date provided')
         }
-    }
-
-    toProperty(name: string): Property {
-        return Property.fromDate(name, this)
     }
 
     getValue(): string {

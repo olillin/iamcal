@@ -50,32 +50,6 @@ describe('constructor', () => {
     })
 })
 
-describe('toProperty', () => {
-    it('returns a property with same name when name is DTSTART', () => {
-        const date = new CalendarDate('20250804')
-        const property = date.toProperty('DTSTART')
-        expect(property.name).toBe('DTSTART')
-    })
-
-    it('returns a property with same name when name is CREATED', () => {
-        const date = new CalendarDate('20250804')
-        const property = date.toProperty('CREATED')
-        expect(property.name).toBe('CREATED')
-    })
-
-    it('returns a property with value type DATE', () => {
-        const date = new CalendarDate('20250804')
-        const property = date.toProperty('DTSTART')
-        expect(property.parameters.get('VALUE')).toStrictEqual(['DATE'])
-    })
-
-    it('returns a property with the value in YYYYMMDD format', () => {
-        const date = new CalendarDate('20250804')
-        const property = date.toProperty('DTSTART')
-        expect(property.value).toBe('20250804')
-    })
-})
-
 describe('getValue', () => {
     it('returns the date in YYYYMMDD format', () => {
         const date = new CalendarDate('20250804')
