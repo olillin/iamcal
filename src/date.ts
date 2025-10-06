@@ -10,6 +10,7 @@ export interface CalendarDateOrTime {
     /**
      * Create a property from this date.
      * @param name The name of the property.
+     * @deprecated Use {@link Property.fromDate} instead.
      */
     toProperty(name: string): Property
 
@@ -63,7 +64,7 @@ export class CalendarDate implements CalendarDateOrTime {
     }
 
     toProperty(name: string): Property {
-        return new Property(name, this.getValue(), { VALUE: 'DATE' })
+        return Property.fromDate(name, this)
     }
 
     getValue(): string {
@@ -103,7 +104,7 @@ export class CalendarDateTime implements CalendarDateOrTime {
     }
 
     toProperty(name: string): Property {
-        return new Property(name, this.getValue())
+        return Property.fromDate(name, this)
     }
 
     getValue(): string {

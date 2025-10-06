@@ -1,3 +1,4 @@
+import { CalendarDateOrTime } from 'src/date'
 import { escapePropertyParameterValue, escapeTextPropertyValue } from './escape'
 import {
     AlarmTriggerRelationship,
@@ -47,6 +48,14 @@ export class Property {
                 typeof value === 'string' ? [value] : value
             )
         }
+    }
+
+    static fromDate(name: string, value: CalendarDateOrTime): Property {
+        return new Property(
+            name,
+            value.getValue(),
+            value.isFullDay() ? { VALUE: 'DATE' } : undefined
+        )
     }
 
     setParameter(name: string, value: string | string[]) {
