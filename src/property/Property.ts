@@ -120,7 +120,7 @@ export class Property {
             this.getValueType() === 'TEXT'
                 ? escapeTextPropertyValue(this.value)
                 : this.value
-        const line = this.name + escapedParams.join() + ':' + serializedValue
+        const line = this.name + escapedParams.join('') + ':' + serializedValue
         return foldLine(line)
     }
 
