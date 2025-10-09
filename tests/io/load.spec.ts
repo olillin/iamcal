@@ -32,7 +32,7 @@ it('takes less than 5,000ms to load 1,000 events', async () => {
     const time = await loadCompressed(
         __dirname + '/resources/1-000-events.ics.zip'
     )
-    expect(time).toBeLessThan(500)
+    expect(time).toBeLessThan(5000)
 }, 6_000)
 
 it('does not have a complexity worse than linear', async () => {
