@@ -2,17 +2,16 @@ import readline from 'readline'
 import { Readable } from 'stream'
 import { Component } from './component'
 import { Calendar, CalendarEvent } from './components'
-import { Property } from './property/Property'
-import {
-    unescapePropertyParameterValue,
-    unescapeTextPropertyValue,
-    unfoldLine,
-} from './property/escape'
 import {
     isNameChar,
     isParameterValueChar,
     isPropertyValueChar,
 } from './patterns'
+import { Property } from './property/Property'
+import {
+    unescapePropertyParameterValue,
+    unescapeTextPropertyValue,
+} from './property/escape'
 
 /** Represents an error that occurs when deserializing a calendar component. */
 export class DeserializationError extends Error {
@@ -190,15 +189,19 @@ export function deserializeProperty(line: string): Property {
     // A stack to store characters before joining to a string
     const stack = new Array<string>(line.length)
     let stackPos = 0
-    /** Get the string currently contained in {@link stack} and reset the stack. */
-    const gatherStack = () => {
+
+    /**
+     * Get the string currently contained in {@link stack} and reset the stack.
+     * @returns The string of characters below {@link stackPos} in {@link stack}.
+     */
+    function gatherStack(): string {
         const s = stack.slice(0, stackPos).join('')
         stackPos = 0
         return s
     }
 
     let propertyName: string | undefined = undefined
-    let rawParameters: Map<string, string[]> = new Map()
+    const rawParameters: Map<string, string[]> = new Map()
 
     let currentParam: string | undefined = undefined
     let quoted: boolean = false
@@ -213,30 +216,31 @@ export function deserializeProperty(line: string): Property {
 
     for (const char of line) {
         // Handle folded content lines
-        if (char === '\r' || char === '\n') {
-            stack[stackPos++] = char
-            continue
-        } else {
-            // Check if there have been new line characters
-            if (stack[stackPos - 1] === '\r')
+        const last = stack[stackPos - 1]
+        if (last === '\r') {
+            if (char !== '\n')
                 throw new DeserializationError('Invalid CR in content line.')
 
-            if (stack[stackPos - 1] === '\n') {
-                if (stack[stackPos - 2] !== '\r')
-                    throw new DeserializationError(
-                        'Invalid LF in content line.'
-                    )
+            stack[stackPos++] = char
+            continue
+        } else if (char === '\n')
+            throw new DeserializationError('Invalid LF in content line.')
 
-                if (char !== ' ' && char !== '\t')
-                    throw new DeserializationError(
-                        'Invalid CRLF without whitespace in content line.'
-                    )
+        if (last === '\n') {
+            if (char !== ' ' && char !== '\t')
+                throw new DeserializationError('Invalid CRLF in content line.')
 
-                stackPos -= 2 // Remove CRLF from stack
-                continue
-            }
+            // Valid folded line sequence, remove CRLF
+            stackPos -= 2
+            continue
         }
 
+        if (char === '\r') {
+            stack[stackPos++] = char
+            continue
+        }
+
+        // Process character
         if (step === Step.Name) {
             // Continue parsing name
             if (isNameChar(char)) {
@@ -280,9 +284,24 @@ export function deserializeProperty(line: string): Property {
         } else if (step === Step.ParamValue) {
             // Continue parsing parameter value
             if (char === '"') {
-                quoted = !quoted
-                if (quoted) hasQuote = true
+                if (quoted) {
+                    quoted = false
+                } else {
+                    if (stackPos !== 0)
+                        throw new DeserializationError(
+                            'Invalid characters before quote in parameter value.'
+                        )
+
+                    quoted = true
+                    hasQuote = true
+                }
             } else if (isParameterValueChar(char, quoted)) {
+                if (!quoted && hasQuote)
+                    if (stackPos !== 0)
+                        throw new DeserializationError(
+                            'Invalid characters after quote in parameter value.'
+                        )
+
                 stack[stackPos++] = char
             } else if (char === ',') {
                 // End of parameter value, begin next parameter value
@@ -292,6 +311,7 @@ export function deserializeProperty(line: string): Property {
                     )
                 const paramValue = gatherStack()
                 rawParameters.get(currentParam)!.push(paramValue)
+                hasQuote = false
                 step = Step.ParamValue
             } else if (char === ';') {
                 // End of parameter value, begin next parameter name

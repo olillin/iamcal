@@ -78,6 +78,7 @@ export function matchesWholeString(pattern: RegExp, text: string): boolean {
  * Get the ordinal (character code) of a character.
  * @param char The character to get the ordinal value of.
  * @returns The ordinal as a number.
+ * @throws If the input string is empty.
  */
 export function ord(char: string): number {
     if (char.length === 0)

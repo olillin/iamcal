@@ -1,4 +1,4 @@
-import { CalendarDate, deserializeProperty, Property } from '../../src'
+import { deserializeProperty, Property } from '../../src'
 
 it('can parse a string in the form "NAME;param=value:value"', () => {
     const serialized = 'DTSTART;VALUE=DATE:20251006'
@@ -155,6 +155,30 @@ it('throws if quoted parameter value contains DQUOTE', () => {
 
 it('throws if unquoted parameter value contains DQUOTE', () => {
     const serialized = 'SUMMARY;key=a"b:value'
+
+    expect(() => deserializeProperty(serialized)).toThrow()
+})
+
+it('throws if quoted parameter has leading characters', () => {
+    const serialized = 'SUMMARY;key=a"b":value'
+
+    expect(() => deserializeProperty(serialized)).toThrow()
+})
+
+it('throws if quoted parameter has trailing characters', () => {
+    const serialized = 'SUMMARY;key="a"b:value'
+
+    expect(() => deserializeProperty(serialized)).toThrow()
+})
+
+it('throws if quoted value has leading characters', () => {
+    const serialized = 'SUMMARY:a"value"'
+
+    expect(() => deserializeProperty(serialized)).toThrow()
+})
+
+it('throws if quoted value has trailing characters', () => {
+    const serialized = 'SUMMARY:"value"b'
 
     expect(() => deserializeProperty(serialized)).toThrow()
 })
