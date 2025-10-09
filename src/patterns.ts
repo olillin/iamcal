@@ -73,3 +73,60 @@ export function matchesWholeString(pattern: RegExp, text: string): boolean {
     const match = text.match(pattern)
     return match !== null && match[0] === text
 }
+
+/**
+ * Get the ordinal (character code) of a character.
+ * @param char The character to get the ordinal value of.
+ * @returns The ordinal as a number.
+ */
+export function ord(char: string): number {
+    if (char.length === 0)
+        throw new Error('Expected a character, got empty string')
+
+    return char.charCodeAt(0)
+}
+
+/**
+ * Check if a character is allowed in a property or parameter name.
+ * @param char The character to check.
+ * @returns Whether or not the character is allowed.
+ */
+export function isNameChar(char: string): boolean {
+    return (
+        (ord(char) >= ord('A') && ord(char) <= ord('Z')) ||
+        (ord(char) >= ord('a') && ord(char) <= ord('z')) ||
+        (ord(char) >= ord('0') && ord(char) <= ord('9')) ||
+        char === '-'
+    )
+}
+
+/**
+ * Check if a character is allowwed in a property value.
+ * @param char The character to check.
+ * @returns Whether or not the character is allowed.
+ */
+export function isPropertyValueChar(char: string): boolean {
+    return ord(char) === 9 || ord(char) >= 32
+}
+
+/**
+ * Check if a character is allowwed in a parameter value.
+ * @param char The character to check.
+ * @param quoted Whether or not the parameter value is quoted, this allows ';', ':' and ','.
+ * @returns Whether or not the character is allowed.
+ */
+export function isParameterValueChar(
+    char: string,
+    quoted: boolean = false
+): boolean {
+    return (
+        // Allow HTAB
+        ord(char) === 9 ||
+        // Do not allow DQUOTE
+        (char !== '"' &&
+            // Allow non-control characters
+            ord(char) >= 32 &&
+            // These characters are only allowed if quoted
+            (quoted || !(char === ';' || char === ':' || char === ',')))
+    )
+}
