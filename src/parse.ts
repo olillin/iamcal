@@ -21,11 +21,13 @@ export class DeserializationError extends Error {
 /**
  * Deserialize a calendar component.
  * @param lines The serialized component as a **readline** interface.
+ * @param strict If true, newlines must be CRLF. Defaults to false.
  * @returns The deserialized calendar component object.
  * @throws {DeserializationError} If the component is invalid.
  */
 export async function deserializeComponent(
-    lines: readline.Interface
+    lines: readline.Interface,
+    strict: boolean = false
 ): Promise<Component> {
     const component = new Component('')
     let done = false
@@ -72,7 +74,8 @@ export async function deserializeComponent(
             if (stack.length == 1) {
                 subcomponentLines.push(line)
                 const subcomponent = await deserializeComponentString(
-                    subcomponentLines.join('\r\n')
+                    subcomponentLines.join('\r\n'),
+                    strict
                 )
                 subcomponentLines.length = 0
 
@@ -93,7 +96,7 @@ export async function deserializeComponent(
                 subcomponentLines.push(line)
             } else {
                 // Property
-                const property = deserializeProperty(line)
+                const property = deserializeProperty(line, strict)
                 component.properties.push(property)
             }
         }
@@ -145,18 +148,20 @@ export async function deserializeComponent(
 /**
  * Deserialize a calendar component string.
  * @param text The serialized component.
+ * @param strict If true, newlines must be CRLF. Defaults to false.
  * @returns The deserialized component object.
  * @throws {DeserializationError} If the component is invalid.
  */
 export async function deserializeComponentString(
-    text: string
+    text: string,
+    strict: boolean = false
 ): Promise<Component> {
     const stream = Readable.from(text)
     const lines = readline.createInterface({
         input: stream,
         crlfDelay: Infinity,
     })
-    return deserializeComponent(lines)
+    return deserializeComponent(lines, strict)
 }
 
 /**
@@ -182,7 +187,7 @@ export async function parseEvent(text: string): Promise<CalendarEvent> {
 /**
  * Deserialize a component property.
  * @param line The serialized content line that defines this property.
- * @param strict If newlines are allowed to be LF and CRLF, not just CRLF. Defaults to false.
+ * @param strict If true, newlines must be CRLF. Defaults to false.
  * @returns The deserialized property.
  * @throws {DeserializationError} If content line is invalid.
  */

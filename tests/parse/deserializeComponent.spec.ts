@@ -86,3 +86,58 @@ END:X-COMPONENT`
     expect(prop).not.toBeNull()
     expect(prop!.value).toBe('value,with, commas')
 })
+
+it('can use CRLF', async () => {
+    const serialized = `BEGIN:X-COMPONENT\r
+END:X-COMPONENT`
+
+    const component = await deserializeComponentString(serialized)
+
+    const expected = new Component('X-COMPONENT')
+    expect(component).toStrictEqual(expected)
+})
+
+it('can use CRLF in strict mode', async () => {
+    const serialized = `BEGIN:X-COMPONENT\r
+END:X-COMPONENT`
+
+    const component = await deserializeComponentString(serialized, true)
+
+    const expected = new Component('X-COMPONENT')
+    expect(component).toStrictEqual(expected)
+})
+
+// it('throws if using LF in strict mode', async () => {
+//     const serialized = `BEGIN:X-COMPONENT
+// END:X-COMPONENT`
+
+//     expect(async () => {
+//         await deserializeComponentString(serialized, true)
+//     }).toThrow()
+// })
+
+// it('passes strict mode to deserializeProperty', async () => {
+//     const serialized = `BEGIN:X-COMPONENT\r
+// SUMMARY:This is a
+//  summary\r
+// END:X-COMPONENT`
+
+//     expect(async () => {
+//         await deserializeComponentString(serialized, true)
+//     }).toThrow()
+// })
+
+// it('passes strict mode to subcomponents', async () => {
+//     const serialized = `BEGIN:X-COMPONENT\r
+// BEGIN:X-COMPONENT\r
+// BEGIN:X-COMPONENT\r
+// SUMMARY:This is a
+//  summary\r
+// END:X-COMPONENT\r
+// END:X-COMPONENT\r
+// END:X-COMPONENT`
+
+//     expect(async () => {
+//         await deserializeComponentString(serialized, true)
+//     }).toThrow()
+// })
