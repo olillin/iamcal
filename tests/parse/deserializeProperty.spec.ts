@@ -188,6 +188,42 @@ it('can parse empty parameter values', () => {
     expect(property).toStrictEqual(expected)
 })
 
+it('can parse quoted parameter values before line fold', () => {
+    const serialized = `ATTENDEE;PARAM="abc"
+ :value`
+
+    const property = deserializeProperty(serialized)
+
+    const example = new Property('ATTENDEE', 'value', {
+        PARAM: 'abc',
+    })
+    expect(property).toStrictEqual(example)
+})
+
+it('can parse an unquoted parameter value after a quoted value', () => {
+    const serialized = `ATTENDEE;PARAM1="abc";PARAM2=def:value`
+
+    const property = deserializeProperty(serialized)
+
+    const example = new Property('ATTENDEE', 'value', {
+        PARAM1: 'abc',
+        PARAM2: 'def',
+    })
+    expect(property).toStrictEqual(example)
+})
+
+it('can parse a quoted parameter value after another quoted value', () => {
+    const serialized = `ATTENDEE;PARAM1="abc";PARAM2="def":value`
+
+    const property = deserializeProperty(serialized)
+
+    const example = new Property('ATTENDEE', 'value', {
+        PARAM1: 'abc',
+        PARAM2: 'def',
+    })
+    expect(property).toStrictEqual(example)
+})
+
 it('can parse values containing colons', () => {
     const serialized = 'ATTENDEE;RSVP=TRUE:mailto: j=smith@example.com'
 

@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix unquoted parameter values following quoted parameter values being treated
+  as trailing data.
+
 ## [v3.0.1] - 2025-10-14
 
 ### Fixed

@@ -334,6 +334,7 @@ export function deserializeProperty(
                     )
                 const paramValue = gatherStack()
                 rawParameters.get(currentParam)!.push(paramValue)
+                hasQuote = false
                 step = Step.ParamName
             } else if (char === ':') {
                 // End of parameter value, begin value
