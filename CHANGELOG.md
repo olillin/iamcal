@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.0] - 2025-10-14
+
 ### Added
 
 - Automatic (un)escaping of special characters (`,`, `;`, `\` and `\n`) in
@@ -200,7 +202,8 @@ and this project adheres to
   - Has getters/setters for the following properties: `DTSTART`, `DTEND`,
     `SUMMARY`, `DESCRIPTION` and `LOCATION`.
 
-[unreleased]: https://github.com/olillin/iamcal/compare/v2.1.2...dev
+[unreleased]: https://github.com/olillin/iamcal/compare/v3.0.0...dev
+[v3.0.0]: https://github.com/olillin/iamcal/compare/v2.1.2...v3.0.0
 [v2.1.2]: https://github.com/olillin/iamcal/compare/v2.1.1...v2.1.2
 [v2.1.1]: https://github.com/olillin/iamcal/compare/v2.1.0...v2.1.1
 [v2.1.0]: https://github.com/olillin/iamcal/compare/v2.0.0...v2.1.0
