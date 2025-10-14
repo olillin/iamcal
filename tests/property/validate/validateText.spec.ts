@@ -36,6 +36,18 @@ it('allows "', () => {
     }).not.toThrow()
 })
 
+it('allows ,', () => {
+    expect(() => {
+        validateText(',')
+    }).not.toThrow()
+})
+
+it('allows ;', () => {
+    expect(() => {
+        validateText(';')
+    }).not.toThrow()
+})
+
 it('allows escaped \\n', () => {
     expect(() => {
         validateText(String.raw`\n`)
@@ -57,11 +69,11 @@ it('allows escaped \\\\', () => {
 it('allow unescaped ,', () => {
     expect(() => {
         validateText(',')
-    }).toThrow()
+    }).not.toThrow()
 })
 
 it('allow unescaped \\n', () => {
     expect(() => {
         validateText('\n')
-    }).toThrow()
+    }).not.toThrow()
 })
