@@ -10,8 +10,9 @@ and this project adheres to
 
 ### Fixed
 
-- Fix unquoted parameter values following quoted parameter values being treated
+- Unquoted parameter values following quoted parameter values being treated
   as trailing data.
+- TEXT validator not allowing values like `\n`.
 
 ## [v3.0.1] - 2025-10-14
 

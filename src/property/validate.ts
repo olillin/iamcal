@@ -23,7 +23,7 @@ export class MissingPropertyError extends Error {
 
 /**
  * Validate if a property value is a valid binary string.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateBinary(value: string) {
@@ -35,7 +35,7 @@ export function validateBinary(value: string) {
 
 /**
  * Validate if a property value is a valid boolean.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateBoolean(value: string) {
@@ -47,7 +47,7 @@ export function validateBoolean(value: string) {
 
 /**
  * Validate if a property value is a valid calendar user address.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateCalendarUserAddress(value: string) {
@@ -62,7 +62,7 @@ export function validateCalendarUserAddress(value: string) {
 
 /**
  * Validate if a property value is a valid date.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateDate(value: string) {
@@ -77,7 +77,7 @@ export function validateDate(value: string) {
 
 /**
  * Validate if a property value is a valid date-time.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateDateTime(value: string) {
@@ -92,7 +92,7 @@ export function validateDateTime(value: string) {
 
 /**
  * Validate if a property value is a valid duration.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateDuration(value: string) {
@@ -104,7 +104,7 @@ export function validateDuration(value: string) {
 
 /**
  * Validate if a property value is a valid float.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateFloat(value: string) {
@@ -116,7 +116,7 @@ export function validateFloat(value: string) {
 
 /**
  * Validate if a property value is a valid integer.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateInteger(value: string) {
@@ -128,7 +128,7 @@ export function validateInteger(value: string) {
 
 /**
  * Validate if a property value is a valid period.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validatePeriod(value: string) {
@@ -140,7 +140,7 @@ export function validatePeriod(value: string) {
 
 /**
  * Validate if a property value is a valid recurrence rule.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -150,7 +150,7 @@ export function validateRecurrenceRule(value: string) {
 
 /**
  * Validate if a property value is valid text.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateText(value: string) {
@@ -162,7 +162,7 @@ export function validateText(value: string) {
 
 /**
  * Validate if a property value is a valid time.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateTime(value: string) {
@@ -174,7 +174,7 @@ export function validateTime(value: string) {
 
 /**
  * Validate if a property value is a valid URI.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateUri(value: string) {
@@ -189,7 +189,7 @@ export function validateUri(value: string) {
 
 /**
  * Validate if a property value is a valid UTC offset.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateUtcOffset(value: string) {
@@ -201,7 +201,7 @@ export function validateUtcOffset(value: string) {
 
 /**
  * Validate a property value for a set value type.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @param type The property value type which `value` will be validated against.
  * @throws {PropertyValidationError} If the validation fails.
  */

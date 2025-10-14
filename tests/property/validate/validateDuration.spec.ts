@@ -28,6 +28,9 @@ it('should allow P15D', () => {
     expect(() => validateDuration('P15D')).not.toThrow()
 })
 
+it('should not allow ABCDEF', () => {
+    expect(() => validateDuration('ABCDEF')).toThrow(PropertyValidationError)
+})
 it('should not allow P', () => {
     expect(() => validateDuration('P')).toThrow(PropertyValidationError)
 })

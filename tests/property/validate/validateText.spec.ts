@@ -54,13 +54,13 @@ it('allows escaped \\\\', () => {
     }).not.toThrow()
 })
 
-it("doesn't allow unescaped ,", () => {
+it('allow unescaped ,', () => {
     expect(() => {
         validateText(',')
     }).toThrow()
 })
 
-it("doesn't allow unescaped \\n", () => {
+it('allow unescaped \\n', () => {
     expect(() => {
         validateText('\n')
     }).toThrow()
