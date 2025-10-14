@@ -2,6 +2,16 @@ import readline from 'readline'
 import { Readable } from 'stream'
 import { Component } from './component'
 import { Calendar, CalendarEvent } from './components'
+import {
+    isNameChar,
+    isParameterValueChar,
+    isPropertyValueChar,
+} from './patterns'
+import { Property } from './property/Property'
+import {
+    unescapePropertyParameterValue,
+    unescapeTextPropertyValue,
+} from './property/escape'
 
 /** Represents an error that occurs when deserializing a calendar component. */
 export class DeserializationError extends Error {
@@ -83,22 +93,7 @@ export async function deserializeComponent(
                 subcomponentLines.push(line)
             } else {
                 // Property
-                const colon = line.indexOf(':')
-                if (colon === -1) {
-                    throw new DeserializationError(
-                        `Invalid content line: ${line}`
-                    )
-                }
-                const name = line.slice(0, colon)
-                const value = line.slice(colon + 1)
-
-                const params = name.split(';')
-                const property = {
-                    name: params[0],
-                    params: params.slice(1),
-                    value: value,
-                }
-
+                const property = deserializeProperty(line)
                 component.properties.push(property)
             }
         }
@@ -148,19 +143,6 @@ export async function deserializeComponent(
 }
 
 /**
- * Deserialize a calendar component.
- * @param lines The serialized component as a **readline** interface.
- * @returns The deserialized calendar component object.
- * @throws {DeserializationError} If the component is invalid.
- * @deprecated Use {@link deserializeComponent} instead.
- */
-export async function deserialize(
-    lines: readline.Interface
-): Promise<Component> {
-    return deserializeComponent(lines)
-}
-
-/**
  * Deserialize a calendar component string.
  * @param text The serialized component.
  * @returns The deserialized component object.
@@ -175,17 +157,6 @@ export async function deserializeComponentString(
         crlfDelay: Infinity,
     })
     return deserializeComponent(lines)
-}
-
-/**
- * Deserialize a calendar component string.
- * @param text The serialized component.
- * @returns The deserialized component object.
- * @throws {DeserializationError} If the component is invalid.
- * @deprecated Use {@link deserializeComponentString} instead.
- */
-export async function deserializeString(text: string): Promise<Component> {
-    return deserializeComponentString(text)
 }
 
 /**
@@ -206,4 +177,205 @@ export async function parseCalendar(text: string): Promise<Calendar> {
 export async function parseEvent(text: string): Promise<CalendarEvent> {
     const component = await deserializeComponentString(text)
     return new CalendarEvent(component)
+}
+
+/**
+ * Deserialize a component property.
+ * @param line The serialized content line that defines this property.
+ * @param strict If newlines are allowed to be LF and CRLF, not just CRLF. Defaults to false.
+ * @returns The deserialized property.
+ * @throws {DeserializationError} If content line is invalid.
+ */
+export function deserializeProperty(
+    line: string,
+    strict: boolean = false
+): Property {
+    // A stack to store characters before joining to a string
+    const stack = new Array<string>(line.length)
+    let stackPos = 0
+
+    /**
+     * Get the string currently contained in {@link stack} and reset the stack.
+     * @returns The string of characters below {@link stackPos} in {@link stack}.
+     */
+    function gatherStack(): string {
+        const s = stack.slice(0, stackPos).join('')
+        stackPos = 0
+        return s
+    }
+
+    let propertyName: string | undefined = undefined
+    const rawParameters: Map<string, string[]> = new Map()
+
+    let currentParam: string | undefined = undefined
+    let quoted: boolean = false
+    let hasQuote: boolean = false
+    enum Step {
+        Name,
+        ParamName,
+        ParamValue,
+        Value,
+    }
+    let step: Step = Step.Name
+
+    for (const char of line) {
+        // Handle folded content lines
+        const last = stack[stackPos - 1]
+        if (last === '\r') {
+            if (char !== '\n')
+                throw new DeserializationError('Invalid CR in content line.')
+
+            stack[stackPos++] = char
+            continue
+        } else if (char === '\n')
+            if (strict) {
+                throw new DeserializationError('Invalid LF in content line.')
+            } else {
+                stack[stackPos++] = char
+                continue
+            }
+
+        if (last === '\n') {
+            if (char !== ' ' && char !== '\t')
+                throw new DeserializationError('Invalid CRLF in content line.')
+
+            // Valid folded line sequence, remove (CR)LF
+            if (stack[stackPos - 2] === '\r') {
+                stackPos -= 2
+            } else {
+                stackPos -= 1
+            }
+            continue
+        }
+
+        if (char === '\r') {
+            stack[stackPos++] = char
+            continue
+        }
+
+        // Process character
+        if (step === Step.Name) {
+            // Continue parsing name
+            if (isNameChar(char)) {
+                stack[stackPos++] = char
+            } else if (char === ';') {
+                // End of name, begin parameters
+                propertyName = gatherStack()
+                stackPos = 0
+                step = Step.ParamName
+            } else if (char === ':') {
+                // End of name, begin value
+                propertyName = gatherStack()
+                stackPos = 0
+                step = Step.Value
+            } else {
+                throw new DeserializationError(
+                    `Invalid character "${char}" in content line name.`
+                )
+            }
+        } else if (step === Step.ParamName) {
+            // Continue parsing parameter name
+            if (isNameChar(char)) {
+                stack[stackPos++] = char
+            } else if (char === '=') {
+                // End of parameter name, begin parameter value
+                if (stackPos === 0)
+                    throw new DeserializationError(
+                        'Parameter name cannot be empty.'
+                    )
+
+                currentParam = gatherStack()
+                if (!rawParameters.has(currentParam)) {
+                    rawParameters.set(currentParam, [])
+                }
+                step = Step.ParamValue
+            } else {
+                throw new DeserializationError(
+                    `Invalid character "${char}" in parameter name.`
+                )
+            }
+        } else if (step === Step.ParamValue) {
+            // Continue parsing parameter value
+            if (char === '"') {
+                if (quoted) {
+                    quoted = false
+                } else {
+                    if (stackPos !== 0)
+                        throw new DeserializationError(
+                            'Invalid characters before quote in parameter value.'
+                        )
+
+                    quoted = true
+                    hasQuote = true
+                }
+            } else if (isParameterValueChar(char, quoted)) {
+                if (!quoted && hasQuote)
+                    if (stackPos !== 0)
+                        throw new DeserializationError(
+                            'Invalid characters after quote in parameter value.'
+                        )
+
+                stack[stackPos++] = char
+            } else if (char === ',') {
+                // End of parameter value, begin next parameter value
+                if (currentParam === undefined)
+                    throw new DeserializationError(
+                        'Invalid state, parameter name is undefined.'
+                    )
+                const paramValue = gatherStack()
+                rawParameters.get(currentParam)!.push(paramValue)
+                hasQuote = false
+                step = Step.ParamValue
+            } else if (char === ';') {
+                // End of parameter value, begin next parameter name
+                if (currentParam === undefined)
+                    throw new DeserializationError(
+                        'Invalid state, parameter name is undefined.'
+                    )
+                const paramValue = gatherStack()
+                rawParameters.get(currentParam)!.push(paramValue)
+                step = Step.ParamName
+            } else if (char === ':') {
+                // End of parameter value, begin value
+                if (currentParam === undefined)
+                    throw new DeserializationError(
+                        'Invalid state, parameter name is undefined.'
+                    )
+                const paramValue = gatherStack()
+                rawParameters.get(currentParam)!.push(paramValue)
+                step = Step.Value
+            }
+        } else if (step === Step.Value) {
+            // Continue parsing value
+            if (isPropertyValueChar(char)) {
+                stack[stackPos++] = char
+            } else if (char === '\r' || char === '\n') {
+                stack[stackPos++] = char
+            }
+        } else {
+            throw new DeserializationError('Parser got lost, step is invalid.')
+        }
+    }
+
+    // Final checks
+    if (quoted)
+        throw new DeserializationError(
+            'Unterminated quote in content line value.'
+        )
+    if (!propertyName) {
+        throw new DeserializationError(`Invalid content line, invalid format.`)
+    }
+
+    // The content line value is whatever is left in the stack
+    const rawValue: string = gatherStack()
+
+    // Parse parameters and value
+    const parsedParameters: { [k: string]: string[] } = {}
+    for (const [key, values] of rawParameters) {
+        const parsedValues = values.map(unescapePropertyParameterValue)
+        parsedParameters[key] = parsedValues
+    }
+    const parsedValue = unescapeTextPropertyValue(rawValue)
+
+    return new Property(propertyName, parsedValue, parsedParameters)
 }

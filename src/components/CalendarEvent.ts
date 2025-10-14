@@ -1,12 +1,13 @@
-import { KnownPropertyName, PropertyValidationError } from '../property'
-import { ComponentValidationError, Component } from '../component'
+import { Component, ComponentValidationError } from '../component'
 import {
+    CalendarDateOrTime,
     CalendarDateTime,
     convertDate,
-    CalendarDateOrTime,
     parseDateProperty,
     toDateTimeString,
 } from '../date'
+import { KnownPropertyName } from '../property/names'
+import { PropertyValidationError } from '../property/validate'
 
 /**
  * Represents a VEVENT component, representing an event in a calendar.
@@ -27,10 +28,10 @@ export class CalendarEvent extends Component {
     ) {
         let component: Component
         if (a instanceof Component) {
-            component = a as Component
+            component = a
             CalendarEvent.prototype.validate.call(component)
         } else {
-            const uid = a as string
+            const uid = a
             const dtstamp = convertDate(b!, false)
             const dtstart = convertDate(c!)
             component = new Component('VEVENT')
@@ -42,7 +43,7 @@ export class CalendarEvent extends Component {
     }
 
     serialize(): string {
-        if (!this.getEnd() && !this.duration()) {
+        if (!this.getEnd() && !this.getDuration()) {
             throw new Error(
                 'Failed to serialize calendar event, end or duration must be set'
             )
@@ -240,31 +241,4 @@ export class CalendarEvent extends Component {
     removeGeographicLocation() {
         this.removePropertiesWithName('GEO')
     }
-
-    /* eslint-disable */
-
-    /** @deprecated use {@link getStamp} instead */
-    stamp = this.getStamp
-    /** @deprecated use {@link getUid} instead */
-    uid = this.getUid
-    /** @deprecated use {@link getSummary} instead */
-    summary = this.getSummary
-    /** @deprecated use {@link getDescription} instead */
-    description = this.getDescription
-    /** @deprecated use {@link getLocation} instead */
-    location = this.getLocation
-    /** @deprecated use {@link getStart} instead */
-    start = this.getStart
-    /** @deprecated use {@link getEnd} instead */
-    end = this.getEnd
-    /** @deprecated use {@link getDuration} instead */
-    duration = this.getDuration
-    /** @deprecated use {@link getCreated} instead */
-    created = this.getCreated
-    /** @deprecated use {@link getGeographicPosition} instead */
-    geo = this.getGeographicPosition
-    /** @deprecated use {@link setGeographicPosition} instead */
-    setGeo = this.setGeographicPosition
-    /** @deprecated use {@link removeGeographicLocation} instead */
-    removeGeo = this.removeGeographicLocation
 }

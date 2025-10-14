@@ -8,6 +8,28 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Automatic (un)escaping of special characters (`,`, `;`, `\` and `\n`) in
+  property values of type `TEXT` during (de)serialization.
+- Automatic (un)quoting of property parameter values containing special characters
+  (`,`, `;` and `:`) during (de)serialization.
+- `Property` class, representing a property on a calendar component.
+  - Property parameters are stored as a map of the parameter name to a list of
+    values.
+  - Has getters, setters and removers for each known parameter specified by
+    RFC 5545.
+  - Has a `fromDate` factory method which replaces the
+    `CalendarDateOrTime.toProperty` method.
+  - Can be (de)serialized independently of calendar components.
+- `deserializeProperty` which can independently deserialize a property.
+
+### Removed
+
+- `Property` interface in favor of `Property` class.
+- Previously deprecated APIs from v2.1.0.
+- `CalendarDateOrTime.toProperty` in favor of `Property.fromDate`.
+
 ## [v2.1.2] - 2025-08-14
 
 ### Changed
