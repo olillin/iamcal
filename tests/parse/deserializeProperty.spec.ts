@@ -31,6 +31,64 @@ it('can unfold with tabs', () => {
     expect(property).toStrictEqual(expected)
 })
 
+it('can unfold without CR when not in strict mode', () => {
+    const serialized = `SUMMARY:my 
+ long
+ line wowowow`
+
+    const property = deserializeProperty(serialized, false)
+
+    const expected = new Property('SUMMARY', 'my longline wowowow')
+    expect(property).toStrictEqual(expected)
+})
+
+it('is not in strict mode by default', () => {
+    const serialized = `SUMMARY:my 
+ long
+ line wowowow`
+
+    const property = deserializeProperty(serialized)
+
+    const expected = new Property('SUMMARY', 'my longline wowowow')
+    expect(property).toStrictEqual(expected)
+})
+
+it('throws if fold has no whitespace', () => {
+    const serialized = `SUMMARY:long \r
+line`
+
+    expect(() => {
+        deserializeProperty(serialized)
+    }).toThrow()
+})
+
+it('throws if fold has no LF', () => {
+    const serialized = `SUMMARY:long \r line`
+
+    expect(() => {
+        deserializeProperty(serialized)
+    }).toThrow()
+})
+
+it('throws if fold has no CR and in strict mode', () => {
+    const serialized = `SUMMARY:long 
+ line`
+
+    expect(() => {
+        deserializeProperty(serialized, true)
+    }).toThrow()
+})
+
+it('allows line to be folded without CR if not in strict mode', () => {
+    const serialized = `SUMMARY:long 
+ line`
+
+    const prop = deserializeProperty(serialized, false)
+
+    const expected = new Property('SUMMARY', 'long line')
+    expect(prop).toStrictEqual(expected)
+})
+
 it('unquotes parameter values', () => {
     let serialized = 'LOCATION;ALTREP="https://example.com/house123":House 123'
     let property = deserializeProperty(serialized)

@@ -182,10 +182,14 @@ export async function parseEvent(text: string): Promise<CalendarEvent> {
 /**
  * Deserialize a component property.
  * @param line The serialized content line that defines this property.
+ * @param strict If newlines are allowed to be LF and CRLF, not just CRLF. Defaults to false.
  * @returns The deserialized property.
  * @throws {DeserializationError} If content line is invalid.
  */
-export function deserializeProperty(line: string): Property {
+export function deserializeProperty(
+    line: string,
+    strict: boolean = false
+): Property {
     // A stack to store characters before joining to a string
     const stack = new Array<string>(line.length)
     let stackPos = 0
@@ -224,14 +228,23 @@ export function deserializeProperty(line: string): Property {
             stack[stackPos++] = char
             continue
         } else if (char === '\n')
-            throw new DeserializationError('Invalid LF in content line.')
+            if (strict) {
+                throw new DeserializationError('Invalid LF in content line.')
+            } else {
+                stack[stackPos++] = char
+                continue
+            }
 
         if (last === '\n') {
             if (char !== ' ' && char !== '\t')
                 throw new DeserializationError('Invalid CRLF in content line.')
 
-            // Valid folded line sequence, remove CRLF
-            stackPos -= 2
+            // Valid folded line sequence, remove (CR)LF
+            if (stack[stackPos - 2] === '\r') {
+                stackPos -= 2
+            } else {
+                stackPos -= 1
+            }
             continue
         }
 
@@ -359,7 +372,7 @@ export function deserializeProperty(line: string): Property {
     // Parse parameters and value
     const parsedParameters: { [k: string]: string[] } = {}
     for (const [key, values] of rawParameters) {
-        const parsedValues = values.map(v => unescapePropertyParameterValue(v))
+        const parsedValues = values.map(unescapePropertyParameterValue)
         parsedParameters[key] = parsedValues
     }
     const parsedValue = unescapeTextPropertyValue(rawValue)
