@@ -1,3 +1,5 @@
+import { ord } from '../patterns'
+
 /**
  * Escape special characters in a TEXT property value.
  *
@@ -18,20 +20,48 @@ export function escapeTextPropertyValue(value: string): string {
  * @see {@link unescapeTextPropertyValue}
  */
 export function unescapeTextPropertyValue(value: string): string {
-    const broadBadEscapePattern = /(?<!\\)\\(\\\\)*[^,;\\nN]/
-    const broadBadEscape = broadBadEscapePattern.exec(value)
-    if (broadBadEscape) {
-        const badEscape = value
-            .substring(broadBadEscape.index)
-            .match(/\\[^,;\\nN]/)!
-        const position = broadBadEscape.index + badEscape.index!
-        throw new SyntaxError(
-            `Bad escaped character '${badEscape[0]}' at position ${position}`
-        )
+    /** List that will contain the characters of the unescaped string. */
+    const chars: number[] = []
+
+    // Character codes for special characters
+    const backslash = ord('\\')
+    const newline = ord('\n')
+    const lowercaseN = ord('n')
+    const uppercaseN = ord('N')
+    const comma = ord(',')
+    const semicolon = ord(';')
+
+    let previousCharWasBackslash = false
+    for (let i = 0; i < value.length; i++) {
+        const char = value.charCodeAt(i)
+
+        if (previousCharWasBackslash) {
+            // Previous character was a backslash, so this character is the second character in an escape sequence
+            if (char === lowercaseN || char === uppercaseN) {
+                chars.push(newline)
+            } else if (
+                char === comma ||
+                char === semicolon ||
+                char === backslash
+            ) {
+                chars.push(char)
+            } else {
+                const position = i - 1
+                throw new SyntaxError(
+                    `Bad escaped character '\\${String.fromCharCode(char)}' at position ${position}`
+                )
+            }
+            // End the escape sequence
+            previousCharWasBackslash = false
+        } else if (char === backslash) {
+            // Start of an escape sequence
+            previousCharWasBackslash = true
+        } else {
+            chars.push(char)
+        }
     }
 
-    const jsonValue = value.replace(/\\N/, '\\n').replace(/\\(?=[,;:"])/g, '')
-    return JSON.parse(`"${jsonValue}"`) as string
+    return String.fromCharCode(...chars)
 }
 
 /**
