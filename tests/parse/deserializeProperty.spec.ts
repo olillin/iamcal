@@ -199,6 +199,24 @@ it('can parse values containing colons', () => {
     expect(property).toStrictEqual(expected)
 })
 
+it('allows one quote', () => {
+    const serialized = 'SUMMARY:"value'
+
+    const property = deserializeProperty(serialized)
+
+    const expected = new Property('SUMMARY', '"value')
+    expect(property).toStrictEqual(expected)
+})
+
+it('allows two quotes', () => {
+    const serialized = 'SUMMARY:"valu"e'
+
+    const property = deserializeProperty(serialized)
+
+    const expected = new Property('SUMMARY', '"valu"e')
+    expect(property).toStrictEqual(expected)
+})
+
 it('throws if no colon is present', () => {
     const serialized = 'LOCATION=Incorrect format'
 
@@ -225,18 +243,6 @@ it('throws if quoted parameter has leading characters', () => {
 
 it('throws if quoted parameter has trailing characters', () => {
     const serialized = 'SUMMARY;key="a"b:value'
-
-    expect(() => deserializeProperty(serialized)).toThrow()
-})
-
-it('throws if quoted value has leading characters', () => {
-    const serialized = 'SUMMARY:a"value"'
-
-    expect(() => deserializeProperty(serialized)).toThrow()
-})
-
-it('throws if quoted value has trailing characters', () => {
-    const serialized = 'SUMMARY:"value"b'
 
     expect(() => deserializeProperty(serialized)).toThrow()
 })

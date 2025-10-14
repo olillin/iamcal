@@ -82,3 +82,15 @@ it('calculates bad escape index correctly', () => {
         unescapeTextPropertyValue(value)
     }).toThrow(new SyntaxError("Bad escaped character '\\a' at position 6"))
 })
+
+it('allows one quote', () => {
+    const value = 'this " is allowed'
+    const unescaped = unescapeTextPropertyValue(value)
+    expect(unescaped).toBe('this " is allowed')
+})
+
+it('allows multiple quotes', () => {
+    const value = 'this " is " allowed'
+    const unescaped = unescapeTextPropertyValue(value)
+    expect(unescaped).toBe('this " is " allowed')
+})
