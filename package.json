@@ -1,6 +1,6 @@
 {
     "name": "iamcal",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "description": "Read and write ICalendar files",
     "files": [
         "/lib",
