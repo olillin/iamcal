@@ -1,4 +1,4 @@
-import { validateText } from '../../src'
+import { validateText } from '../../../src/property/validate'
 
 it('allows lowercase letters', () => {
     expect(() => {

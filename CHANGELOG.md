@@ -8,6 +8,30 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.0] - 2025-10-14
+
+### Added
+
+- Automatic (un)escaping of special characters (`,`, `;`, `\` and `\n`) in
+  property values of type `TEXT` during (de)serialization.
+- Automatic (un)quoting of property parameter values containing special characters
+  (`,`, `;` and `:`) during (de)serialization.
+- `Property` class, representing a property on a calendar component.
+  - Property parameters are stored as a map of the parameter name to a list of
+    values.
+  - Has getters, setters and removers for each known parameter specified by
+    RFC 5545.
+  - Has a `fromDate` factory method which replaces the
+    `CalendarDateOrTime.toProperty` method.
+  - Can be (de)serialized independently of calendar components.
+- `deserializeProperty` which can independently deserialize a property.
+
+### Removed
+
+- `Property` interface in favor of `Property` class.
+- Previously deprecated APIs from v2.1.0.
+- `CalendarDateOrTime.toProperty` in favor of `Property.fromDate`.
+
 ## [v2.1.2] - 2025-08-14
 
 ### Changed
@@ -178,7 +202,8 @@ and this project adheres to
   - Has getters/setters for the following properties: `DTSTART`, `DTEND`,
     `SUMMARY`, `DESCRIPTION` and `LOCATION`.
 
-[unreleased]: https://github.com/olillin/iamcal/compare/v2.1.2...dev
+[unreleased]: https://github.com/olillin/iamcal/compare/v3.0.0...dev
+[v3.0.0]: https://github.com/olillin/iamcal/compare/v2.1.2...v3.0.0
 [v2.1.2]: https://github.com/olillin/iamcal/compare/v2.1.1...v2.1.2
 [v2.1.1]: https://github.com/olillin/iamcal/compare/v2.1.0...v2.1.1
 [v2.1.0]: https://github.com/olillin/iamcal/compare/v2.0.0...v2.1.0

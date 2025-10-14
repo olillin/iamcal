@@ -12,12 +12,8 @@ it('sets DTSTAMP', () => {
 
     event.setStamp(stamp)
 
-    const expected: Property = {
-        name: 'DTSTAMP',
-        params: [],
-        value: '20250101T123456',
-    }
-    expect(event.getProperty('DTSTAMP')).toEqual(expected)
+    const expected = new Property('DTSTAMP', '20250101T123456')
+    expect(event.getProperty('DTSTAMP')).toStrictEqual(expected)
 })
 
 it('can be set with a Date object', () => {
