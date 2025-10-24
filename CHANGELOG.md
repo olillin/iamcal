@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.3] - 2025-10-24
+
 ### Fixed
 
 - Folding lines cuts off the last line.
@@ -220,7 +222,8 @@ and this project adheres to
   - Has getters/setters for the following properties: `DTSTART`, `DTEND`,
     `SUMMARY`, `DESCRIPTION` and `LOCATION`.
 
-[unreleased]: https://github.com/olillin/iamcal/compare/v3.0.2...dev
+[unreleased]: https://github.com/olillin/iamcal/compare/v3.0.3...dev
+[v3.0.3]: https://github.com/olillin/iamcal/compare/v3.0.2...v3.0.3
 [v3.0.2]: https://github.com/olillin/iamcal/compare/v3.0.1...v3.0.2
 [v3.0.1]: https://github.com/olillin/iamcal/compare/v3.0.0...v3.0.1
 [v3.0.0]: https://github.com/olillin/iamcal/compare/v2.1.2...v3.0.0
