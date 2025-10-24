@@ -109,17 +109,24 @@ export const MAX_LINE_LENGTH = 75
  * @returns The folded line.
  */
 export function foldLine(line: string): string {
-    if (line.length < MAX_LINE_LENGTH) return line
+    if (line.length <= MAX_LINE_LENGTH) return line
 
-    const lines = [line.substring(0, MAX_LINE_LENGTH)]
+    const firstChar = line.charAt(0)
+    const lines = [line.substring(1, MAX_LINE_LENGTH)]
     const matches = line
         .substring(MAX_LINE_LENGTH)
-        .matchAll(new RegExp(`.{${MAX_LINE_LENGTH - 2}}`, 'g'))
+        .matchAll(new RegExp(`.{${MAX_LINE_LENGTH - 1}}`, 'g'))
     for (const match of matches) {
         lines.push(match[0])
     }
+    // Add last line
+    const lastLineStart =
+        Math.floor(line.length / (MAX_LINE_LENGTH - 1)) *
+            (MAX_LINE_LENGTH - 1) +
+        1
+    lines.push(line.substring(lastLineStart))
 
-    return lines.join('\r\n ')
+    return firstChar + lines.join('\r\n ')
 }
 
 /**

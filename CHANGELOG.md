@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Folding lines cuts off the last line.
+
 ## [v3.0.2] - 2025-10-14
 
 ### Fixed
