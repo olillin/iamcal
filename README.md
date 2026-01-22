@@ -19,7 +19,7 @@ Below is an example of editing a calendar file.
 ```typescript
 import { Calendar, dump, parseCalendar } from 'iamcal'
 
-const calendar: Calendar = await parseCalendar(`
+const calendar: Calendar = parseCalendar(`
 BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:example
@@ -40,7 +40,7 @@ calendar.getEvents().forEach(event => {
     }
 })
 
-await dump(calendar, './new_calendar.ics')
+dumpCalendarSync(calendar, './new_calendar.ics')
 ```
 
 Running the code will produce the file `new_calendar.ics`:

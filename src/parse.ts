@@ -1,5 +1,4 @@
 import readline from 'readline'
-import { Readable } from 'stream'
 import { Component } from './component'
 import { Calendar, CalendarEvent } from './components'
 import {
@@ -23,10 +22,22 @@ export class DeserializationError extends Error {
  * @param lines The serialized component as a **readline** interface.
  * @returns The deserialized calendar component object.
  * @throws {DeserializationError} If the component is invalid.
+ * @deprecated Use the synchronous `deserializeComponentLines` instead.
  */
 export async function deserializeComponent(
     lines: readline.Interface
 ): Promise<Component> {
+    const realLines = await readLines(lines)
+    return deserializeComponentLines(realLines)
+}
+
+/**
+ * Deserialize a calendar component from a list of lines.
+ * @param lines The serialized component as a list of lines.
+ * @returns The deserialized calendar component object.
+ * @throws {DeserializationError} If the component is invalid.
+ */
+export function deserializeComponentLines(lines: string[]): Component {
     const component = new Component('')
     let done = false
 
@@ -35,7 +46,7 @@ export async function deserializeComponent(
 
     const subcomponentLines = new Array<string>()
 
-    const processLine = async (line: string) => {
+    const processLine = (line: string) => {
         if (line.trim() === '') return
 
         if (done) {
@@ -71,7 +82,7 @@ export async function deserializeComponent(
             // Check the length of the stack after being popped
             if (stack.length == 1) {
                 subcomponentLines.push(line)
-                const subcomponent = await deserializeComponentString(
+                const subcomponent = deserializeComponentString(
                     subcomponentLines.join('\r\n')
                 )
                 subcomponentLines.length = 0
@@ -117,14 +128,14 @@ export async function deserializeComponent(
         that exists on a long line.
     */
     let unfoldedLine = ''
-    for await (const line of lines) {
+    for (const line of lines) {
         if (line.startsWith(' ') || line.startsWith('\t')) {
             // Unfold continuation line (remove leading whitespace and append)
             unfoldedLine += line.replace(/[\r\n]/, '').slice(1)
         } else {
             if (unfoldedLine) {
                 // Process the previous unfolded line
-                await processLine(unfoldedLine)
+                processLine(unfoldedLine)
             }
             // Start a new unfolded line
             unfoldedLine = line
@@ -132,7 +143,7 @@ export async function deserializeComponent(
     }
 
     // Process the last unfolded line
-    await processLine(unfoldedLine)
+    processLine(unfoldedLine)
 
     // Check that component has been closed
     if (!done) {
@@ -143,20 +154,33 @@ export async function deserializeComponent(
 }
 
 /**
+ * Convert a **readline** interface to a list of lines.
+ * @param rl The interface.
+ * @returns The list of lines read from the interface.
+ * @throws {DeserializationError} If the component is invalid.
+ */
+async function readLines(rl: readline.Interface): Promise<string[]> {
+    return new Promise(resolve => {
+        const lines: string[] = []
+
+        rl.on('line', line => {
+            lines.push(line)
+        })
+        rl.on('close', () => {
+            resolve(lines)
+        })
+    })
+}
+
+/**
  * Deserialize a calendar component string.
  * @param text The serialized component.
  * @returns The deserialized component object.
  * @throws {DeserializationError} If the component is invalid.
  */
-export async function deserializeComponentString(
-    text: string
-): Promise<Component> {
-    const stream = Readable.from(text)
-    const lines = readline.createInterface({
-        input: stream,
-        crlfDelay: Infinity,
-    })
-    return deserializeComponent(lines)
+export function deserializeComponentString(text: string): Component {
+    const lines = text.split(/\r?\n/g)
+    return deserializeComponentLines(lines)
 }
 
 /**
@@ -164,8 +188,8 @@ export async function deserializeComponentString(
  * @param text A serialized calendar as you would see in an iCalendar file.
  * @returns The parsed calendar object.
  */
-export async function parseCalendar(text: string): Promise<Calendar> {
-    const component = await deserializeComponentString(text)
+export function parseCalendar(text: string): Calendar {
+    const component = deserializeComponentString(text)
     return new Calendar(component)
 }
 
@@ -174,8 +198,8 @@ export async function parseCalendar(text: string): Promise<Calendar> {
  * @param text A serialized event as you would see in an iCalendar file.
  * @returns The parsed event object.
  */
-export async function parseEvent(text: string): Promise<CalendarEvent> {
-    const component = await deserializeComponentString(text)
+export function parseEvent(text: string): CalendarEvent {
+    const component = deserializeComponentString(text)
     return new CalendarEvent(component)
 }
 

@@ -8,6 +8,31 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Synchronous io methods:
+  - `loadCalendarSync()`
+  - `dumpCalendarSync()`
+
+### Changed
+
+- All deserialization is now done synchronously meaning that methods have been
+  renamed and no longer return promises.
+  - `deserializeComponent()` which takes a **readline** interface has been
+    replaced by `deserializeComponentLines()` which takes an array of strings.
+
+### Deprecated
+
+- `load()`, use `loadCalendarSync()` instead.
+- `dump()`, use `dumpCalendarSync()` instead.
+- `deserializeComponent()`, use `deserializeComponentLines()` or
+  `deserializeComponentString()` instead.
+
+### Fixed
+
+- Bug where last line of component would be missed when using
+  `deserializeComponentString()`, invalidating the component.
+
 ## [v3.0.3] - 2025-10-24
 
 ### Fixed
