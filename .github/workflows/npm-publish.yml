@@ -5,8 +5,6 @@ name: Publish Node.js Package
 
 on:
     push:
-        tags:
-            - '*'
         branches: [main]
 
 jobs:
@@ -33,5 +31,3 @@ jobs:
             - run: npm ci -D
             - run: npm run build
             - run: npm publish
-              env:
-                  NODE_AUTH_TOKEN: ${{secrets.npm_token}}
