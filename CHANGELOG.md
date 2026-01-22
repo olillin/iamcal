@@ -33,6 +33,10 @@ and this project adheres to
 - Bug where last line of component would be missed when using
   `deserializeComponentString()`, invalidating the component.
 
+### Security
+
+- Update depndencies.
+
 ## [v3.0.3] - 2025-10-24
 
 ### Fixed
