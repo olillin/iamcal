@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [v3.1.0] - 2026-01-22
+
 ### Added
 
 - Synchronous io methods:
@@ -251,7 +253,8 @@ and this project adheres to
   - Has getters/setters for the following properties: `DTSTART`, `DTEND`,
     `SUMMARY`, `DESCRIPTION` and `LOCATION`.
 
-[unreleased]: https://github.com/olillin/iamcal/compare/v3.0.3...dev
+[unreleased]: https://github.com/olillin/iamcal/compare/v3.1.0...dev
+[v3.0.3]: https://github.com/olillin/iamcal/compare/v3.0.3...v3.1.0
 [v3.0.3]: https://github.com/olillin/iamcal/compare/v3.0.2...v3.0.3
 [v3.0.2]: https://github.com/olillin/iamcal/compare/v3.0.1...v3.0.2
 [v3.0.1]: https://github.com/olillin/iamcal/compare/v3.0.0...v3.0.1
