@@ -8,6 +8,37 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [v3.1.0] - 2026-01-22
+
+### Added
+
+- Synchronous io methods:
+  - `loadCalendarSync()`
+  - `dumpCalendarSync()`
+
+### Changed
+
+- All deserialization is now done synchronously meaning that methods have been
+  renamed and no longer return promises.
+  - `deserializeComponent()` which takes a **readline** interface has been
+    replaced by `deserializeComponentLines()` which takes an array of strings.
+
+### Deprecated
+
+- `load()`, use `loadCalendarSync()` instead.
+- `dump()`, use `dumpCalendarSync()` instead.
+- `deserializeComponent()`, use `deserializeComponentLines()` or
+  `deserializeComponentString()` instead.
+
+### Fixed
+
+- Bug where last line of component would be missed when using
+  `deserializeComponentString()`, invalidating the component.
+
+### Security
+
+- Update depndencies.
+
 ## [v3.0.3] - 2025-10-24
 
 ### Fixed
@@ -222,7 +253,8 @@ and this project adheres to
   - Has getters/setters for the following properties: `DTSTART`, `DTEND`,
     `SUMMARY`, `DESCRIPTION` and `LOCATION`.
 
-[unreleased]: https://github.com/olillin/iamcal/compare/v3.0.3...dev
+[unreleased]: https://github.com/olillin/iamcal/compare/v3.1.0...dev
+[v3.0.3]: https://github.com/olillin/iamcal/compare/v3.0.3...v3.1.0
 [v3.0.3]: https://github.com/olillin/iamcal/compare/v3.0.2...v3.0.3
 [v3.0.2]: https://github.com/olillin/iamcal/compare/v3.0.1...v3.0.2
 [v3.0.1]: https://github.com/olillin/iamcal/compare/v3.0.0...v3.0.1

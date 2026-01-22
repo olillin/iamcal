@@ -3,22 +3,22 @@ import { CalendarDate, CalendarDateTime } from '../../src/date'
 import { deserializeComponentString } from '../../src/parse'
 import { Property } from '../../src/property/Property'
 
-it('can parse an empty component', async () => {
+it('can parse an empty component', () => {
     const serialized = `BEGIN:X-COMPONENT
 END:X-COMPONENT`
 
-    const component = await deserializeComponentString(serialized)
+    const component = deserializeComponentString(serialized)
 
     const expected = new Component('X-COMPONENT')
     expect(component).toStrictEqual(expected)
 })
 
-it('can parse a component with a property', async () => {
+it('can parse a component with a property', () => {
     const serialized = `BEGIN:X-COMPONENT
 SUMMARY:This is a summary
 END:X-COMPONENT`
 
-    const component = await deserializeComponentString(serialized)
+    const component = deserializeComponentString(serialized)
 
     const expected = new Component('X-COMPONENT', [
         new Property('SUMMARY', 'This is a summary'),
@@ -26,13 +26,13 @@ END:X-COMPONENT`
     expect(component).toStrictEqual(expected)
 })
 
-it('can parse a component with multiple properties', async () => {
+it('can parse a component with multiple properties', () => {
     const serialized = `BEGIN:X-COMPONENT
 SUMMARY:This is a summary
 DTSTART;VALUE=DATE:20251011
 END:X-COMPONENT`
 
-    const component = await deserializeComponentString(serialized)
+    const component = deserializeComponentString(serialized)
 
     const expected = new Component('X-COMPONENT', [
         new Property('SUMMARY', 'This is a summary'),
@@ -41,7 +41,7 @@ END:X-COMPONENT`
     expect(component).toStrictEqual(expected)
 })
 
-it('can parse a calendar with an event', async () => {
+it('can parse a calendar with an event', () => {
     const serialized = `BEGIN:VCALENDAR
 PRODID:-//Example Corp.//CalDAV Client//EN
 VERSION:2.0
@@ -53,7 +53,7 @@ DTSTART;VALUE=DATE:20251011
 END:VEVENT
 END:VCALENDAR`
 
-    const component = await deserializeComponentString(serialized)
+    const component = deserializeComponentString(serialized)
 
     const stamp = new CalendarDateTime('20251011T123456')
     const start = new CalendarDate('20251011')
@@ -75,12 +75,12 @@ END:VCALENDAR`
     expect(component).toStrictEqual(expected)
 })
 
-it('unescapes commas in property values', async () => {
+it('unescapes commas in property values', () => {
     const serialized = `BEGIN:X-COMPONENT
 X-PROP:value\\,with\\, commas
 END:X-COMPONENT`
 
-    const component = await deserializeComponentString(serialized)
+    const component = deserializeComponentString(serialized)
     const prop = component.getProperty('X-PROP')
 
     expect(prop).not.toBeNull()
