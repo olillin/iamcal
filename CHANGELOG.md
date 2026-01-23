@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Added
 
-- `CalendarDuration` class:
+- `CalendarDuration` class ([#13](https://github.com/olillin/iamcal/issues/13))
   - Represents properties with type `DURATION`.
   - Can be created with a duration string such as `P1D2H3M4S` or another
     `CalendarDuration`.
@@ -61,7 +61,7 @@ and this project adheres to
   - `setDuration()` now accepts values of type `CalendarDuration`.
   - `getEnd()` will now imply when the event ends even if `DTEND` is unset by calculating the end using `DURATION` if present or using the default event duration.
   - `getDuration()` will now imply the duration of the even if `DURATION` is unset by calculating the duration using `DTEND` if present or using the default event duration.
-  - Events now have a default duration if neither `DTEND` nor `DURATION` is set. (#22)
+  - Events now have a default duration if neither `DTEND` nor `DURATION` is set. ([#22](https://github.com/olillin/iamcal/issues/22))
     - For full day events this is one day, for other events it is zero seconds.
 - `Component.setProperty` can take a `CalendarDuration` as a value and uses the new `Property.setValue` internally.
 - `CalendarDateOrTime.isFullDay()` is now a type guard which returns if the object is a `CalendarDate`.
@@ -203,8 +203,8 @@ and this project adheres to
 
 ### Fixed
 
-- Possible to have different types in `DTSTART` and `DTEND` (#9).
-- Some properties falsely assumed to always be present (#12).
+- Possible to have different types in `DTSTART` and `DTEND` ([#9](https://github.com/olillin/iamcal/issues/9)).
+- Some properties falsely assumed to always be present ([#12](https://github.com/olillin/iamcal/issues/12)).
 - `DTSTAMP` property being able to be set as `DATE` value type.
 - `LAST-MODIFIED` property incorrectly being set as `LAST-MOD`.
 
@@ -238,7 +238,7 @@ and this project adheres to
 
 ### Fixed
 
-- Parsing start and end times doesn't work (#4)
+- Parsing start and end times doesn't work ([#4](https://github.com/olillin/iamcal/issues/4))
 - `CalendarEvent` missing method `removeGeo`.
 
 ## [v1.0.3] - 2025-06-19
