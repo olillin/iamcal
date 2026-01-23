@@ -1,4 +1,7 @@
-import { validateDuration, PropertyValidationError } from '../../src/property'
+import {
+    validateDuration,
+    PropertyValidationError,
+} from '../../../src/property/validate'
 
 it('should allow P15DT5H0M20S', () => {
     expect(() => validateDuration('P15DT5H0M20S')).not.toThrow()
@@ -25,6 +28,9 @@ it('should allow P15D', () => {
     expect(() => validateDuration('P15D')).not.toThrow()
 })
 
+it('should not allow ABCDEF', () => {
+    expect(() => validateDuration('ABCDEF')).toThrow(PropertyValidationError)
+})
 it('should not allow P', () => {
     expect(() => validateDuration('P')).toThrow(PropertyValidationError)
 })

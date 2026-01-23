@@ -1,14 +1,15 @@
 import { CalendarDateOrTime } from './date'
+import { Property } from './property/Property'
+import type { AllowedPropertyName, KnownPropertyName } from './property/names'
 import {
-    AllowedPropertyName,
-    KnownPropertyName,
     MissingPropertyError,
-    Property,
     PropertyValidationError,
     validateProperty,
-} from './property'
+} from './property/validate'
 
-/** Represents an error which occurs while validating a calendar component. */
+/**
+ * Represents an error which occurs while validating a calendar component.
+ */
 export class ComponentValidationError extends Error {
     constructor(message: string) {
         super(message)
@@ -16,9 +17,16 @@ export class ComponentValidationError extends Error {
     }
 }
 
-// Max line length as defined by RFC 5545 3.1.
-const MAX_LINE_LENGTH = 75
-
+/**
+ * Represents an error which occurs when trying to perform an operation which
+ * would break the state of a calendar component.
+ */
+export class IllegalOperationError extends Error {
+    constructor(message: string) {
+        super(message)
+        this.name = 'IllegalOperationError'
+    }
+}
 export class Component {
     name: string
     properties: Property[]
@@ -31,7 +39,10 @@ export class Component {
     ) {
         this.name = name
         if (properties) {
-            this.properties = properties
+            this.properties = []
+            properties.forEach(property => {
+                this.addProperty(property)
+            })
         } else {
             this.properties = []
         }
@@ -47,17 +58,7 @@ export class Component {
         const lines = [`BEGIN:${this.name}`]
 
         for (const property of this.properties) {
-            let line =
-                property['name'] + //
-                property.params.map(p => ';' + p).join('') +
-                ':' +
-                property['value']
-
-            // Wrap lines
-            while (line.length > MAX_LINE_LENGTH) {
-                lines.push(line.substring(0, MAX_LINE_LENGTH))
-                line = ' ' + line.substring(MAX_LINE_LENGTH)
-            }
+            const line = property.serialize()
             lines.push(line)
         }
 
@@ -84,29 +85,52 @@ export class Component {
 
     setProperty(name: string, value: string | CalendarDateOrTime): this {
         for (const property of this.properties) {
-            if (property.name === name) {
-                if (typeof value === 'string') {
-                    property.value = value
-                } else {
-                    const prop = value.toProperty(name)
-                    property.params = prop.params
-                    property.value = prop.value
-                }
+            if (property.name !== name) continue
+
+            if (typeof value === 'string') {
+                property.value = value
                 return this
             }
+
+            const dateProperty = Property.fromDate(name, value)
+
+            // Update value type
+            if (dateProperty.getValueType() === 'DATE')
+                property.setValueType('DATE')
+            else property.removeValueType()
+
+            // Update value
+            property.value = dateProperty.value
+
+            return this
         }
+        // Property is new
         this.properties.push(
             typeof value === 'string'
-                ? {
-                      name: name,
-                      params: [],
-                      value: value,
-                  }
-                : value.toProperty(name)
+                ? new Property(name, value)
+                : Property.fromDate(name, value)
         )
         return this
     }
 
+    /**
+     * Add a property to this component.
+     * @param property The property to add.
+     * @returns This component for chaining.
+     * @throws {IllegalOperationError} If the property cannot be added to this component.
+     */
+    addProperty(property: Property): this {
+        // TODO: Validate if property can be added to this component.
+        this.properties.push(property)
+        return this
+    }
+
+    /**
+     * Check whether this component has a certain property.
+     * @param name The property name to check.
+     * @param value An optional value to check against the property. If this is specified the property value must equal this value.
+     * @returns Whether the property is present and matches the value if given.
+     */
     hasProperty(name: string, value?: string): boolean {
         for (const property of this.properties) {
             if (
@@ -124,24 +148,6 @@ export class Component {
         if (index === -1) return
         // Remove property at index
         this.properties.splice(index, 1)
-    }
-
-    getPropertyParams(name: string): string[] | null {
-        for (const property of this.properties) {
-            if (property.name === name) {
-                return property.params
-            }
-        }
-        return null
-    }
-
-    setPropertyParams(name: string, params: string[]): this {
-        for (const property of this.properties) {
-            if (property.name === name) {
-                property.params = params
-            }
-        }
-        return this
     }
 
     addComponent(component: Component): this {

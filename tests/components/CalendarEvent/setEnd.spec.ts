@@ -16,12 +16,8 @@ it('sets DTEND', () => {
 
     event.setEnd(end)
 
-    const expected: Property = {
-        name: 'DTEND',
-        params: [],
-        value: '20250101T123456',
-    }
-    expect(event.getProperty('DTEND')).toEqual(expected)
+    const expected = new Property('DTEND', '20250101T123456')
+    expect(event.getProperty('DTEND')).toStrictEqual(expected)
 })
 
 it('can be set with a Date object', () => {

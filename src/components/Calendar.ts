@@ -1,4 +1,4 @@
-import { KnownPropertyName } from '../property'
+import { KnownPropertyName } from '../property/names'
 import { Component, ComponentValidationError } from '../component'
 import { CalendarEvent } from './CalendarEvent'
 
@@ -27,13 +27,13 @@ export class Calendar extends Component {
      * @param component A VCALENDAR component.
      */
     constructor(component: Component)
-    constructor(a?: string | Component, b?: string) {
+    constructor(a: string | Component, b?: string) {
         let component: Component
         if (a instanceof Component) {
-            component = a as Component
+            component = a
             Calendar.prototype.validate.call(component)
         } else {
-            const prodid = a as string
+            const prodid = a
             const version = (b as string) ?? '2.0'
             component = new Component('VCALENDAR')
             component.setProperty('PRODID', prodid)
@@ -61,10 +61,9 @@ export class Calendar extends Component {
     removeEvent(uid: string): boolean
     removeEvent(a: CalendarEvent | string): boolean {
         if (a instanceof CalendarEvent) {
-            const event = a as CalendarEvent
-            return this.removeComponent(event)
+            return this.removeComponent(a)
         } else {
-            const uid = a as string
+            const uid = a
             for (const event of this.getEvents()) {
                 if (event.getUid() !== uid) continue
                 return this.removeComponent(event)
@@ -136,27 +135,4 @@ export class Calendar extends Component {
     removeCalendarDescription() {
         this.removePropertiesWithName('X-WR-CALDESC')
     }
-
-    /* eslint-disable */
-
-    /** @deprecated use {@link getEvents} instead */
-    events = this.getEvents
-    /** @deprecated use {@link getProductId} instead */
-    prodId = this.getProductId
-    /** @deprecated use {@link setProductId} instead */
-    setProdId = this.setProductId
-    /** @deprecated use {@link getVersion} instead */
-    version = this.getVersion
-    /** @deprecated use {@link getCalendarScale} instead */
-    calScale = this.getCalendarScale
-    /** @deprecated use {@link setCalendarScale} instead */
-    setCalScale = this.setCalendarScale
-    /** @deprecated use {@link removeCalendarScale} instead */
-    removeCalScale = this.removeCalendarScale
-    /** @deprecated use {@link getMethod} instead */
-    method = this.getMethod
-    /** @deprecated use {@link getCalendarName} instead */
-    calendarName = this.getCalendarName
-    /** @deprecated use {@link getCalendarDescription} instead */
-    calendarDescription = this.getCalendarDescription
 }

@@ -2,7 +2,7 @@ import {
     CalendarDateTime,
     CalendarEvent,
     Component,
-    type Property,
+    Property,
 } from '../../../src'
 
 it('sets the UID property', () => {
@@ -12,12 +12,8 @@ it('sets the UID property', () => {
 
     const event = new CalendarEvent(uid, stamp, start)
 
-    const expected: Property = {
-        name: 'UID',
-        params: [],
-        value: uid,
-    }
-    expect(event.getProperty('UID')).toEqual(expected)
+    const expected = new Property('UID', uid)
+    expect(event.getProperty('UID')).toStrictEqual(expected)
 })
 
 it('sets the DTSTAMP property', () => {
@@ -27,12 +23,8 @@ it('sets the DTSTAMP property', () => {
 
     const event = new CalendarEvent(uid, stamp, start)
 
-    const expected: Property = {
-        name: 'DTSTAMP',
-        params: [],
-        value: '20250705T160000',
-    }
-    expect(event.getProperty('DTSTAMP')).toEqual(expected)
+    const expected = new Property('DTSTAMP', '20250705T160000')
+    expect(event.getProperty('DTSTAMP')).toStrictEqual(expected)
 })
 
 it('sets the DTSTART property', () => {
@@ -42,12 +34,8 @@ it('sets the DTSTART property', () => {
 
     const event = new CalendarEvent(uid, stamp, start)
 
-    const expected: Property = {
-        name: 'DTSTART',
-        params: [],
-        value: '20250806T173000',
-    }
-    expect(event.getProperty('DTSTART')).toEqual(expected)
+    const expected = new Property('DTSTART', '20250806T173000')
+    expect(event.getProperty('DTSTART')).toStrictEqual(expected)
 })
 
 it('can be created from a CalendarEvent', () => {
@@ -63,7 +51,7 @@ it('can be created from a CalendarEvent', () => {
     }).not.toThrow()
     if (event != null) {
         expect(event).toBeInstanceOf(CalendarEvent)
-        expect(event).toEqual(base)
+        expect(event).toStrictEqual(base)
     }
 })
 

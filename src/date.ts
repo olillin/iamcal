@@ -1,5 +1,5 @@
 import * as patterns from './patterns'
-import { getPropertyValueType, type Property } from './property'
+import { Property } from './property/Property'
 
 export const ONE_SECOND_MS = 1000
 export const ONE_MINUTE_MS = 60 * ONE_SECOND_MS
@@ -13,12 +13,6 @@ export const ONE_DAY_SECONDS = 24 * ONE_HOUR_SECONDS
 export const ONE_WEEK_SECONDS = 7 * ONE_DAY_SECONDS
 
 export interface CalendarDateOrTime {
-    /**
-     * Create a property from this date.
-     * @param name The name of the property.
-     */
-    toProperty(name: string): Property
-
     /**
      * Get the string value of this date.
      * @returns An iCalendar date or date-time string.
@@ -68,14 +62,6 @@ export class CalendarDate implements CalendarDateOrTime {
         this.date.setHours(0, 0, 0, 0)
     }
 
-    toProperty(name: string): Property {
-        return {
-            name,
-            params: ['VALUE=DATE'],
-            value: this.getValue(),
-        }
-    }
-
     getValue(): string {
         return toDateString(this.date)
     }
@@ -118,14 +104,6 @@ export class CalendarDateTime implements CalendarDateOrTime {
 
         if (!this.date || isNaN(this.date.getTime())) {
             throw new Error('Invalid date provided')
-        }
-    }
-
-    toProperty(name: string): Property {
-        return {
-            name,
-            params: [],
-            value: this.getValue(),
         }
     }
 
@@ -241,24 +219,30 @@ export function padSeconds(seconds: number): string {
 /**
  * Parse a date property into a {@link CalendarDateOrTime}.
  * @param dateProperty The property to parse.
- * @param defaultType The default value type to be used if the property does not have an explicit value type.
  * @returns The parsed date as a {@link CalendarDateOrTime}.
  * @throws If the value is invalid for the value type.
  * @throws If the value type is not `DATE-TIME` or `DATE`.
  */
-export function parseDateProperty(
-    dateProperty: Property,
-    defaultType: 'DATE-TIME' | 'DATE' = 'DATE-TIME'
-): CalendarDateOrTime {
+export function parseDateProperty(dateProperty: Property): CalendarDateOrTime {
     const value = dateProperty.value
-    const valueType = getPropertyValueType(dateProperty, defaultType)
+    const valueType = dateProperty.getValueType()
 
     if (valueType === 'DATE-TIME') {
         return new CalendarDateTime(value)
     } else if (valueType === 'DATE') {
         return new CalendarDate(value)
     } else {
-        throw new Error(`Illegal value type for date '${valueType}'`)
+        const explicitValueType = dateProperty.hasValueType()
+        if (explicitValueType)
+            throw new Error(`Illegal value type for date '${valueType}'`)
+        else {
+            // Infer type based on shape
+            try {
+                return new CalendarDateTime(value)
+            } catch {
+                return new CalendarDate(value)
+            }
+        }
     }
 }
 

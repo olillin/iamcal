@@ -11,27 +11,34 @@ export default tseslint.config(
     includeIgnoreFile(gitignorePath, 'Imported .gitignore patterns'),
     {
         files: ['**/*.ts'],
-    },
-    {
-        languageOptions: { globals: globals.node },
-    },
-    eslint.configs.recommended,
-    jsdoc.configs['flat/contents-typescript'],
-    jsdoc.configs['flat/logical-typescript'],
-    jsdoc.configs['flat/requirements-typescript'],
-    jsdoc.configs['flat/stylistic-typescript'],
-    {
+        languageOptions: {
+            globals: globals.node,
+            parserOptions: {
+                project: ['./tsconfig.json', './tsconfig.test.json'],
+                tsconfigRootDir: import.meta.dirname,
+            },
+        },
+        extends: [
+            eslint.configs.recommended,
+            ...tseslint.configs.recommended,
+            ...tseslint.configs.recommendedTypeChecked,
+            jsdoc.configs['flat/contents-typescript'],
+            jsdoc.configs['flat/logical-typescript'],
+            jsdoc.configs['flat/requirements-typescript'],
+            jsdoc.configs['flat/stylistic-typescript'],
+        ],
         rules: {
-            'jsdoc/require-throws': 'warn',
+            'max-depth': ['error', { max: 3 }],
+            '@typescript-eslint/no-deprecated': 'warn',
+            'jsdoc/require-throws': 'error',
             'jsdoc/require-description-complete-sentence': 'warn',
             'jsdoc/sort-tags': 'warn',
             'jsdoc/require-example': 'off',
             'jsdoc/match-description': 'off',
             'jsdoc/require-param': [
-                'warn',
+                'error',
                 { checkGetters: true, checkSetters: true },
             ],
         },
-    },
-    tseslint.configs.recommended
+    }
 )

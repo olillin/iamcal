@@ -30,7 +30,6 @@ describe('constructor', () => {
 
     it('throws if created from Invalid Date object', () => {
         const date = new Date('Invalid Date')
-        console.log(date)
         expect(() => {
             new CalendarDate(date)
         }).toThrow('Invalid date provided')
@@ -48,32 +47,6 @@ describe('constructor', () => {
         expect(() => {
             new CalendarDate(dateTime)
         }).not.toThrow()
-    })
-})
-
-describe('toProperty', () => {
-    it('returns a property with same name when name is DTSTART', () => {
-        const date = new CalendarDate('20250804')
-        const property = date.toProperty('DTSTART')
-        expect(property.name).toBe('DTSTART')
-    })
-
-    it('returns a property with same name when name is CREATED', () => {
-        const date = new CalendarDate('20250804')
-        const property = date.toProperty('CREATED')
-        expect(property.name).toBe('CREATED')
-    })
-
-    it('returns a property with the params ["VALUE=DATE"]', () => {
-        const date = new CalendarDate('20250804')
-        const property = date.toProperty('DTSTART')
-        expect(property.params).toStrictEqual(['VALUE=DATE'])
-    })
-
-    it('returns a property with the value in YYYYMMDD format', () => {
-        const date = new CalendarDate('20250804')
-        const property = date.toProperty('DTSTART')
-        expect(property.value).toBe('20250804')
     })
 })
 
@@ -102,7 +75,7 @@ describe('getDate', () => {
         const calendarDate = new CalendarDate(date)
         const returned = calendarDate.getDate()
         const expected = new Date('2025-08-04T00:00:00')
-        expect(returned).toEqual(expected)
+        expect(returned).toStrictEqual(expected)
     })
 
     it('returns the same object when created with a calendar date string', () => {
@@ -111,7 +84,7 @@ describe('getDate', () => {
         const returnedA = calendarDateA.getDate()
         const calendarDateB = new CalendarDate('20250804')
         const returnedB = calendarDateB.getDate()
-        expect(returnedA).toEqual(returnedB)
+        expect(returnedA).toStrictEqual(returnedB)
     })
 })
 

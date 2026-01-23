@@ -207,12 +207,12 @@ describe('timezone handling', () => {
     it('ignores timezone offset for local time date-times', () => {
         const date = '20250102T123456'
         const parsedDate = parseDateTimeString(date)
-        expect(parsedDate).toEqual(new Date('2025-01-02T12:34:56'))
+        expect(parsedDate).toStrictEqual(new Date('2025-01-02T12:34:56'))
     })
 
     it('offsets by timezone offset for UTC date-times', () => {
         const date = '20250102T123456Z' // Ends with Z, indicating UTC
         const parsedDate = parseDateTimeString(date)
-        expect(parsedDate).toEqual(new Date('2025-01-02T12:34:56.000Z'))
+        expect(parsedDate).toStrictEqual(new Date('2025-01-02T12:34:56.000Z'))
     })
 })

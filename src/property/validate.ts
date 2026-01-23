@@ -1,185 +1,9 @@
-import { parseDateString, parseDateTimeString } from './date'
-import * as patterns from './patterns'
-import { matchesWholeString } from './patterns'
-
-export interface Property {
-    name: string
-    params: string[]
-    value: string
-}
-
-export const knownPropertyNames = [
-    'CALSCALE',
-    'METHOD',
-    'PRODID',
-    'VERSION',
-    'ATTACH',
-    'CATEGORIES',
-    'CLASS',
-    'COMMENT',
-    'DESCRIPTION',
-    'GEO',
-    'LOCATION',
-    'PERCENT-COMPLETE',
-    'PRIORITY',
-    'RESOURCES',
-    'STATUS',
-    'SUMMARY',
-    'COMPLETED',
-    'DTEND',
-    'DUE',
-    'DTSTART',
-    'DURATION',
-    'FREEBUSY',
-    'TRANSP',
-    'TZID',
-    'TZNAME',
-    'TZOFFSETFROM',
-    'TZOFFSETTO',
-    'TZURL',
-    'ATTENDEE',
-    'CONTACT',
-    'ORGANIZER',
-    'RECURRENCE-ID',
-    'RELATED-TO',
-    'URL',
-    'UID',
-    'EXDATE',
-    'RDATE',
-    'RRULE',
-    'ACTION',
-    'REPEAT',
-    'TRIGGER',
-    'CREATED',
-    'DTSTAMP',
-    'LAST-MODIFIED',
-    'SEQUENCE',
-    'REQUEST-STATUS',
-] as const
-export type KnownPropertyName = (typeof knownPropertyNames)[number]
-export type AllowedPropertyName =
-    | KnownPropertyName
-    | (`X-${string}` & {})
-    | (string & {})
-
-export const knownValueTypes = [
-    'BINARY',
-    'BOOLEAN',
-    'CAL-ADDRESS',
-    'DATE',
-    'DATE-TIME',
-    'DURATION',
-    'FLOAT',
-    'INTEGER',
-    'PERIOD',
-    'RECUR',
-    'TEXT',
-    'TIME',
-    'URI',
-    'UTC-OFFSET',
-] as const
-export type KnownValueType = (typeof knownValueTypes)[number]
-export type AllowedValueType = KnownValueType | (string & {})
-
-/**
- * The value types that each property supports as defined by the iCalendar
- * specification. The first in the list is the default type.
- */
-export const supportedValueTypes: {
-    [name in KnownPropertyName]: KnownValueType[]
-} = {
-    CALSCALE: ['TEXT'],
-    METHOD: ['TEXT'],
-    PRODID: ['TEXT'],
-    VERSION: ['TEXT'],
-    ATTACH: ['URI', 'BINARY'],
-    CATEGORIES: ['TEXT'],
-    CLASS: ['TEXT'],
-    COMMENT: ['TEXT'],
-    DESCRIPTION: ['TEXT'],
-    GEO: ['FLOAT'],
-    LOCATION: ['TEXT'],
-    'PERCENT-COMPLETE': ['INTEGER'],
-    PRIORITY: ['INTEGER'],
-    RESOURCES: ['TEXT'],
-    STATUS: ['TEXT'],
-    SUMMARY: ['TEXT'],
-    COMPLETED: ['DATE-TIME'],
-    DTEND: ['DATE-TIME', 'DATE'],
-    DUE: ['DATE-TIME', 'DATE'],
-    DTSTART: ['DATE-TIME', 'DATE'],
-    DURATION: ['DURATION'],
-    FREEBUSY: ['PERIOD'],
-    TRANSP: ['TEXT'],
-    TZID: ['TEXT'],
-    TZNAME: ['TEXT'],
-    TZOFFSETFROM: ['UTC-OFFSET'],
-    TZOFFSETTO: ['UTC-OFFSET'],
-    TZURL: ['URI'],
-    ATTENDEE: ['CAL-ADDRESS'],
-    CONTACT: ['TEXT'],
-    ORGANIZER: ['CAL-ADDRESS'],
-    'RECURRENCE-ID': ['DATE-TIME', 'DATE'],
-    'RELATED-TO': ['TEXT'],
-    URL: ['URI'],
-    UID: ['TEXT'],
-    EXDATE: ['DATE-TIME', 'DATE'],
-    RDATE: ['DATE-TIME', 'DATE', 'PERIOD'],
-    RRULE: ['RECUR'],
-    ACTION: ['TEXT'],
-    REPEAT: ['INTEGER'],
-    TRIGGER: ['DURATION', 'DATE-TIME'],
-    CREATED: ['DATE-TIME'],
-    DTSTAMP: ['DATE-TIME'],
-    'LAST-MODIFIED': ['DATE-TIME'],
-    SEQUENCE: ['INTEGER'],
-    'REQUEST-STATUS': ['TEXT'],
-}
-
-/**
- * Get the value type of a property, as defined by the VALUE parameter.
- * @param property The property to get the value type of.
- * @returns The value type if present, else `undefined`.
- * @throws If the parameter value is misformed.
- */
-export function getPropertyValueType(
-    property: Property
-): AllowedValueType | undefined
-
-/**
- * Get the value type of a property, as defined by the VALUE parameter.
- * @param property The property to get the value type of.
- * @param defaultValue The default value to return if the property VALUE parameter is not present.
- * @returns The value type if present, else `defaultValue` or `undefined`.
- * @throws If the parameter value is misformed.
- */
-export function getPropertyValueType(
-    property: Property,
-    defaultValue: AllowedValueType
-): AllowedValueType
-export function getPropertyValueType(
-    property: Property,
-    defaultValue: AllowedValueType | undefined
-): AllowedValueType | undefined
-export function getPropertyValueType(
-    property: Property,
-    defaultValue?: AllowedValueType | undefined
-): AllowedValueType | undefined {
-    const found = property.params.find(param => /^VALUE=.+$/i.test(param))
-    if (!found) return defaultValue
-
-    if (!patterns.matchesWholeString(patterns.paramValue, found)) {
-        throw new Error('Parameter value is misformed')
-    }
-
-    // Return as uppercase if known value
-    const value = found?.split('=')[1]
-    if ((knownValueTypes as readonly string[]).includes(value.toUpperCase())) {
-        return value.toUpperCase()
-    }
-
-    return value
-}
+import { parseDateString, parseDateTimeString } from '../date'
+import * as patterns from '../patterns'
+import { matchesWholeString } from '../patterns'
+import type { Property } from './Property'
+import { isKnownPropertyName, type KnownPropertyName } from './names'
+import { type AllowedValueType, supportedValueTypes } from './valueType'
 
 /** Represents an error which occurs while validating a calendar property. */
 export class PropertyValidationError extends Error {
@@ -199,7 +23,7 @@ export class MissingPropertyError extends Error {
 
 /**
  * Validate if a property value is a valid binary string.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateBinary(value: string) {
@@ -211,7 +35,7 @@ export function validateBinary(value: string) {
 
 /**
  * Validate if a property value is a valid boolean.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateBoolean(value: string) {
@@ -223,7 +47,7 @@ export function validateBoolean(value: string) {
 
 /**
  * Validate if a property value is a valid calendar user address.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateCalendarUserAddress(value: string) {
@@ -238,7 +62,7 @@ export function validateCalendarUserAddress(value: string) {
 
 /**
  * Validate if a property value is a valid date.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateDate(value: string) {
@@ -253,7 +77,7 @@ export function validateDate(value: string) {
 
 /**
  * Validate if a property value is a valid date-time.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateDateTime(value: string) {
@@ -268,7 +92,7 @@ export function validateDateTime(value: string) {
 
 /**
  * Validate if a property value is a valid duration.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateDuration(value: string) {
@@ -280,7 +104,7 @@ export function validateDuration(value: string) {
 
 /**
  * Validate if a property value is a valid float.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateFloat(value: string) {
@@ -292,7 +116,7 @@ export function validateFloat(value: string) {
 
 /**
  * Validate if a property value is a valid integer.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateInteger(value: string) {
@@ -304,7 +128,7 @@ export function validateInteger(value: string) {
 
 /**
  * Validate if a property value is a valid period.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validatePeriod(value: string) {
@@ -316,7 +140,7 @@ export function validatePeriod(value: string) {
 
 /**
  * Validate if a property value is a valid recurrence rule.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -326,7 +150,7 @@ export function validateRecurrenceRule(value: string) {
 
 /**
  * Validate if a property value is valid text.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateText(value: string) {
@@ -338,7 +162,7 @@ export function validateText(value: string) {
 
 /**
  * Validate if a property value is a valid time.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateTime(value: string) {
@@ -350,7 +174,7 @@ export function validateTime(value: string) {
 
 /**
  * Validate if a property value is a valid URI.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateUri(value: string) {
@@ -365,7 +189,7 @@ export function validateUri(value: string) {
 
 /**
  * Validate if a property value is a valid UTC offset.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @throws {PropertyValidationError} If the validation fails.
  */
 export function validateUtcOffset(value: string) {
@@ -377,7 +201,7 @@ export function validateUtcOffset(value: string) {
 
 /**
  * Validate a property value for a set value type.
- * @param value The property value to validate.
+ * @param value The unescaped property value to validate.
  * @param type The property value type which `value` will be validated against.
  * @throws {PropertyValidationError} If the validation fails.
  */
@@ -431,6 +255,18 @@ export function validateValue(value: string, type: AllowedValueType) {
     }
 }
 
+/**
+ * Validate if a value is a valid content type.
+ * @param value The value to validate.
+ * @throws {PropertyValidationError} If the validation fails.
+ */
+export function validateContentType(value: string) {
+    if (!matchesWholeString(patterns.contentType, value))
+        throw new PropertyValidationError(
+            `${value} does not match pattern for content type`
+        )
+}
+
 /* eslint-disable jsdoc/require-description-complete-sentence --
  * Does not allow line to end with ':'.
  **/
@@ -452,32 +288,15 @@ export function validateValue(value: string, type: AllowedValueType) {
 export function validateProperty(property: Property) {
     // Get supported and default types
     let supportedTypes: AllowedValueType[] | undefined = undefined
-    let defaultType: AllowedValueType | undefined = undefined
-
-    if (knownPropertyNames.includes(property.name as KnownPropertyName)) {
-        const name = property.name as KnownPropertyName
+    if (isKnownPropertyName(property.name)) {
+        const name: KnownPropertyName = property.name
         supportedTypes = supportedValueTypes[name]
-        defaultType = supportedTypes[0]
     }
 
-    // Find value type
-    const valueType = getPropertyValueType(property, defaultType)
+    // Get value type
+    const valueType = property.getValueType()
 
-    // If value type is unknown, validate as TEXT
-    if (valueType === undefined) {
-        try {
-            validateText(property.value)
-        } catch (e) {
-            throw e instanceof PropertyValidationError
-                ? new PropertyValidationError(
-                      `Unknown property ${property.name} is not valid text`
-                  )
-                : e
-        }
-        return
-    }
-
-    // Check if type is unsupported
+    // Check if value type is unsupported by the property
     if (supportedTypes !== undefined && !supportedTypes.includes(valueType)) {
         throw new PropertyValidationError(
             supportedTypes.length === 1
