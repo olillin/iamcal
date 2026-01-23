@@ -1,7 +1,7 @@
 import {
-    CalendarDate,
     CalendarDateOrTime,
     isDateObject,
+    isCalendarDateOrTime,
     ONE_DAY_MS,
     ONE_DAY_SECONDS,
     ONE_HOUR_SECONDS,
@@ -99,7 +99,7 @@ export class CalendarDuration {
     /**
      * Get the floor the duration to the nearest of a given unit.
      * @param unit The unit to floor to.
-     * @return The duration with units smaller than `unit` removed.
+     * @returns The duration with units smaller than `unit` removed.
      * @example
      * const duration = new CalendarDuration("1W2D5H30M")
      * const days = duration.floor("D") // Floor to days
@@ -107,6 +107,7 @@ export class CalendarDuration {
      */
     floor(unit: DurationUnit): CalendarDuration {
         const result = new CalendarDuration(this)
+        /* eslint-disable no-fallthrough */
         switch (unit) {
             case 'W':
                 result.days = undefined
@@ -117,6 +118,7 @@ export class CalendarDuration {
             case 'M':
                 result.seconds = undefined
         }
+        /* eslint-enable no-fallthrough */
         return result
     }
 
@@ -159,36 +161,36 @@ export class CalendarDuration {
      * @returns A {@link CalendarDuration} representing the difference between the two dates.
      * @throws {Error} If the start date and end date have different types.
      */
-    static fromDifference<T extends CalendarDateOrTime | Date>(
-        start: T,
-        end: T
+    static fromDifference(
+        start: Date | CalendarDateOrTime,
+        end: Date | CalendarDateOrTime
     ): CalendarDuration {
         if (isDateObject(start)) {
             // Date
-            if (!isDateObject(end))
-                throw new Error('Start and end dates must be of the same type')
-
-            const differenceSeconds =
-                (end.getTime() - start.getTime()) / ONE_SECOND_MS
-            return CalendarDuration.fromSeconds(differenceSeconds)
+            if (isDateObject(end)) {
+                const differenceSeconds =
+                    (end.getTime() - start.getTime()) / ONE_SECOND_MS
+                return CalendarDuration.fromSeconds(differenceSeconds)
+            }
         } else if (start.isFullDay()) {
             // CalendarDate
-            if (!(end as CalendarDateOrTime).isFullDay())
-                throw new Error('Start and end dates must be of the same type')
-            if (!(end as CalendarDateOrTime).isFullDay())
-                throw new Error('Start and end dates must be of the same type')
-
-            const startMs = (start as CalendarDate).getDate().getTime()
-            const endMs = (end as CalendarDate).getDate().getTime()
-            const differenceDays = (endMs - startMs) / ONE_DAY_MS
-            return CalendarDuration.fromDays(differenceDays)
+            if (isCalendarDateOrTime(end) && end.isFullDay()) {
+                const startMs = start.getDate().getTime()
+                const endMs = end.getDate().getTime()
+                const differenceDays = (endMs - startMs) / ONE_DAY_MS
+                return CalendarDuration.fromDays(differenceDays)
+            }
         } else {
             // CalendarDateTime
-            const startMs = (start as CalendarDate).getDate().getTime()
-            const endMs = (end as CalendarDate).getDate().getTime()
-            const differenceSeconds = (endMs - startMs) / ONE_SECOND_MS
-            return CalendarDuration.fromSeconds(differenceSeconds)
+            if (isCalendarDateOrTime(end) && !end.isFullDay()) {
+                const startMs = start.getDate().getTime()
+                const endMs = end.getDate().getTime()
+                const differenceSeconds = (endMs - startMs) / ONE_SECOND_MS
+                return CalendarDuration.fromSeconds(differenceSeconds)
+            }
         }
+
+        throw new Error('Start and end dates must be of the same type')
     }
 }
 

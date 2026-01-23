@@ -26,7 +26,7 @@ it('returns instant duration if unset with type DATE-TIME', () => {
         start
     )
 
-    const expected = CalendarDuration.INSTANT
+    const expected = new CalendarDuration('PT0S')
     expect(event.getDuration()).toStrictEqual(expected)
 })
 

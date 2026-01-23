@@ -159,7 +159,7 @@ export class CalendarEvent extends Component {
     }
 
     /**
-     * Get the non-inclusive end of the event.
+     * Get the non-inclusive end of the event, implies value from duration if unset.
      * @returns The end date of the event as a {@link CalendarDateOrTime} or `undefined` if not set.
      */
     getEnd(): CalendarDateOrTime {
@@ -217,7 +217,7 @@ export class CalendarEvent extends Component {
     }
 
     /**
-     * Get the duration of the event.
+     * Get the duration of the event, implies value from end or default if unset.
      * @returns The duration of the event as a {@link CalendarDuration}.
      */
     getDuration(): CalendarDuration {

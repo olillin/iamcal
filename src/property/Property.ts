@@ -79,7 +79,7 @@ export class Property {
 
     /**
      * Get the value of this property, converted into the appropriate class if possible.
-     * @return The value as a string or appropriate class.
+     * @returns The value as a string or appropriate class.
      */
     getValue(): string | CalendarDateOrTime | CalendarDuration {
         const valueType = this.getValueType()
@@ -221,7 +221,7 @@ export class Property {
 
     /**
      * Get the default value type for this property.
-     * @return The default value type based on the name of this property.
+     * @returns The default value type based on the name of this property.
      */
     getDefaultValueType(): KnownValueType {
         return getDefaultValueType(this.name)
