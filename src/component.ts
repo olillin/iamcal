@@ -1,4 +1,5 @@
-import { CalendarDateOrTime } from './date'
+import { CalendarDateOrTime, isCalendarDateOrTime } from './date'
+import { CalendarDuration } from './duration'
 import { Property } from './property/Property'
 import type { AllowedPropertyName, KnownPropertyName } from './property/names'
 import {
@@ -83,33 +84,24 @@ export class Component {
         return null
     }
 
-    setProperty(name: string, value: string | CalendarDateOrTime): this {
+    setProperty(name: string, value: string | CalendarDateOrTime | CalendarDuration): this {
         for (const property of this.properties) {
             if (property.name !== name) continue
-
-            if (typeof value === 'string') {
-                property.value = value
-                return this
-            }
-
-            const dateProperty = Property.fromDate(name, value)
-
-            // Update value type
-            if (dateProperty.getValueType() === 'DATE')
-                property.setValueType('DATE')
-            else property.removeValueType()
-
-            // Update value
-            property.value = dateProperty.value
-
+            property.setValue(value)
             return this
         }
         // Property is new
-        this.properties.push(
-            typeof value === 'string'
-                ? new Property(name, value)
-                : Property.fromDate(name, value)
-        )
+        let property: Property
+
+        if (typeof value === 'string') {
+            property = new Property(name, value)
+        } else if (isCalendarDateOrTime(value)) {
+            property = Property.fromDate(name, value)
+        } else {
+            property = Property.fromDuration(name, value)
+        }
+
+        this.properties.push(property)
         return this
     }
 

@@ -11,6 +11,8 @@ import {
 } from './date'
 import { validateDuration } from './property'
 
+export type DurationUnit = 'W' | 'D' | 'H' | 'M' | 'S'
+
 /**
  * Represents a DURATION value as defined by RFC5545.
  */
@@ -25,23 +27,28 @@ export class CalendarDuration {
         if (typeof duration === 'string') {
             validateDuration(duration)
 
+            const negative = duration.startsWith('-') ? -1 : 1
             const findParts = /(\d+)([WDHMS])/g
             const parts = duration.matchAll(findParts)
             for (const part of parts) {
                 const value = parseInt(part[1], 10)
-                const name = part[2]
+                const name = part[2] as DurationUnit
                 switch (name) {
                     case 'W':
-                        this.weeks = value
+                        this.weeks = value * negative
                         break
                     case 'D':
-                        this.days = value
+                        this.days = value * negative
+                        break
                     case 'H':
-                        this.hours = value
+                        this.hours = value * negative
+                        break
                     case 'M':
-                        this.minutes = value
+                        this.minutes = value * negative
+                        break
                     case 'S':
-                        this.minutes = value
+                        this.seconds = value * negative
+                        break
                 }
             }
         } else {
@@ -90,6 +97,30 @@ export class CalendarDuration {
     }
 
     /**
+     * Get the floor the duration to the nearest of a given unit.
+     * @param unit The unit to floor to.
+     * @return The duration with units smaller than `unit` removed.
+     * @example
+     * const duration = new CalendarDuration("1W2D5H30M")
+     * const days = duration.floor("D") // Floor to days
+     * console.log(days.getValue()) // "1W2D"
+     */
+    floor(unit: DurationUnit): CalendarDuration {
+        const result = new CalendarDuration(this)
+        switch (unit) {
+            case 'W':
+                result.days = undefined
+            case 'D':
+                result.hours = undefined
+            case 'H':
+                result.minutes = undefined
+            case 'M':
+                result.seconds = undefined
+        }
+        return result
+    }
+
+    /**
      * Create a duration from a number of seconds.
      *
      * Will convert the duration using {@link toDurationString}.
@@ -127,7 +158,6 @@ export class CalendarDuration {
      * @param end The end date or time.
      * @returns A {@link CalendarDuration} representing the difference between the two dates.
      * @throws {Error} If the start date and end date have different types.
-     * @throws {Error} If the start date is after the end date.
      */
     static fromDifference<T extends CalendarDateOrTime | Date>(
         start: T,
@@ -137,8 +167,6 @@ export class CalendarDuration {
             // Date
             if (!isDateObject(end))
                 throw new Error('Start and end dates must be of the same type')
-            if (start.getTime() > end.getTime())
-                throw new Error('Start date cannot be after end date')
 
             const differenceSeconds =
                 (end.getTime() - start.getTime()) / ONE_SECOND_MS
@@ -205,27 +233,27 @@ export function toDurationString(seconds: number): string {
 /**
  * Convert a number of weeks to a duration string.
  * @param weeks How many weeks the duration should represent.
- * @returns A string representing the duration in the format `P[n]W`.
- * @throws {Error} If weeks is NaN, a decimal or negative.
+ * @returns A string representing the duration in the format `P[n]W`, prefixed with `-` if negative.
+ * @throws {Error} If weeks is NaN or a decimal.
  */
 export function toWeekDurationString(weeks: number): string {
     if (isNaN(weeks)) throw new Error('Weeks must not be NaN')
-    if (weeks < 0) throw new Error('Weeks must not be negative')
     if (weeks % 1 !== 0) throw new Error('Weeks must be an integer')
 
-    return `P${weeks}W`
+    const prefix = weeks < 0 ? '-' : ''
+    return prefix + `P${Math.abs(weeks)}W`
 }
 
 /**
  * Convert a number of days to a duration string.
  * @param days How many days the duration should represent.
- * @returns A string representing the duration in the format `P[n]D`.
- * @throws {Error} If days is NaN, a decimal or negative.
+ * @returns A string representing the duration in the format `P[n]D`, prefixed with `-` if negative.
+ * @throws {Error} If days is NaN or a decimal.
  */
 export function toDayDurationString(days: number): string {
     if (isNaN(days)) throw new Error('Days must not be NaN')
-    if (days < 0) throw new Error('Days must not be negative')
     if (days % 1 !== 0) throw new Error('Days must be an integer')
 
-    return `P${days}D`
+    const prefix = days < 0 ? '-' : ''
+    return prefix + `P${Math.abs(days)}D`
 }

@@ -15,6 +15,11 @@ it('produces P0D for 0 days', () => {
     expect(duration).toBe('P0D')
 })
 
+it('can be negative', () => {
+    const duration = toDayDurationString(-2)
+    expect(duration).toBe('-P2D')
+})
+
 it('throws if days is NaN', () => {
     expect(() => {
         toDayDurationString(NaN)
@@ -25,10 +30,4 @@ it('throws if days is decimal', () => {
     expect(() => {
         toDayDurationString(1.5)
     }).toThrow('Days must be an integer')
-})
-
-it('throws if days is negative', () => {
-    expect(() => {
-        toDayDurationString(-2)
-    }).toThrow('Days must not be negative')
 })

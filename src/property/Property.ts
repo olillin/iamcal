@@ -1,4 +1,5 @@
-import { CalendarDateOrTime } from 'src/date'
+import { CalendarDateOrTime, CalendarDate, CalendarDateTime, isCalendarDateOrTime } from '../date'
+import { CalendarDuration } from '../duration'
 import {
     escapePropertyParameterValue,
     escapeTextPropertyValue,
@@ -16,7 +17,7 @@ import {
     RsvpExpectation,
 } from './parameter'
 import { validateCalendarUserAddress, validateContentType } from './validate'
-import { AllowedValueType, getDefaultValueType } from './valueType'
+import { AllowedValueType, KnownValueType, getDefaultValueType } from './valueType'
 
 /**
  * Represents a property of a calendar component as described by RFC 5545 in
@@ -55,11 +56,70 @@ export class Property {
     }
 
     static fromDate(name: string, value: CalendarDateOrTime): Property {
+        const valueType = value.isFullDay() ? 'DATE' : 'DATE-TIME'
+        let properties: { [k: string]: string | string[] } | undefined = undefined
+        if (getDefaultValueType(name) !== valueType) {
+            properties = { VALUE: valueType }
+        }
+
         return new Property(
             name,
             value.getValue(),
-            value.isFullDay() ? { VALUE: 'DATE' } : undefined
+            properties,
         )
+    }
+
+    static fromDuration(name: string, value: CalendarDuration): Property {
+        return new Property(
+            name,
+            value.getValue(),
+            { VALUE: 'CALENDARDATE' },
+        )
+    }
+
+    /**
+     * Get the value of this property, converted into the appropriate class if possible.
+     * @return The value as a string or appropriate class.
+     */
+    getValue(): string | CalendarDateOrTime | CalendarDuration {
+        const valueType = this.getValueType()
+        switch (valueType) {
+            case 'DATE':
+                return new CalendarDate(this.value)
+            case 'DATE-TIME':
+                return new CalendarDateTime(this.value)
+            case 'DURATION':
+                return new CalendarDuration(this.value)
+            default:
+                return this.value
+        }
+    }
+
+    /**
+     * Set the value of this property and change the value type if a class is used.
+     * @param value The new value as a string or class.
+     */
+    setValue(value: string | CalendarDateOrTime | CalendarDuration) {
+        const valueTypeBefore = this.getExplicitValueType()
+        if (typeof value === 'string') {
+            // Set string
+            this.value = value
+        } else if (isCalendarDateOrTime(value)) {
+            // Set date
+            this.value = value.getValue()
+            this.setValueType(value.isFullDay() ? 'DATE' : 'DATE-TIME')
+        } else {
+            // Set duration
+            this.value = value.getValue()
+            this.setValueType('DURATION')
+        }
+
+        // Remove value type if set to default, unless it was already set
+        const valueType = this.getExplicitValueType()
+        const defaultValueType = this.getDefaultValueType()
+        if (valueType === defaultValueType && valueType !== valueTypeBefore) {
+            this.removeValueType()
+        }
     }
 
     setParameter(name: string, value: string | string[]) {
@@ -148,8 +208,23 @@ export class Property {
      * @returns The value type of this property.
      */
     getValueType(): AllowedValueType {
-        const assignedValueType = this.getParameter('VALUE')?.[0].toUpperCase()
-        return assignedValueType ?? getDefaultValueType(this.name)
+        return this.getExplicitValueType() ?? this.getDefaultValueType()
+    }
+
+    /**
+     * Get the value type of this property.
+     * @returns The value type of this property, or `undefined` if unset.
+     */
+    getExplicitValueType(): AllowedValueType | undefined {
+        return this.getParameter('VALUE')?.[0].toUpperCase()
+    }
+
+    /**
+     * Get the default value type for this property.
+     * @return The default value type based on the name of this property.
+     */
+    getDefaultValueType(): KnownValueType {
+        return getDefaultValueType(this.name)
     }
 
     /**
