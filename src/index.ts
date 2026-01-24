@@ -1,6 +1,7 @@
 export * from './component'
 export * from './components'
 export * from './date'
+export * from './duration'
 export * from './io'
 export * from './parse'
 export * from './property'

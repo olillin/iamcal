@@ -85,7 +85,7 @@ export function validateDateTime(value: string) {
         parseDateTimeString(value)
     } catch {
         throw new PropertyValidationError(
-            `${value} does not match pattern for DATETIME`
+            `${value} does not match pattern for DATE-TIME`
         )
     }
 }

@@ -1,10 +1,17 @@
 import * as patterns from './patterns'
 import { Property } from './property/Property'
+import { CalendarDuration } from './duration'
 
 export const ONE_SECOND_MS = 1000
 export const ONE_MINUTE_MS = 60 * ONE_SECOND_MS
 export const ONE_HOUR_MS = 60 * ONE_MINUTE_MS
 export const ONE_DAY_MS = 24 * ONE_HOUR_MS
+export const ONE_WEEK_MS = 7 * ONE_DAY_MS
+
+export const ONE_MINUTE_SECONDS = 60
+export const ONE_HOUR_SECONDS = 60 * ONE_MINUTE_SECONDS
+export const ONE_DAY_SECONDS = 24 * ONE_HOUR_SECONDS
+export const ONE_WEEK_SECONDS = 7 * ONE_DAY_SECONDS
 
 export interface CalendarDateOrTime {
     /**
@@ -24,7 +31,14 @@ export interface CalendarDateOrTime {
      * Check if this date represents a full day, as opposed to a date-time.
      * @returns `true` if this object is a {@link CalendarDate}.
      */
-    isFullDay(): boolean
+    isFullDay(): this is CalendarDate
+
+    /**
+     * Get a new time offset by a duration.
+     * @param duration The duration to offset the time by.
+     * @returns A new {@link CalendarDateOrTime} of the same type.
+     */
+    offset(duration: CalendarDuration): CalendarDateOrTime
 }
 
 /**
@@ -36,10 +50,10 @@ export class CalendarDate implements CalendarDateOrTime {
 
     constructor(date: Date | string | CalendarDateOrTime) {
         if (typeof date === 'object') {
-            if (Object.prototype.toString.call(date) === '[object Date]') {
-                this.date = date as Date
+            if (isDateObject(date)) {
+                this.date = date
             } else {
-                this.date = (date as CalendarDateOrTime).getDate()
+                this.date = (date).getDate()
             }
         } else {
             try {
@@ -64,8 +78,29 @@ export class CalendarDate implements CalendarDateOrTime {
         return new Date(this.date)
     }
 
-    isFullDay(): boolean {
+    isFullDay(): this is CalendarDate {
         return true
+    }
+
+    /**
+     * Get a new date offset by a duration.
+     * @param duration The duration to offset the date by.
+     * @returns A new {@link CalendarDate} offset by the duration.
+     */
+    offset(duration: CalendarDuration): CalendarDate {
+        const offsetMs = duration.floor('D').inMilliseconds()
+        const ms = this.getDate().getTime()
+        const time = new Date(ms + offsetMs)
+        return new CalendarDate(time)
+    }
+
+    [Symbol.toPrimitive](hint: string): number | string | null {
+        if (hint === 'string') {
+            return this.getValue()
+        } else if (hint === 'number') {
+            return this.date.getTime()
+        }
+        return null
     }
 }
 
@@ -74,10 +109,10 @@ export class CalendarDateTime implements CalendarDateOrTime {
 
     constructor(date: Date | string | CalendarDateOrTime) {
         if (typeof date === 'object') {
-            if (Object.prototype.toString.call(date) === '[object Date]') {
-                this.date = date as Date
+            if (isDateObject(date)) {
+                this.date = date
             } else {
-                this.date = (date as CalendarDateOrTime).getDate()
+                this.date = (date).getDate()
             }
         } else {
             try {
@@ -100,9 +135,57 @@ export class CalendarDateTime implements CalendarDateOrTime {
         return new Date(this.date)
     }
 
-    isFullDay(): boolean {
+    isFullDay(): this is CalendarDate {
         return false
     }
+
+    /**
+     * Get a new time offset by a duration.
+     * @param duration The duration to offset the time by.
+     * @returns A new {@link CalendarDateTime} offset by the duration.
+     */
+    offset(duration: CalendarDuration): CalendarDateTime {
+        const offsetMs = duration.inMilliseconds()
+        const ms = this.getDate().getTime()
+        const time = new Date(ms + offsetMs)
+        return new CalendarDateTime(time)
+    }
+
+    [Symbol.toPrimitive](hint: string): number | string | null {
+        if (hint === 'string') {
+            return this.getValue()
+        } else if (hint === 'number') {
+            return this.date.getTime()
+        }
+        return null
+    }
+}
+
+/**
+ * Check if an object is a JavaScript `Date`.
+ * @param maybeDate The object to check.
+ * @returns `true` if the object is a `Date`, `false` otherwise.
+ */
+export function isDateObject(maybeDate: unknown): maybeDate is Date {
+    return Object.prototype.toString.call(maybeDate) === '[object Date]'
+}
+
+/**
+ * Check if an object is a `CalendarDateOrTime`.
+ * @param maybeDate The object to check.
+ * @returns `true` if the object is a `CalendarDateOrTime`, `false` otherwise.
+ */
+export function isCalendarDateOrTime(
+    maybeDate: unknown
+): maybeDate is CalendarDateOrTime {
+    return (
+        maybeDate != null &&
+        typeof maybeDate === "object" &&
+        typeof (maybeDate as CalendarDateOrTime).getValue === "function" &&
+        typeof (maybeDate as CalendarDateOrTime).getDate === "function" &&
+        typeof (maybeDate as CalendarDateOrTime).isFullDay === "function" &&
+        typeof (maybeDate as CalendarDateOrTime).offset === "function"
+    )
 }
 
 /**
@@ -370,10 +453,10 @@ export function convertDate(
     date: Date | CalendarDateOrTime,
     fullDay: boolean = false
 ): CalendarDateOrTime {
-    if (Object.prototype.toString.call(date) === '[object Date]') {
-        if (fullDay) return new CalendarDate(date as Date)
-        else return new CalendarDateTime(date as Date)
+    if (isDateObject(date)) {
+        if (fullDay) return new CalendarDate(date)
+        else return new CalendarDateTime(date)
     } else {
-        return date as CalendarDateOrTime
+        return date
     }
 }

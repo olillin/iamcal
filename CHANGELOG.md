@@ -8,6 +8,69 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `CalendarDuration` class ([#13](https://github.com/olillin/iamcal/issues/13))
+  - Represents properties with type `DURATION`.
+  - Can be created with a duration string such as `P1D2H3M4S` or another
+    `CalendarDuration`.
+  - `inSeconds` and `inMilliseconds` converts the duration to seconds and
+    milliseconds respectively.
+  - `getValue` serializes the duration to a duration string to be used as a
+    property value.
+  - `floor` removes smaller units than the unit specified.
+  - The factories `fromSeconds`, `fromDays` and `fromWeeks` creates a duration
+    from seconds, days and weeks respectively.
+  - The `fromDifference` factory creates a duration from the difference between
+    two times.
+- `DurationUnit` type which can be one of W, D, H, M or S which represents
+  weeks, days, hours, minutes and seconds respectively.
+- `formatDurationString` creates a duration string from weeks, days, hours, minutes and seconds. The duration will be prefixed with `-` if any unit is negative.
+- `secondsToDurationString` converts seconds to a duration string, using the largest
+  units possible.
+- `weeksToDurationString` and `daysToDurationString` creates duration strings
+  from weeks or days.
+- `CalendarEvent` has new methods:
+  - `isFullDay()` returns if the event is a full day event, i.e. if the start
+    is a full day time.
+  - `getExplicitEnd()` returns the value of the `DTEND` property, same as the
+    old `getEnd()`.
+  - `getExplicitDuration()` returns the value of the `DURATION` property, same
+    as the old `getDuration()`.
+- `getDefaultEventDuration()` function returns either one day or zero seconds
+  depending on the `isFullDay` parameter.
+- `Property` has a few new methods:
+  - `setValue()` sets the property value to the serialized `value` parameter
+    and updates the value type accordingly.
+  - `getValue()` gets the property value, deserializes date times and
+    durations based on value type.
+  - `getDefaultValueType()` gets the default value type based on the name of
+    the property.
+  - `getExplicitValueType()` get the parameter `VALUE` or `undefined` if unset.
+    As opposed to `getValueType()` which returns the default if unset.
+  - `fromDuration()` creates a new property from a `CalendarDuration`.
+- `CalendarDateOrTime.offset` returns a new calendar date or time offset by a
+  `CalendarDuration`.
+- `CalendarDate` and `CalendarDateTime` now implement `[Symbol.toPrimitive]`.
+- New type guards: `isDateObject` and `isCalendarDateOrTime`.
+- New constants: `ONE_WEEK_MS`, `ONE_MINUTE_SECONDS`, `ONE_HOUR_SECONDS`,
+  `ONE_DAY_SECONDS` and `ONE_WEEK_SECONDS`.
+
+### Changed
+
+- `CalendarEvent` changes:
+  - `setDuration()` now accepts values of type `CalendarDuration`.
+  - `getEnd()` will now imply when the event ends even if `DTEND` is unset by calculating the end using `DURATION` if present or using the default event duration.
+  - `getDuration()` will now imply the duration of the even if `DURATION` is unset by calculating the duration using `DTEND` if present or using the default event duration.
+  - Events now have a default duration if neither `DTEND` nor `DURATION` is set. ([#22](https://github.com/olillin/iamcal/issues/22))
+    - For full day events this is one day, for other events it is zero seconds.
+- `Component.setProperty` can take a `CalendarDuration` as a value and uses the new `Property.setValue` internally.
+- `CalendarDateOrTime.isFullDay()` is now a type guard which returns if the object is a `CalendarDate`.
+
+### Fixed
+
+- `Property.fromDate` no longer assumes that the default type is `DATE-TIME`.
+
 ## [v3.1.0] - 2026-01-22
 
 ### Added
@@ -141,8 +204,8 @@ and this project adheres to
 
 ### Fixed
 
-- Possible to have different types in `DTSTART` and `DTEND` (#9).
-- Some properties falsely assumed to always be present (#12).
+- Possible to have different types in `DTSTART` and `DTEND` ([#9](https://github.com/olillin/iamcal/issues/9)).
+- Some properties falsely assumed to always be present ([#12](https://github.com/olillin/iamcal/issues/12)).
 - `DTSTAMP` property being able to be set as `DATE` value type.
 - `LAST-MODIFIED` property incorrectly being set as `LAST-MOD`.
 
@@ -176,7 +239,7 @@ and this project adheres to
 
 ### Fixed
 
-- Parsing start and end times doesn't work (#4)
+- Parsing start and end times doesn't work ([#4](https://github.com/olillin/iamcal/issues/4))
 - `CalendarEvent` missing method `removeGeo`.
 
 ## [v1.0.3] - 2025-06-19

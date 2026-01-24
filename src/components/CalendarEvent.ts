@@ -6,8 +6,21 @@ import {
     parseDateProperty,
     toDateTimeString,
 } from '../date'
+import { CalendarDuration } from '../duration'
 import { KnownPropertyName } from '../property/names'
 import { PropertyValidationError } from '../property/validate'
+
+export const DEFAULT_EVENT_DURATION_DATE_TIME: CalendarDuration = new CalendarDuration('PT0S')
+export const DEFAULT_EVENT_DURATION_DATE: CalendarDuration = new CalendarDuration('P1D')
+
+/**
+ * Get the default event duration for an event without an end nor duration.
+ * @param isFullDay Whether the event is a full day event.
+ * @returns `DEFAULT_EVENT_DURATION_DATE` for full day events, `DEFAULT_EVENT_DURATION_DATE_TIME` for other events.
+ */
+export function getDefaultEventDuration(isFullDay: boolean): CalendarDuration {
+    return isFullDay ? DEFAULT_EVENT_DURATION_DATE : DEFAULT_EVENT_DURATION_DATE_TIME
+}
 
 /**
  * Represents a VEVENT component, representing an event in a calendar.
@@ -138,10 +151,36 @@ export class CalendarEvent extends Component {
     }
 
     /**
-     * Get the non-inclusive end of the event.
+     * Check if this event is a full day event.
+     * @returns `true` if the event is a full day event, `false` if not.
+     */
+    isFullDay(): boolean {
+        return this.getStart().isFullDay()
+    }
+
+    /**
+     * Get the non-inclusive end of the event, implies value from duration if unset.
      * @returns The end date of the event as a {@link CalendarDateOrTime} or `undefined` if not set.
      */
-    getEnd(): CalendarDateOrTime | undefined {
+    getEnd(): CalendarDateOrTime {
+        const explicit = this.getExplicitEnd()
+        if (explicit) return explicit
+
+        // Calculate end from start and duration
+        const start = this.getStart()
+        let duration = this.getExplicitDuration()
+        if (!duration) {
+            duration = getDefaultEventDuration(this.isFullDay())
+        }
+
+        return start.offset(duration)
+    }
+
+    /**
+     * Get the DTEND property of the event, representing the non-inclusive end of the event.
+     * @returns The end date of the event as a {@link CalendarDateOrTime} or `undefined` if not set.
+     */
+    getExplicitEnd(): CalendarDateOrTime | undefined {
         const property = this.getProperty('DTEND')
         if (!property) return
         return parseDateProperty(property)
@@ -178,25 +217,49 @@ export class CalendarEvent extends Component {
     }
 
     /**
-     * Get the duration of the event as a string formatted according to the iCalendar specification.
-     * @returns The duration of the event, or `undefined` if not set.
+     * Get the duration of the event, implies value from end or default if unset.
+     * @returns The duration of the event as a {@link CalendarDuration}.
      */
-    getDuration(): string | undefined {
-        return this.getProperty('DURATION')?.value
+    getDuration(): CalendarDuration {
+        const explicit = this.getExplicitDuration()
+        if (explicit) return explicit
+
+        // Calculate duration from start and end
+        const start = this.getStart()
+        const end = this.getExplicitEnd()
+        if (!end) {
+            return getDefaultEventDuration(this.isFullDay())
+        }
+        return CalendarDuration.fromDifference(start, end)
+    }
+
+    /**
+     * Get the DURATION property of the event.
+     * @returns The duration of the event as a {@link CalendarDuration}, or `undefined` if not set.
+     */
+    getExplicitDuration(): CalendarDuration | undefined {
+        const property = this.getProperty('DURATION')?.value
+        if (property == undefined) return undefined
     }
 
     /**
      * Set the duration of the event.
      *
-     * Will remove 'end' if present.
-     * @param value The duration of the event as a string in the format defined by RFC5545.
+     * Will remove 'DTEND' if present.
+     *
+     * If DTSTART is of type DATE the duration will be floored to the nearest day.
+     * @param value The duration of the event as a {@link CalendarDuration} duration string.
      * @returns The CalendarEvent instance for chaining.
      * @example
      * // Set duration to 1 hour and 30 minutes.
      * event.setDuration(`PT1H30M`)
      */
-    setDuration(value: string): this {
+    setDuration(value: string | CalendarDuration): this {
         this.removeEnd()
+        if (typeof value === 'string')
+            value = new CalendarDuration(value)
+        if (this.getStart().isFullDay())
+            value = value.floor('D')
         return this.setProperty('DURATION', value)
     }
 
@@ -242,3 +305,4 @@ export class CalendarEvent extends Component {
         this.removePropertiesWithName('GEO')
     }
 }
+
