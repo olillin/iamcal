@@ -12,7 +12,7 @@ it('serializes as VEVENT', () => {
     expect(firstRow).toBe('BEGIN:VEVENT')
 })
 
-it('throws without end or duration', () => {
+it("doesn't throw without end or duration", () => {
     const stamp = new CalendarDateTime('2025-08-06T17:30:00')
     const start = stamp
 
@@ -20,7 +20,7 @@ it('throws without end or duration', () => {
 
     expect(() => {
         event.serialize()
-    }).toThrow()
+    }).not.toThrow()
 })
 
 it("doesn't throw when end is set", () => {

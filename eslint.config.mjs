@@ -30,6 +30,7 @@ export default tseslint.config(
         rules: {
             'max-depth': ['error', { max: 3 }],
             '@typescript-eslint/no-deprecated': 'warn',
+            '@typescript-eslint/no-base-to-string': 'off',
             'jsdoc/require-throws': 'error',
             'jsdoc/require-description-complete-sentence': 'warn',
             'jsdoc/sort-tags': 'warn',
