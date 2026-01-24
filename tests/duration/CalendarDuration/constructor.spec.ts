@@ -38,7 +38,7 @@ it('can be negative', () => {
     expect(duration.seconds).toBe(-4)
 })
 
-it('cannot be empty', () => {
+it('cannot be created from an empty duration string', () => {
     expect(() => {
     new CalendarDuration('P')
     }).toThrow()

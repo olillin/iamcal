@@ -25,9 +25,10 @@ and this project adheres to
     two times.
 - `DurationUnit` type which can be one of W, D, H, M or S which represents
   weeks, days, hours, minutes and seconds respectively.
-- `toDurationString` converts seconds to a duration string, using the largest
+- `formatDurationString` creates a duration string from weeks, days, hours, minutes and seconds. The duration will be prefixed with `-` if any unit is negative.
+- `secondsToDurationString` converts seconds to a duration string, using the largest
   units possible.
-- `toWeekDurationString` and `toDayDurationString` creates duration strings
+- `weeksToDurationString` and `daysToDurationString` creates duration strings
   from weeks or days.
 - `CalendarEvent` has new methods:
   - `isFullDay()` returns if the event is a full day event, i.e. if the start

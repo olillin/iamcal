@@ -27,7 +27,7 @@ export class CalendarDuration {
         if (typeof duration === 'string') {
             validateDuration(duration)
 
-            const negative = duration.startsWith('-') ? -1 : 1
+            const negativeMultiplier = duration.startsWith('-') ? -1 : 1
             const findParts = /(\d+)([WDHMS])/g
             const parts = duration.matchAll(findParts)
             for (const part of parts) {
@@ -35,19 +35,19 @@ export class CalendarDuration {
                 const name = part[2] as DurationUnit
                 switch (name) {
                     case 'W':
-                        this.weeks = value * negative
+                        this.weeks = value * negativeMultiplier
                         break
                     case 'D':
-                        this.days = value * negative
+                        this.days = value * negativeMultiplier
                         break
                     case 'H':
-                        this.hours = value * negative
+                        this.hours = value * negativeMultiplier
                         break
                     case 'M':
-                        this.minutes = value * negative
+                        this.minutes = value * negativeMultiplier
                         break
                     case 'S':
-                        this.seconds = value * negative
+                        this.seconds = value * negativeMultiplier
                         break
                 }
             }
@@ -86,14 +86,17 @@ export class CalendarDuration {
     }
 
     /**
-     * Get the duration string that most accurately represents this duration.
-     * @returns A duration string in the format `P[n]W` for weeks, or `P[n]DT[n]H[n]M[n]S` for days, hours, minutes and seconds.
+     * Get the duration string that represents this duration.
+     * @returns A duration string in the format `P[n]W` for weeks, or `P[n]DT[n]H[n]M[n]S` for days, hours, minutes and seconds. Prefixed with a `-` if negative.
      */
     getValue(): string {
-        if (this.weeks !== undefined) {
-            return toDayDurationString(this.weeks)
-        }
-        return toDurationString(this.inSeconds())
+        return formatDurationString(
+            this.weeks,
+            this.days,
+            this.hours,
+            this.minutes,
+            this.seconds
+        )
     }
 
     /**
@@ -124,34 +127,32 @@ export class CalendarDuration {
 
     /**
      * Create a duration from a number of seconds.
-     *
-     * Will convert the duration using {@link toDurationString}.
      * @param seconds How many seconds the duration should represent.
      * @returns A {@link CalendarDuration} representing the specified number of seconds.
-     * @throws {Error} If seconds is NaN, a decimal or negative.
+     * @throws {Error} If seconds is NaN.
      */
     static fromSeconds(seconds: number): CalendarDuration {
-        return new CalendarDuration(toDurationString(seconds))
+        return new CalendarDuration(secondsToDurationString(seconds))
     }
 
     /**
      * Create a duration from a number of days.
      * @param days How many days the duration should represent.
      * @returns A {@link CalendarDuration} representing the specified number of days.
-     * @throws {Error} If days is NaN, a decimal or negative.
+     * @throws {Error} If days is NaN.
      */
     static fromDays(days: number): CalendarDuration {
-        return new CalendarDuration(toDayDurationString(days))
+        return new CalendarDuration(daysToDurationString(days))
     }
 
     /**
      * Create a duration from a number of weeks.
      * @param weeks How many weeks the duration should represent.
      * @returns A {@link CalendarDuration} representing the specified number of weeks.
-     * @throws {Error} If weeks is NaN, a decimal or negative.
+     * @throws {Error} If weeks is NaN.
      */
     static fromWeeks(weeks: number): CalendarDuration {
-        return new CalendarDuration(toWeekDurationString(weeks))
+        return new CalendarDuration(weeksToDurationString(weeks))
     }
 
     /**
@@ -195,67 +196,134 @@ export class CalendarDuration {
 }
 
 /**
- * Convert a number of seconds to a duration string.
- * @param seconds How many seconds the duration should represent.
- * @returns A string representing the duration in the format `P[n]DT[n]H[n]M[n]S` where values may be omitted if equal to 0.
- * @throws {Error} If seconds is NaN, a decimal or negative.
+ * Convert time units to a duration string.
+ *
+ * A duration is considered negative if any unit is less than 0.
+ * @param weeks How many weeks the duration should represent.
+ * @param days The days part of the duration.
+ * @param hours The hours part of the duration.
+ * @param minutes The minutes part of the duration.
+ * @param seconds The seconds part of the duration.
+ * @returns A string representing the duration in the format `P[n]W` or `P[n]DT[n]H[n]M[n]S` where values may be omitted if 0, prefixed with `-` if negative.
+ * @throws {Error} If weeks are combined with other values.
+ * @throws {Error} If any unit is NaN.
  */
-export function toDurationString(seconds: number): string {
-    if (isNaN(seconds)) throw new Error('Seconds must not be NaN')
-    if (seconds < 0) throw new Error('Seconds must not be negative')
-    if (seconds % 1 !== 0) throw new Error('Seconds must be an integer')
+export function formatDurationString(
+    weeks: number | undefined,
+    days: number | undefined,
+    hours: number | undefined,
+    minutes: number | undefined,
+    seconds: number | undefined,
+): string {
+    let prefix = ''
+    let durationString = prefix + 'P'
+    let hasTime = false
+    let isEmpty = true
 
-    const secondsValue = seconds % 60
-    const minutes = Math.floor(seconds / 60)
-    const minutesValue = minutes % 60
-    const hours = Math.floor(minutes / 24)
-    const hoursValue = hours % 24
-    const daysValue = Math.floor(hours / 24)
-
-    let durationString = 'P'
-    if (daysValue > 0) {
-        durationString += `${daysValue}D`
+    const appendUnit = (time: number | undefined, unit: string) => {
+        if (time === undefined) return
+        if (isNaN(time)) {
+            throw new Error(`${unit} must not be NaN`)
+        }
+        if (time < 0) prefix = '-'
+        const absTime = Math.abs(Math.floor(time))
+        durationString += absTime + unit.charAt(0)
+        isEmpty = false
     }
-    if (hoursValue > 0 || minutesValue > 0 || secondsValue > 0) {
-        durationString += 'T'
-        if (hoursValue > 0) {
-            durationString += `${hoursValue}H`
+    const appendTimeUnit = (time: number | undefined, unit: string) => {
+        if (time === undefined) return
+        if (!hasTime) {
+            durationString += 'T'
+            hasTime = true
         }
-        if (minutesValue > 0 || (hoursValue > 0 && secondsValue > 0)) {
-            durationString += `${minutesValue}M`
-        }
-        if (secondsValue > 0) {
-            durationString += `${secondsValue}S`
-        }
+        appendUnit(time, unit)
     }
 
-    return durationString
+    // Add units
+    if (weeks !== undefined) {
+        if (days !== undefined ||
+            hours !== undefined ||
+            minutes !== undefined ||
+            seconds !== undefined) {
+            throw new Error('Cannot combine weeks with other units in duration string')
+        }
+
+        appendUnit(weeks, 'Weeks')
+    }
+    appendUnit(days, 'Days')
+    appendTimeUnit(hours, 'Hours')
+    if (minutes !== undefined) {
+        appendTimeUnit(minutes, 'Minutes')
+    } else if (hours !== undefined && seconds !== undefined) {
+        appendTimeUnit(0, 'Minutes')
+    }
+    appendTimeUnit(seconds, 'Seconds')
+
+    if (isEmpty) {
+        throw new Error('Duration string must not be empty')
+    }
+
+    return prefix + durationString
 }
 
 /**
- * Convert a number of weeks to a duration string.
- * @param weeks How many weeks the duration should represent.
- * @returns A string representing the duration in the format `P[n]W`, prefixed with `-` if negative.
- * @throws {Error} If weeks is NaN or a decimal.
+ * Convert a number of seconds to a duration string.
+ * @param seconds How many seconds the duration should represent.
+ * @returns A string representing the duration in the format `PT[n]H[n]M[n]S` where values may be omitted if 0, prefixed with `-` if negative.
+ * @throws {Error} If seconds is NaN.
  */
-export function toWeekDurationString(weeks: number): string {
-    if (isNaN(weeks)) throw new Error('Weeks must not be NaN')
-    if (weeks % 1 !== 0) throw new Error('Weeks must be an integer')
+export function secondsToDurationString(seconds: number): string {
+    if (isNaN(seconds)) throw new Error('Seconds must not be NaN')
+    seconds = Math.floor(seconds)
 
-    const prefix = weeks < 0 ? '-' : ''
-    return prefix + `P${Math.abs(weeks)}W`
+    const absSeconds = Math.abs(seconds)
+    const minutes = Math.floor(absSeconds / 60)
+    const hours = Math.floor(minutes / 60)
+    let secondsValue: number | undefined = seconds % 60
+    let minutesValue: number | undefined = minutes % 60
+    let hoursValue: number | undefined = hours
+
+    if (hoursValue === 0) hoursValue = undefined
+    if (minutesValue === 0) minutesValue = undefined
+    if (secondsValue === 0 && !(minutesValue === undefined && hoursValue === undefined)) secondsValue = undefined
+
+    return formatDurationString(
+        undefined,
+        undefined,
+        hoursValue,
+        minutesValue,
+        secondsValue,
+    )
 }
 
 /**
  * Convert a number of days to a duration string.
  * @param days How many days the duration should represent.
  * @returns A string representing the duration in the format `P[n]D`, prefixed with `-` if negative.
- * @throws {Error} If days is NaN or a decimal.
+ * @throws {Error} If days is NaN.
  */
-export function toDayDurationString(days: number): string {
-    if (isNaN(days)) throw new Error('Days must not be NaN')
-    if (days % 1 !== 0) throw new Error('Days must be an integer')
+export function daysToDurationString(days: number): string {
+    return formatDurationString(
+        undefined,
+        days,
+        undefined,
+        undefined,
+        undefined
+    )
+}
 
-    const prefix = days < 0 ? '-' : ''
-    return prefix + `P${Math.abs(days)}D`
+/**
+ * Convert a number of weeks to a duration string.
+ * @param weeks How many weeks the duration should represent.
+ * @returns A string representing the duration in the format `P[n]W`, prefixed with `-` if negative.
+ * @throws {Error} If weeks is NaN.
+ */
+export function weeksToDurationString(weeks: number): string {
+    return formatDurationString(
+        weeks,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+    )
 }
