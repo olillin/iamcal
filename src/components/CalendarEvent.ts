@@ -304,5 +304,32 @@ export class CalendarEvent extends Component {
     removeGeographicLocation() {
         this.removePropertiesWithName('GEO')
     }
+
+    /**
+     * Get the color used for displaying the event.
+     * @returns The color of the event, or `undefined` if not set.
+     */
+    getColor(): string | undefined {
+        const property = this.getProperty('COLOR')
+        if (!property) return
+        return String(property.getValue())
+    }
+
+    /**
+     * Set the color used for displaying the event.
+     * @param color The color of the event.
+     * @returns The CalendarEvent instance for chaining.
+     */
+    setColor(color: string): this {
+        this.setProperty('COLOR', color)
+        return this
+    }
+
+    /**
+     * Remove the color of the event.
+     */
+    removeColor() {
+        this.removePropertiesWithName('COLOR')
+    }
 }
 
