@@ -8,6 +8,21 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [v4.1.0] - 2026-03-05
+
+### Added
+
+- `CalendarDateTime` constructor has new `absolute` parameter which sets if the
+  datetime should be parsed and serialized in UTC.
+- `CalendarDateTime` has new method `isAbsolute()` which returns if it is
+  absolute.
+- `TimeZone.fromName` can create a `TimeZone` component from a time zone name
+  such as `Europe/Berlin`.
+
+### Security
+
+- Update dependencies to address security vulnerabilities.
+
 ## [v4.0.0] - 2026-01-24
 
 ### Added
@@ -102,7 +117,7 @@ and this project adheres to
 
 ### Security
 
-- Update depndencies.
+- Update dependencies to address security vulnerabilities.
 
 ## [v3.0.3] - 2025-10-24
 
@@ -318,7 +333,8 @@ and this project adheres to
   - Has getters/setters for the following properties: `DTSTART`, `DTEND`,
     `SUMMARY`, `DESCRIPTION` and `LOCATION`.
 
-[unreleased]: https://github.com/olillin/iamcal/compare/v4.0.0...dev
+[unreleased]: https://github.com/olillin/iamcal/compare/v4.1.0...dev
+[v4.1.0]: https://github.com/olillin/iamcal/compare/v4.0.0...v4.1.0
 [v4.0.0]: https://github.com/olillin/iamcal/compare/v3.1.0...v4.0.0
 [v3.1.0]: https://github.com/olillin/iamcal/compare/v3.0.3...v3.1.0
 [v3.0.3]: https://github.com/olillin/iamcal/compare/v3.0.2...v3.0.3

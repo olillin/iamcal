@@ -48,12 +48,36 @@ describe('constructor', () => {
             new CalendarDateTime(dateTime)
         }).not.toThrow()
     })
+
+    it('parses strings ending in Z as UTC', () => {
+        const date = new CalendarDateTime('2025-08-04T12:34:56Z')
+        const expected = new Date('2025-08-04T12:34:56Z')
+        expect(date.getDate()).toStrictEqual(expected)
+    })
+
+    it('parses strings as local if absolute is false', () => {
+        const date = new CalendarDateTime('2025-08-04T12:34:56Z', false)
+        const expected = new Date('2025-08-04T10:34:56Z')
+        expect(date.getDate()).toStrictEqual(expected)
+    })
+
+    it('converts the time to UTC from a non-absolute datetime when absolute', () => {
+        const base = new CalendarDateTime('2025-08-04T12:34:56', false)
+        const date = new CalendarDateTime(base, true)
+        const expected = new Date('2025-08-04T10:34:56Z')
+        expect(date.getDate()).toStrictEqual(expected)
+    })
 })
 
 describe('getValue', () => {
-    it('returns the date in YYYYMMDDTHHmmSS format', () => {
+    it('returns the date in YYYYMMDDTHHmmSS format when not absolute', () => {
         const date = new CalendarDateTime('2025-08-04T12:34:56')
         expect(date.getValue()).toBe('20250804T123456')
+    })
+
+    it('returns the date in YYYYMMDDTHHmmSSZ format when absolute', () => {
+        const date = new CalendarDateTime('2025-08-04T12:34:56', true)
+        expect(date.getValue()).toBe('20250804T123456Z')
     })
 
     it('returns same day when time is midnight', () => {
@@ -111,3 +135,39 @@ describe('toPrimitive', () => {
         expect(Boolean(date)).toBeTruthy()
     })
 })
+
+describe('isAbsolute', () => {
+    it('is false by default', () => {
+        const date = new CalendarDateTime('20260305T220000')
+        expect(date.isAbsolute()).toBe(false)
+    })
+
+    it('is true if set', () => {
+        const date = new CalendarDateTime('20260305T220000', true)
+        expect(date.isAbsolute()).toBe(true)
+    })
+
+    it('is true if created from UTC string', () => {
+        const date = new CalendarDateTime('20260305T220000Z')
+        expect(date.isAbsolute()).toBe(true)
+    })
+
+    it('is true if created from absolute CalendarDateTime', () => {
+        const base = new CalendarDateTime('20260305T220000', true)
+        const date = new CalendarDateTime(base)
+        expect(date.isAbsolute()).toBe(true)
+    })
+
+    it('is false if created from non-absolute CalendarDateTime', () => {
+        const base = new CalendarDateTime('20260305T220000', false)
+        const date = new CalendarDateTime(base)
+        expect(date.isAbsolute()).toBe(false)
+    })
+
+    it('is false if created from CalendarDate', () => {
+        const base = new CalendarDate('20260305')
+        const date = new CalendarDateTime(base)
+        expect(date.isAbsolute()).toBe(false)
+    })
+})
+

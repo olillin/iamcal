@@ -106,15 +106,25 @@ export class CalendarDate implements CalendarDateOrTime {
 
 export class CalendarDateTime implements CalendarDateOrTime {
     private date: Date
+    private absolute: boolean
 
-    constructor(date: Date | string | CalendarDateOrTime) {
+    constructor(date: Date | string | CalendarDateOrTime, absolute?: boolean) {
         if (typeof date === 'object') {
             if (isDateObject(date)) {
                 this.date = date
+                this.absolute = false
             } else {
-                this.date = (date).getDate()
+                this.date = date.getDate()
+                this.absolute = date.isFullDay() ? false : (date as CalendarDateTime).isAbsolute()
             }
         } else {
+            this.absolute = absolute ?? date.endsWith('Z')
+            if (date.endsWith('Z') && !this.absolute) {
+                date = date.substring(0, date.length - 1)
+            } else if (!date.endsWith('Z') && this.absolute) {
+                date += 'Z'
+            }
+
             try {
                 this.date = parseDateTimeString(date)
             } catch {
@@ -125,10 +135,16 @@ export class CalendarDateTime implements CalendarDateOrTime {
         if (!this.date || isNaN(this.date.getTime())) {
             throw new Error('Invalid date provided')
         }
+
+        if (absolute !== undefined) {
+            this.absolute = absolute
+        }
     }
 
     getValue(): string {
-        return toDateTimeString(this.date)
+        return this.absolute
+            ? toDateTimeStringUTC(this.date, this.date.getTimezoneOffset())
+            : toDateTimeString(this.date)
     }
 
     getDate(): Date {
@@ -137,6 +153,14 @@ export class CalendarDateTime implements CalendarDateOrTime {
 
     isFullDay(): this is CalendarDate {
         return false
+    }
+
+    /**
+     * Check if this datetime is absolute, i.e. if it is represented in UTC.
+     * @returns If the datetime is absolute.
+     */
+    isAbsolute(): boolean {
+        return this.absolute
     }
 
     /**
