@@ -51,5 +51,8 @@
         "ts-jest": "^29.4.0",
         "typescript": "^5.7.2",
         "typescript-eslint": "^8.38.0"
+    },
+    "dependencies": {
+        "timezones-ical-library": "^2.1.2"
     }
 }

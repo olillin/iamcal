@@ -2,6 +2,8 @@ import { Component, ComponentValidationError } from '../component'
 import { CalendarDateOrTime, parseDateProperty } from '../date'
 import { KnownPropertyName } from '../property/names'
 import { TimeZoneOffset } from './TimeZoneOffset'
+import { deserializeComponentString } from '../parse'
+import { tzlib_get_ical_block } from 'timezones-ical-library'
 
 /**
  * Represents a VTIMEZONE component, containing time zone definitions.
@@ -29,6 +31,16 @@ export class TimeZone extends Component {
             throw new ComponentValidationError('Component name must be VEVENT')
         const requiredProperties: KnownPropertyName[] = ['TZID']
         this.validateAllProperties(requiredProperties)
+    }
+
+    static fromName(tzName: string): TimeZone {
+        const serializedTimezone = tzlib_get_ical_block(tzName)
+        const timezone = deserializeComponentString(
+            typeof serializedTimezone === 'string'
+                ? serializedTimezone
+                : serializedTimezone[0]
+        )
+        return new TimeZone(timezone)
     }
 
     getId(): string {
