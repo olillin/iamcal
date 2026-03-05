@@ -16,3 +16,5 @@ jobs:
             - run: npm ci -D
             - run: npm run build
             - run: npm test
+              env:
+                  TZ: Europe/Berlin
