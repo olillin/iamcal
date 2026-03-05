@@ -8,6 +8,19 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `CalendarDateTime` constructor has new `absolute` parameter which sets if the
+  datetime should be parsed and serialized in UTC.
+- `CalendarDateTime` has new method `isAbsolute()` which returns if it is
+  absolute.
+- `TimeZone.fromName` can create a `TimeZone` component from a time zone name
+  such as `Europe/Berlin`.
+
+### Security
+
+- Update dependencies to address security vulnerabilities.
+
 ## [v4.0.0] - 2026-01-24
 
 ### Added
@@ -102,7 +115,7 @@ and this project adheres to
 
 ### Security
 
-- Update depndencies.
+- Update dependencies to address security vulnerabilities.
 
 ## [v3.0.3] - 2025-10-24
 
