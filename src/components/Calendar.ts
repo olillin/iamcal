@@ -64,8 +64,8 @@ export class Calendar extends Component {
             return this.removeComponent(a)
         } else {
             const uid = a
-            for (const event of this.getEvents()) {
-                if (event.getUid() !== uid) continue
+            for (const event of this.getComponentsWithName('VEVENT')) {
+                if (event.getProperty('UID')?.getValue() !== uid) continue
                 return this.removeComponent(event)
             }
         }

@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [v4.1.1] - 2026-03-19
+
+### Fixed
+
+- `Calendar.removeEvent` did not remove events.
+
 ## [v4.1.0] - 2026-03-05
 
 ### Added
@@ -333,7 +339,8 @@ and this project adheres to
   - Has getters/setters for the following properties: `DTSTART`, `DTEND`,
     `SUMMARY`, `DESCRIPTION` and `LOCATION`.
 
-[unreleased]: https://github.com/olillin/iamcal/compare/v4.1.0...dev
+[unreleased]: https://github.com/olillin/iamcal/compare/v4.1.1...dev
+[v4.1.1]: https://github.com/olillin/iamcal/compare/v4.1.0...v4.1.1
 [v4.1.0]: https://github.com/olillin/iamcal/compare/v4.0.0...v4.1.0
 [v4.0.0]: https://github.com/olillin/iamcal/compare/v3.1.0...v4.0.0
 [v3.1.0]: https://github.com/olillin/iamcal/compare/v3.0.3...v3.1.0
