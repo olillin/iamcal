@@ -156,7 +156,7 @@ export class CalendarDateTime implements CalendarDateOrTime {
     }
 
     /**
-     * Check if this datetime is absolute, i.e. if it is represented in UTC.
+     * Check if this datetime is absolute (in UTC).
      * @returns If the datetime is absolute.
      */
     isAbsolute(): boolean {

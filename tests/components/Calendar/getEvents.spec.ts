@@ -35,5 +35,5 @@ it('returns only components that are events', () => {
     const result = calendar.getEvents()
     expect(result).toHaveLength(1)
     expect(result[0]).toBeInstanceOf(CalendarEvent)
-    expect((result[0] as CalendarEvent).getUid()).toBe('MyEvent')
+    expect((result[0]).getUid()).toBe('MyEvent')
 })
