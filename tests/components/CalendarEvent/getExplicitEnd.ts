@@ -1,8 +1,4 @@
-import {
-    CalendarDate,
-    CalendarDateTime,
-    CalendarEvent,
-} from '../../../src'
+import { CalendarDate, CalendarDateTime, CalendarEvent } from '../../../src'
 
 it('returns explicit DTEND if set', () => {
     const start = new CalendarDateTime('20260123T012345')
@@ -38,4 +34,3 @@ it('returns undefined if not set and type is DATE', () => {
 
     expect(event.getExplicitEnd()).toBeUndefined()
 })
-

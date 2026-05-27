@@ -30,14 +30,18 @@ it('can load a calendar file successfully', () => {
 
 it('can load a large calendar file with 1,000 events', () => {
     expect(() => {
-        const time = loadCompressed(__dirname + '/resources/1-000-events.ics.zip')
+        const time = loadCompressed(
+            __dirname + '/resources/1-000-events.ics.zip'
+        )
         console.log(`Took ${time.toFixed(0)} ms to load 1,000 events`)
     }).not.toThrow()
 })
 
 it('can load a large calendar file with 40,000 events', () => {
     expect(() => {
-        const time = loadCompressed(__dirname + '/resources/40-000-events.ics.zip')
+        const time = loadCompressed(
+            __dirname + '/resources/40-000-events.ics.zip'
+        )
         console.log(`Took ${time.toFixed(0)} ms to load 40,000 events`)
     }).not.toThrow()
 })

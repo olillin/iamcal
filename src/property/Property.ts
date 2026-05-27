@@ -1,4 +1,9 @@
-import { CalendarDateOrTime, CalendarDate, CalendarDateTime, isCalendarDateOrTime } from '../date'
+import {
+    CalendarDateOrTime,
+    CalendarDate,
+    CalendarDateTime,
+    isCalendarDateOrTime,
+} from '../date'
 import { CalendarDuration } from '../duration'
 import {
     escapePropertyParameterValue,
@@ -17,7 +22,11 @@ import {
     RsvpExpectation,
 } from './parameter'
 import { validateCalendarUserAddress, validateContentType } from './validate'
-import { AllowedValueType, KnownValueType, getDefaultValueType } from './valueType'
+import {
+    AllowedValueType,
+    KnownValueType,
+    getDefaultValueType,
+} from './valueType'
 
 /**
  * Represents a property of a calendar component as described by RFC 5545 in
@@ -57,24 +66,17 @@ export class Property {
 
     static fromDate(name: string, value: CalendarDateOrTime): Property {
         const valueType = value.isFullDay() ? 'DATE' : 'DATE-TIME'
-        let properties: { [k: string]: string | string[] } | undefined = undefined
+        let properties: { [k: string]: string | string[] } | undefined =
+            undefined
         if (getDefaultValueType(name) !== valueType) {
             properties = { VALUE: valueType }
         }
 
-        return new Property(
-            name,
-            value.getValue(),
-            properties,
-        )
+        return new Property(name, value.getValue(), properties)
     }
 
     static fromDuration(name: string, value: CalendarDuration): Property {
-        return new Property(
-            name,
-            value.getValue(),
-            { VALUE: 'CALENDARDATE' },
-        )
+        return new Property(name, value.getValue(), { VALUE: 'CALENDARDATE' })
     }
 
     /**

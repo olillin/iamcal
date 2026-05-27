@@ -170,4 +170,3 @@ describe('isAbsolute', () => {
         expect(date.isAbsolute()).toBe(false)
     })
 })
-

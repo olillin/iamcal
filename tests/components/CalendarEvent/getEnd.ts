@@ -67,4 +67,3 @@ it('returns calculated end if duration is set with type DATE', () => {
     const expected = new CalendarDateTime('20260125T012345')
     expect(event.getEnd()).toStrictEqual(expected)
 })
-

@@ -34,18 +34,18 @@ and this project adheres to
 ### Added
 
 - `CalendarDuration` class ([#13](https://github.com/olillin/iamcal/issues/13))
-  - Represents properties with type `DURATION`.
-  - Can be created with a duration string such as `P1D2H3M4S` or another
-    `CalendarDuration`.
-  - `inSeconds` and `inMilliseconds` converts the duration to seconds and
-    milliseconds respectively.
-  - `getValue` serializes the duration to a duration string to be used as a
-    property value.
-  - `floor` removes smaller units than the unit specified.
-  - The factories `fromSeconds`, `fromDays` and `fromWeeks` creates a duration
-    from seconds, days and weeks respectively.
-  - The `fromDifference` factory creates a duration from the difference between
-    two times.
+    - Represents properties with type `DURATION`.
+    - Can be created with a duration string such as `P1D2H3M4S` or another
+      `CalendarDuration`.
+    - `inSeconds` and `inMilliseconds` converts the duration to seconds and
+      milliseconds respectively.
+    - `getValue` serializes the duration to a duration string to be used as a
+      property value.
+    - `floor` removes smaller units than the unit specified.
+    - The factories `fromSeconds`, `fromDays` and `fromWeeks` creates a duration
+      from seconds, days and weeks respectively.
+    - The `fromDifference` factory creates a duration from the difference between
+      two times.
 - `DurationUnit` type which can be one of W, D, H, M or S which represents
   weeks, days, hours, minutes and seconds respectively.
 - `formatDurationString` creates a duration string from weeks, days, hours, minutes and seconds. The duration will be prefixed with `-` if any unit is negative.
@@ -54,24 +54,24 @@ and this project adheres to
 - `weeksToDurationString` and `daysToDurationString` creates duration strings
   from weeks or days.
 - `CalendarEvent` has new methods:
-  - `isFullDay()` returns if the event is a full day event, i.e. if the start
-    is a full day time.
-  - `getExplicitEnd()` returns the value of the `DTEND` property, same as the
-    old `getEnd()`.
-  - `getExplicitDuration()` returns the value of the `DURATION` property, same
-    as the old `getDuration()`.
+    - `isFullDay()` returns if the event is a full day event, i.e. if the start
+      is a full day time.
+    - `getExplicitEnd()` returns the value of the `DTEND` property, same as the
+      old `getEnd()`.
+    - `getExplicitDuration()` returns the value of the `DURATION` property, same
+      as the old `getDuration()`.
 - `getDefaultEventDuration()` function returns either one day or zero seconds
   depending on the `isFullDay` parameter.
 - `Property` has a few new methods:
-  - `setValue()` sets the property value to the serialized `value` parameter
-    and updates the value type accordingly.
-  - `getValue()` gets the property value, deserializes date times and
-    durations based on value type.
-  - `getDefaultValueType()` gets the default value type based on the name of
-    the property.
-  - `getExplicitValueType()` get the parameter `VALUE` or `undefined` if unset.
-    As opposed to `getValueType()` which returns the default if unset.
-  - `fromDuration()` creates a new property from a `CalendarDuration`.
+    - `setValue()` sets the property value to the serialized `value` parameter
+      and updates the value type accordingly.
+    - `getValue()` gets the property value, deserializes date times and
+      durations based on value type.
+    - `getDefaultValueType()` gets the default value type based on the name of
+      the property.
+    - `getExplicitValueType()` get the parameter `VALUE` or `undefined` if unset.
+      As opposed to `getValueType()` which returns the default if unset.
+    - `fromDuration()` creates a new property from a `CalendarDuration`.
 - `CalendarDateOrTime.offset` returns a new calendar date or time offset by a
   `CalendarDuration`.
 - `CalendarDate` and `CalendarDateTime` now implement `[Symbol.toPrimitive]`.
@@ -82,11 +82,11 @@ and this project adheres to
 ### Changed
 
 - `CalendarEvent` changes:
-  - `setDuration()` now accepts values of type `CalendarDuration`.
-  - `getEnd()` will now imply when the event ends even if `DTEND` is unset by calculating the end using `DURATION` if present or using the default event duration.
-  - `getDuration()` will now imply the duration of the even if `DURATION` is unset by calculating the duration using `DTEND` if present or using the default event duration.
-  - Events now have a default duration if neither `DTEND` nor `DURATION` is set. ([#22](https://github.com/olillin/iamcal/issues/22))
-    - For full day events this is one day, for other events it is zero seconds.
+    - `setDuration()` now accepts values of type `CalendarDuration`.
+    - `getEnd()` will now imply when the event ends even if `DTEND` is unset by calculating the end using `DURATION` if present or using the default event duration.
+    - `getDuration()` will now imply the duration of the even if `DURATION` is unset by calculating the duration using `DTEND` if present or using the default event duration.
+    - Events now have a default duration if neither `DTEND` nor `DURATION` is set. ([#22](https://github.com/olillin/iamcal/issues/22))
+        - For full day events this is one day, for other events it is zero seconds.
 - `Component.setProperty` can take a `CalendarDuration` as a value and uses the new `Property.setValue` internally.
 - `CalendarDateOrTime.isFullDay()` is now a type guard which returns if the object is a `CalendarDate`.
 
@@ -99,15 +99,15 @@ and this project adheres to
 ### Added
 
 - Synchronous io methods:
-  - `loadCalendarSync()`
-  - `dumpCalendarSync()`
+    - `loadCalendarSync()`
+    - `dumpCalendarSync()`
 
 ### Changed
 
 - All deserialization is now done synchronously meaning that methods have been
   renamed and no longer return promises.
-  - `deserializeComponent()` which takes a **readline** interface has been
-    replaced by `deserializeComponentLines()` which takes an array of strings.
+    - `deserializeComponent()` which takes a **readline** interface has been
+      replaced by `deserializeComponentLines()` which takes an array of strings.
 
 ### Deprecated
 
@@ -154,13 +154,13 @@ and this project adheres to
 - Automatic (un)quoting of property parameter values containing special characters
   (`,`, `;` and `:`) during (de)serialization.
 - `Property` class, representing a property on a calendar component.
-  - Property parameters are stored as a map of the parameter name to a list of
-    values.
-  - Has getters, setters and removers for each known parameter specified by
-    RFC 5545.
-  - Has a `fromDate` factory method which replaces the
-    `CalendarDateOrTime.toProperty` method.
-  - Can be (de)serialized independently of calendar components.
+    - Property parameters are stored as a map of the parameter name to a list of
+      values.
+    - Has getters, setters and removers for each known parameter specified by
+      RFC 5545.
+    - Has a `fromDate` factory method which replaces the
+      `CalendarDateOrTime.toProperty` method.
+    - Can be (de)serialized independently of calendar components.
 - `deserializeProperty` which can independently deserialize a property.
 
 ### Removed
@@ -195,19 +195,19 @@ and this project adheres to
 - Add component and property validation.
 - Add `get` prefix to property getters. I.e. `summary` -> `getSummary`.
 - Rename some property getters and setters for clarity:
-  - prodID -> productId
-  - calScale -> calendarScale
-  - geo -> geographicPosition
-  - lastMod -> lastModified
+    - prodID -> productId
+    - calScale -> calendarScale
+    - geo -> geographicPosition
+    - lastMod -> lastModified
 - Rename deserialization functions.
-  - deserialize -> deserializeComponent
-  - deserializeString -> deserializeComponentString
+    - deserialize -> deserializeComponent
+    - deserializeString -> deserializeComponentString
 - Add documentation for most functions and methods.
 - Add unit tests.
-  - Run on push with GitHub Actions.
+    - Run on push with GitHub Actions.
 - Add ESLint config.
-  - Require JSDoc for classes and functions.
-  - Run on push with GitHub Actions.
+    - Require JSDoc for classes and functions.
+    - Run on push with GitHub Actions.
 - Add Prettier config.
 - Add `test`, `coverage` and `lint` npm scripts.
 
@@ -221,9 +221,9 @@ and this project adheres to
 ### Removed
 
 - `fullDay` parameter from the following setters:
-  - `CalendarEvent.setStamp`
-  - `CalendarEvent.setStart`
-  - `CalendarEvent.setEnd`
+    - `CalendarEvent.setStamp`
+    - `CalendarEvent.setStart`
+    - `CalendarEvent.setEnd`
 
 ### Fixed
 
@@ -270,30 +270,30 @@ and this project adheres to
 ### Added
 
 - Specific constructors for `Calendar` and `CalendarEvent`
-  - `Calendar` can be created with a product id and an optional iCalendar
-    version number.
-  - `CalendarEvent` can be created with a UID, date time stamp and start time.
+    - `Calendar` can be created with a product id and an optional iCalendar
+      version number.
+    - `CalendarEvent` can be created with a UID, date time stamp and start time.
 - Utility methods on `Component`:
-  - Remove properties: `removePropertiesWithName(name: string)`
-  - Add subcomponent: `addComponent(component: Component)`
-  - Remove subcomponent: `removeComponent(component: Component): boolean`
-  - Get subcomponents: `getComponents(name: string): Component[]`
+    - Remove properties: `removePropertiesWithName(name: string)`
+    - Add subcomponent: `addComponent(component: Component)`
+    - Remove subcomponent: `removeComponent(component: Component): boolean`
+    - Get subcomponents: `getComponents(name: string): Component[]`
 - New property getters/setters (and removers) on `Calendar`: `PRODID`,
   `VERSION`, `CALSCALE`, `METHOD`, `X-WR-CALNAME` and `X-WR-CALDESC`.
 - Property removers for optional properties on `CalendarEvent`.
 - New property getters/setters/removers on `CalendarEvent`: `CREATED`
   and `GEO`.
 - `TimeZone` component.
-  - Represents a `VTIMEZONEOFFSET`, containing time zone information for a
-    calendar.
-  - Has getters (and setters/removers) for the following properties: `TZID`,
-    `LAST-MOD` and `TZURL`
-  - Has getters for all time zone offset subcomponents, or filtered by
-    `DAYLIGHT`/`STANDARD`.
+    - Represents a `VTIMEZONEOFFSET`, containing time zone information for a
+      calendar.
+    - Has getters (and setters/removers) for the following properties: `TZID`,
+      `LAST-MOD` and `TZURL`
+    - Has getters for all time zone offset subcomponents, or filtered by
+      `DAYLIGHT`/`STANDARD`.
 - `TimeZoneOffset` component.
-  - Represents the `DAYLIGHT` and `STANDARD` subcomponents.
-  - Has getters (and setters/removers) for the following properties: `DTSTART`,
-    `TZOFFSETFROM`, `TZOFFSETTO`, `TZNAME` and `COMMENT`.
+    - Represents the `DAYLIGHT` and `STANDARD` subcomponents.
+    - Has getters (and setters/removers) for the following properties: `DTSTART`,
+      `TZOFFSETFROM`, `TZOFFSETTO`, `TZNAME` and `COMMENT`.
 - Explicit type exports in `package.json`.
 
 ## [v1.0.2] - 2025-01-05
@@ -313,8 +313,8 @@ and this project adheres to
 
 - Uglification/minification of emitted JavaScript to decrease bundle size.
 - GitHub Actions workflows:
-  - Test package on push.
-  - Publish package on push to `main`.
+    - Test package on push.
+    - Publish package on push to `main`.
 
 ### Changes
 
@@ -329,15 +329,15 @@ and this project adheres to
 ### Added
 
 - Base calendar `Component` class.
-  - Has basic methods for getting and setting component properties.
+    - Has basic methods for getting and setting component properties.
 - Component serialization and deserialization.
 - `Calendar` component class.
-  - Represents a `VCALENDAR` component.
-  - Has `events()` getter  for getting all event subcomponents.
+    - Represents a `VCALENDAR` component.
+    - Has `events()` getter for getting all event subcomponents.
 - `CalendarEvent` component class.
-  - Represents a `VEVENT` component.
-  - Has getters/setters for the following properties: `DTSTART`, `DTEND`,
-    `SUMMARY`, `DESCRIPTION` and `LOCATION`.
+    - Represents a `VEVENT` component.
+    - Has getters/setters for the following properties: `DTSTART`, `DTEND`,
+      `SUMMARY`, `DESCRIPTION` and `LOCATION`.
 
 [unreleased]: https://github.com/olillin/iamcal/compare/v4.1.1...dev
 [v4.1.1]: https://github.com/olillin/iamcal/compare/v4.1.0...v4.1.1

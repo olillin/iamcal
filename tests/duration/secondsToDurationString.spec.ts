@@ -1,4 +1,10 @@
-import { secondsToDurationString, ONE_WEEK_SECONDS, ONE_DAY_SECONDS, ONE_MINUTE_SECONDS, ONE_HOUR_SECONDS } from '../../src'
+import {
+    secondsToDurationString,
+    ONE_WEEK_SECONDS,
+    ONE_DAY_SECONDS,
+    ONE_MINUTE_SECONDS,
+    ONE_HOUR_SECONDS,
+} from '../../src'
 
 it('produces PT59S for 59 seconds', () => {
     const duration = secondsToDurationString(59)
@@ -31,7 +37,9 @@ it('produces PT0S for 0 seconds', () => {
 })
 
 it('produces PT1H1M1S for 3661 seconds', () => {
-    const duration = secondsToDurationString(ONE_HOUR_SECONDS + ONE_MINUTE_SECONDS + 1)
+    const duration = secondsToDurationString(
+        ONE_HOUR_SECONDS + ONE_MINUTE_SECONDS + 1
+    )
     expect(duration).toBe('PT1H1M1S')
 })
 
@@ -52,7 +60,7 @@ it('can be negative time', () => {
 
 it('floors seconds if decimal', () => {
     const duration = secondsToDurationString(1.6)
-    expect(duration).toBe("PT1S")
+    expect(duration).toBe('PT1S')
 })
 
 it('throws if NaN', () => {
@@ -60,4 +68,3 @@ it('throws if NaN', () => {
         secondsToDurationString(NaN)
     }).toThrow('Seconds must not be NaN')
 })
-

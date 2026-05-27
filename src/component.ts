@@ -84,7 +84,10 @@ export class Component {
         return null
     }
 
-    setProperty(name: string, value: string | CalendarDateOrTime | CalendarDuration): this {
+    setProperty(
+        name: string,
+        value: string | CalendarDateOrTime | CalendarDuration
+    ): this {
         for (const property of this.properties) {
             if (property.name !== name) continue
             property.setValue(value)

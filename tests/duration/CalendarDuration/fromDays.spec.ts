@@ -25,4 +25,3 @@ it("doesn't set seconds", () => {
     const duration = CalendarDuration.fromDays(2)
     expect(duration.seconds).toBeUndefined()
 })
-

@@ -1,4 +1,4 @@
-import { CalendarDuration,  } from '../../../src'
+import { CalendarDuration } from '../../../src'
 
 it('correctly serializes a complete duration', () => {
     const durationString = 'P1DT2H3M4S'
@@ -97,4 +97,3 @@ it('does not convert days to weeks', () => {
     const expected = durationString
     expect(value).toBe(expected)
 })
-

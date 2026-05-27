@@ -10,8 +10,10 @@ import { CalendarDuration } from '../duration'
 import { KnownPropertyName } from '../property/names'
 import { PropertyValidationError } from '../property/validate'
 
-export const DEFAULT_EVENT_DURATION_DATE_TIME: CalendarDuration = new CalendarDuration('PT0S')
-export const DEFAULT_EVENT_DURATION_DATE: CalendarDuration = new CalendarDuration('P1D')
+export const DEFAULT_EVENT_DURATION_DATE_TIME: CalendarDuration =
+    new CalendarDuration('PT0S')
+export const DEFAULT_EVENT_DURATION_DATE: CalendarDuration =
+    new CalendarDuration('P1D')
 
 /**
  * Get the default event duration for an event without an end nor duration.
@@ -19,7 +21,9 @@ export const DEFAULT_EVENT_DURATION_DATE: CalendarDuration = new CalendarDuratio
  * @returns `DEFAULT_EVENT_DURATION_DATE` for full day events, `DEFAULT_EVENT_DURATION_DATE_TIME` for other events.
  */
 export function getDefaultEventDuration(isFullDay: boolean): CalendarDuration {
-    return isFullDay ? DEFAULT_EVENT_DURATION_DATE : DEFAULT_EVENT_DURATION_DATE_TIME
+    return isFullDay
+        ? DEFAULT_EVENT_DURATION_DATE
+        : DEFAULT_EVENT_DURATION_DATE_TIME
 }
 
 /**
@@ -256,10 +260,8 @@ export class CalendarEvent extends Component {
      */
     setDuration(value: string | CalendarDuration): this {
         this.removeEnd()
-        if (typeof value === 'string')
-            value = new CalendarDuration(value)
-        if (this.getStart().isFullDay())
-            value = value.floor('D')
+        if (typeof value === 'string') value = new CalendarDuration(value)
+        if (this.getStart().isFullDay()) value = value.floor('D')
         return this.setProperty('DURATION', value)
     }
 
@@ -305,4 +307,3 @@ export class CalendarEvent extends Component {
         this.removePropertiesWithName('GEO')
     }
 }
-
