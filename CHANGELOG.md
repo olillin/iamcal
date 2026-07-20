@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [v4.1.2] - 2026-07-20
+
+### Security
+
+- Updated dependencies with vulnerable versions
+
 ## [v4.1.1] - 2026-03-19
 
 ### Fixed
@@ -339,7 +345,8 @@ and this project adheres to
     - Has getters/setters for the following properties: `DTSTART`, `DTEND`,
       `SUMMARY`, `DESCRIPTION` and `LOCATION`.
 
-[unreleased]: https://github.com/olillin/iamcal/compare/v4.1.1...dev
+[unreleased]: https://github.com/olillin/iamcal/compare/v4.1.2...dev
+[v4.1.2]: https://github.com/olillin/iamcal/compare/v4.1.1...v4.1.2
 [v4.1.1]: https://github.com/olillin/iamcal/compare/v4.1.0...v4.1.1
 [v4.1.0]: https://github.com/olillin/iamcal/compare/v4.0.0...v4.1.0
 [v4.0.0]: https://github.com/olillin/iamcal/compare/v3.1.0...v4.0.0
