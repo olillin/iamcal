@@ -24,4 +24,3 @@ it("doesn't set seconds", () => {
     const duration = CalendarDuration.fromWeeks(2)
     expect(duration.seconds).toBeUndefined()
 })
-

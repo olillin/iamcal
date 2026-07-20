@@ -13,19 +13,37 @@ it('correctly formats a duration with hours and minutes', () => {
 })
 
 it('correctly formats just days', () => {
-    const value = formatDurationString(undefined, 2, undefined, undefined, undefined)
+    const value = formatDurationString(
+        undefined,
+        2,
+        undefined,
+        undefined,
+        undefined
+    )
     const expected = 'P2D'
     expect(value).toBe(expected)
 })
 
 it('correctly serializes just weeks', () => {
-    const value = formatDurationString(2, undefined, undefined, undefined, undefined)
+    const value = formatDurationString(
+        2,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+    )
     const expected = 'P2W'
     expect(value).toBe(expected)
 })
 
 it('prefixes with - if weeks is negative', () => {
-    const value = formatDurationString(-2, undefined, undefined, undefined, undefined)
+    const value = formatDurationString(
+        -2,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+    )
     const expected = '-P2W'
     expect(value).toBe(expected)
 })
@@ -67,7 +85,13 @@ it('does not remove units when 0', () => {
 })
 
 it('does not remove weeks when 0', () => {
-    const value = formatDurationString(0, undefined, undefined, undefined, undefined)
+    const value = formatDurationString(
+        0,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+    )
     const expected = 'P0W'
     expect(value).toBe(expected)
 })
@@ -79,38 +103,49 @@ it('does not convert units', () => {
 })
 
 it('does not convert days to weeks', () => {
-    const value = formatDurationString(undefined, 7, undefined, undefined, undefined)
+    const value = formatDurationString(
+        undefined,
+        7,
+        undefined,
+        undefined,
+        undefined
+    )
     const expected = 'P7D'
     expect(value).toBe(expected)
 })
 
 it('throws if all units are undefined', () => {
     expect(() => {
-        formatDurationString(undefined, undefined, undefined, undefined, undefined)
-    }).toThrow("Duration string must not be empty")
+        formatDurationString(
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined
+        )
+    }).toThrow('Duration string must not be empty')
 })
 
 it('throws if combining weeks with days', () => {
     expect(() => {
         formatDurationString(1, 1, undefined, undefined, undefined)
-    }).toThrow("Cannot combine weeks with other units in duration string")
+    }).toThrow('Cannot combine weeks with other units in duration string')
 })
 
 it('throws if combining weeks with hours', () => {
     expect(() => {
         formatDurationString(1, undefined, 1, undefined, undefined)
-    }).toThrow("Cannot combine weeks with other units in duration string")
+    }).toThrow('Cannot combine weeks with other units in duration string')
 })
 
 it('throws if combining weeks with minutes', () => {
     expect(() => {
         formatDurationString(1, undefined, undefined, 1, undefined)
-    }).toThrow("Cannot combine weeks with other units in duration string")
+    }).toThrow('Cannot combine weeks with other units in duration string')
 })
 
 it('throws if combining weeks with seconds', () => {
     expect(() => {
         formatDurationString(1, undefined, undefined, undefined, 1)
-    }).toThrow("Cannot combine weeks with other units in duration string")
+    }).toThrow('Cannot combine weeks with other units in duration string')
 })
-

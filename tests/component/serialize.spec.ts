@@ -32,10 +32,13 @@ END:X-COMPONENT`
 
 it('can serialize multiline properties', () => {
     const component = new Component('X-COMPONENT')
-    component.setProperty('DESCRIPTION', 'Aktivitet: Tentamen\n' +
-        'Kurs: Principer för parallell programmering (DIT392GU, TDA384)\n' +
-        'Hitta din tentamen: https://cloud.timeedit.net/chalmers/web/public/ri1Q4.html\n' +
-        'Registrering: 2026-06-06 - 2026-07-02')
+    component.setProperty(
+        'DESCRIPTION',
+        'Aktivitet: Tentamen\n' +
+            'Kurs: Principer för parallell programmering (DIT392GU, TDA384)\n' +
+            'Hitta din tentamen: https://cloud.timeedit.net/chalmers/web/public/ri1Q4.html\n' +
+            'Registrering: 2026-06-06 - 2026-07-02'
+    )
 
     const serialized = component.serialize()
 

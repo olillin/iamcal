@@ -213,7 +213,7 @@ export function formatDurationString(
     days: number | undefined,
     hours: number | undefined,
     minutes: number | undefined,
-    seconds: number | undefined,
+    seconds: number | undefined
 ): string {
     let prefix = ''
     let durationString = prefix + 'P'
@@ -241,11 +241,15 @@ export function formatDurationString(
 
     // Add units
     if (weeks !== undefined) {
-        if (days !== undefined ||
+        if (
+            days !== undefined ||
             hours !== undefined ||
             minutes !== undefined ||
-            seconds !== undefined) {
-            throw new Error('Cannot combine weeks with other units in duration string')
+            seconds !== undefined
+        ) {
+            throw new Error(
+                'Cannot combine weeks with other units in duration string'
+            )
         }
 
         appendUnit(weeks, 'Weeks')
@@ -285,14 +289,18 @@ export function secondsToDurationString(seconds: number): string {
 
     if (hoursValue === 0) hoursValue = undefined
     if (minutesValue === 0) minutesValue = undefined
-    if (secondsValue === 0 && !(minutesValue === undefined && hoursValue === undefined)) secondsValue = undefined
+    if (
+        secondsValue === 0 &&
+        !(minutesValue === undefined && hoursValue === undefined)
+    )
+        secondsValue = undefined
 
     return formatDurationString(
         undefined,
         undefined,
         hoursValue,
         minutesValue,
-        secondsValue,
+        secondsValue
     )
 }
 

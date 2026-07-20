@@ -1,4 +1,4 @@
-import { CalendarDuration,  } from '../../../src'
+import { CalendarDuration } from '../../../src'
 
 it('can be created from a complete duration string', () => {
     const duration = new CalendarDuration('P1DT2H3M4S')
@@ -40,7 +40,7 @@ it('can be negative', () => {
 
 it('cannot be created from an empty duration string', () => {
     expect(() => {
-    new CalendarDuration('P')
+        new CalendarDuration('P')
     }).toThrow()
 })
 

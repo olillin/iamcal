@@ -53,7 +53,7 @@ export class CalendarDate implements CalendarDateOrTime {
             if (isDateObject(date)) {
                 this.date = date
             } else {
-                this.date = (date).getDate()
+                this.date = date.getDate()
             }
         } else {
             try {
@@ -115,7 +115,9 @@ export class CalendarDateTime implements CalendarDateOrTime {
                 this.absolute = false
             } else {
                 this.date = date.getDate()
-                this.absolute = date.isFullDay() ? false : (date as CalendarDateTime).isAbsolute()
+                this.absolute = date.isFullDay()
+                    ? false
+                    : (date as CalendarDateTime).isAbsolute()
             }
         } else {
             this.absolute = absolute ?? date.endsWith('Z')
@@ -204,11 +206,11 @@ export function isCalendarDateOrTime(
 ): maybeDate is CalendarDateOrTime {
     return (
         maybeDate != null &&
-        typeof maybeDate === "object" &&
-        typeof (maybeDate as CalendarDateOrTime).getValue === "function" &&
-        typeof (maybeDate as CalendarDateOrTime).getDate === "function" &&
-        typeof (maybeDate as CalendarDateOrTime).isFullDay === "function" &&
-        typeof (maybeDate as CalendarDateOrTime).offset === "function"
+        typeof maybeDate === 'object' &&
+        typeof (maybeDate as CalendarDateOrTime).getValue === 'function' &&
+        typeof (maybeDate as CalendarDateOrTime).getDate === 'function' &&
+        typeof (maybeDate as CalendarDateOrTime).isFullDay === 'function' &&
+        typeof (maybeDate as CalendarDateOrTime).offset === 'function'
     )
 }
 
